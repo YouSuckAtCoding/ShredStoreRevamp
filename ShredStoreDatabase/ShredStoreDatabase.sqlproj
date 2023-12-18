@@ -1,0 +1,96 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Name>ShredStoreDatabase</Name>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>4.1</ProjectVersion>
+    <ProjectGuid>{4c4bd9f6-5818-40f4-9d71-cb0eb5ed4eaf}</ProjectGuid>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql160DatabaseSchemaProvider</DSP>
+    <OutputType>Database</OutputType>
+    <RootPath>
+    </RootPath>
+    <RootNamespace>ShredStoreDatabase</RootNamespace>
+    <AssemblyName>ShredStoreDatabase</AssemblyName>
+    <ModelCollation>1033, CI</ModelCollation>
+    <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
+    <DeployToDatabase>True</DeployToDatabase>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetLanguage>CS</TargetLanguage>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <SqlServerVerification>False</SqlServerVerification>
+    <IncludeCompositeObjects>True</IncludeCompositeObjects>
+    <TargetDatabaseSet>True</TargetDatabaseSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+    <!-- Default to the v11.0 targets path if the targets file for the current VS version is not found -->
+    <SSDTExists Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets')">True</SSDTExists>
+    <VisualStudioVersion Condition="'$(SSDTExists)' == ''">11.0</VisualStudioVersion>
+  </PropertyGroup>
+  <Import Condition="'$(SQLDBExtensionsRefPath)' != ''" Project="$(SQLDBExtensionsRefPath)\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <ItemGroup>
+    <Folder Include="Properties" />
+    <Folder Include="dbo" />
+    <Folder Include="dbo\Tables" />
+    <Folder Include="dbo\StoredProcedures" />
+    <Folder Include="dbo\StoredProcedures\Usuario" />
+    <Folder Include="dbo\StoredProcedures\Pedido" />
+    <Folder Include="dbo\StoredProcedures\Carrinho" />
+    <Folder Include="dbo\StoredProcedures\Produto" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="dbo\Tables\Usuario.sql" />
+    <Build Include="dbo\Tables\Carrinho.sql" />
+    <Build Include="dbo\Tables\Pedido.sql" />
+    <Build Include="dbo\Tables\Produto.sql" />
+    <Build Include="dbo\StoredProcedures\Usuario\spUsuario_Insert.sql" />
+    <Build Include="dbo\StoredProcedures\Pedido\spPedido_Insert.sql" />
+    <Build Include="dbo\StoredProcedures\Produto\spProduto_Insert.sql" />
+    <Build Include="dbo\StoredProcedures\Carrinho\spCarrinho_Insert.sql" />
+    <Build Include="dbo\StoredProcedures\Usuario\spUsuario_GetAll.sql" />
+    <Build Include="dbo\StoredProcedures\Pedido\spPedido_GetAll.sql" />
+    <Build Include="dbo\StoredProcedures\Produto\spProduto_GetAll.sql" />
+    <Build Include="dbo\StoredProcedures\Carrinho\spCarrinho_GetById.sql" />
+    <Build Include="dbo\StoredProcedures\Usuario\spUsuario_Update.sql" />
+    <Build Include="dbo\StoredProcedures\Usuario\spUsuario_Delete.sql" />
+    <Build Include="dbo\StoredProcedures\Usuario\spUsuario_GetById.sql" />
+    <Build Include="dbo\StoredProcedures\Pedido\spPedido_GetById.sql" />
+    <Build Include="dbo\StoredProcedures\Pedido\spPedido_Update.sql" />
+    <Build Include="dbo\StoredProcedures\Pedido\spPedido_Delete.sql" />
+    <Build Include="dbo\StoredProcedures\Produto\spProduto_GetById.sql" />
+    <Build Include="dbo\StoredProcedures\Produto\spProduto_Delete.sql" />
+    <Build Include="dbo\StoredProcedures\Produto\spProduto_Update.sql" />
+    <Build Include="dbo\StoredProcedures\Carrinho\spCarrinho_Update.sql" />
+    <Build Include="dbo\StoredProcedures\Carrinho\spCarrinho_Delete.sql" />
+    <Build Include="dbo\StoredProcedures\Usuario\spUsuario_Login.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ShredStoreDatabase.publish.xml" />
+  </ItemGroup>
+</Project>
