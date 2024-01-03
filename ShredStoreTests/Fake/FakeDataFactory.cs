@@ -16,7 +16,7 @@ namespace ShredStoreTests.Fake
             var userFaker = new Faker<Usuario>("pt_BR")
             .RuleFor(x => x.Nome, f => f.Name.FullName(Bogus.DataSets.Name.Gender.Male))
             .RuleFor(x => x.Email, f => f.Internet.Email(f.Person.FirstName).ToLower())
-            .RuleFor(x => x.Cpf, f => f.Person.Cpf())
+            .RuleFor(x => x.Cpf, f => f.Person.Cpf(false))
             .RuleFor(x => x.Endereco, f => f.Address.StreetAddress())
             .RuleFor(x => x.Idade, f => f.Random.Number(25))
             .RuleFor(x => x.Password, f => f.Random.AlphaNumeric(25));
