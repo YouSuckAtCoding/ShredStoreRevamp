@@ -35,10 +35,22 @@ namespace ShredStoreTests.DataAdapterFiles
                     Salt UNIQUEIDENTIFIER NOT NULL
                 );"
                 );
+            await connection.ExecuteAsync(
+                @"CREATE TABLE [dbo].[Produto]
+                (
+                	[Id] INT NOT NULL PRIMARY KEY IDENTITY,
+                	[Nome] VARCHAR(25) NOT NULL,
+                	[Descricao] VARCHAR(300) NOT NULL,
+                	[Valor] MONEY NOT NULL,
+                	[Tipo] VARCHAR(30) NOT NULL,
+                	[Categoria] VARCHAR(30) NOT NULL
+                )
+                ");
                 await CreateUsuarioStoredProcedures(connection);
+                await CreateProdutoStoredProcedures(connection);
 
-            
-            
+
+
         }
 
         private async Task CreateUsuarioStoredProcedures(IDbConnection connection)
@@ -135,6 +147,79 @@ namespace ShredStoreTests.DataAdapterFiles
             		Set @ResponseMessage='Invalid Login Attempt'
             
                 End");
+        }
+
+        private async Task CreateProdutoStoredProcedures(IDbConnection connection)
+        {
+            await connection.ExecuteAsync(
+                @"CREATE PROCEDURE [dbo].[spProduto_Insert]
+            	@Nome VARCHAR(25),
+            	@Descricao varchar(300),
+            	@Valor MONEY,
+            	@Tipo VARCHAR(30),
+            	@Categoria VARCHAR(30)
+            	
+                AS
+                Begin
+            	
+            	INSERT INTO dbo.Produto (Nome, Descricao, Valor, Tipo, Categoria)
+            	VALUES (@Nome, @Descricao, @Valor, @Tipo, @Categoria)
+            
+                End
+                "
+                );
+
+            await connection.ExecuteAsync(
+                @"CREATE PROCEDURE [dbo].[spProduto_GetById]
+                @Id int
+                AS
+                Begin
+                
+                	Select Id, Nome, Descricao, Valor, Tipo, Categoria from dbo.Produto
+                	Where Id = @Id
+                
+                End");
+
+            await connection.ExecuteAsync(
+                @"CREATE PROCEDURE [dbo].[spProduto_GetAll]
+	
+                AS
+                Begin
+                
+                	Select Id, Nome, Descricao, Valor, Tipo, Categoria from dbo.Produto
+                
+                End"
+                );
+            await connection.ExecuteAsync(
+                @"CREATE PROCEDURE [dbo].[spProduto_Update]
+            	@Id int,
+            	@Nome VARCHAR(25),
+            	@Descricao varchar(300),
+            	@Valor MONEY,
+            	@Tipo VARCHAR(30),
+            	@Categoria VARCHAR(30)
+                AS
+                Begin
+            
+            	Update dbo.Produto
+            	Set Nome = @Nome,
+            	Descricao = @Descricao,
+            	Valor = @Valor,
+            	Tipo = @Tipo,
+            	Categoria = @Categoria
+            
+                End
+                ");
+            await connection.ExecuteAsync(
+                @"CREATE PROCEDURE [dbo].[spProduto_Delete]
+                @Id int
+                AS
+                Begin
+                
+                	Delete from dbo.Produto where Id = @Id
+                
+                End
+                ");
         }
     }
 }

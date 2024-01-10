@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE [dbo].[sp_Produto_Insert]
+﻿CREATE PROCEDURE [dbo].[spProduto_Insert]
 	@Nome VARCHAR(25),
 	@Descricao varchar(300),
 	@Valor MONEY,

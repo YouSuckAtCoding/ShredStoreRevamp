@@ -27,10 +27,11 @@ namespace ShredStoreTests.Fake
         public static Produto FakeProdutos()
         {
             var produtoFaker = new Faker<Produto>("pt_BR")
-            .RuleFor(x => x.Nome, f => f.Random.String())
+            .RuleFor(x => x.Nome, f => f.Name.FirstName())
             .RuleFor(x => x.Valor, f => f.Random.Number(100, 2000))
-            .RuleFor(x => x.Tipo, f => f.Random.String())
-            .RuleFor(x => x.Categoria, f => f.Random.String());
+            .RuleFor(x => x.Tipo, f => f.Random.Word())
+            .RuleFor(x => x.Categoria, f => f.Random.Word())
+            .RuleFor(x => x.Descricao, f => f.Random.Words());
 
             return produtoFaker;
         }
