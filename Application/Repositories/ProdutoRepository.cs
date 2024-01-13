@@ -16,19 +16,19 @@ namespace Application.Repositories
         {
             sqlDataAccess = _sqlDataAccess;
         }
-        public Task InsertProduto(Produto produto) =>
-            sqlDataAccess.SaveData("dbo.spProduto_Insert", new { produto.Nome, produto.Descricao, produto.Valor, produto.Tipo, produto.Categoria });
+        public Task InsertProduto(Product produto) =>
+            sqlDataAccess.SaveData("dbo.spProduto_Insert", new { produto.Name, produto.Description, produto.Price, produto.Type, produto.Category });
 
-        public Task<IEnumerable<Produto>> GetProdutos() => sqlDataAccess.LoadData<Produto, dynamic>("dbo.spProduto_GetAll", new { });
+        public Task<IEnumerable<Product>> GetProdutos() => sqlDataAccess.LoadData<Product, dynamic>("dbo.spProduto_GetAll", new { });
 
-        public async Task<Produto?> GetProduto(int id)
+        public async Task<Product?> GetProduto(int id)
         {
-            var result = await sqlDataAccess.LoadData<Produto, dynamic>("dbo.spProduto_GetById", new { Id = id });
+            var result = await sqlDataAccess.LoadData<Product, dynamic>("dbo.spProduto_GetById", new { Id = id });
 
             return result.FirstOrDefault();
 
         }
-        public Task UpdateProduto(Produto produto) => sqlDataAccess.SaveData("dbo.spProduto_Update", new { produto.Id, produto.Nome, produto.Descricao, produto.Valor, produto.Tipo, produto.Categoria });
+        public Task UpdateProduto(Product produto) => sqlDataAccess.SaveData("dbo.spProduto_Update", new { produto.Id, produto.Name, produto.Description, produto.Price, produto.Type, produto.Category });
 
         public Task DeleteProduto(int id) => sqlDataAccess.SaveData("dbo.spProduto_Delete", new { Id = id });
     }

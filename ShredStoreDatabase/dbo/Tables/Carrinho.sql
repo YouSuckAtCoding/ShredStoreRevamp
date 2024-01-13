@@ -1,8 +1,0 @@
-﻿CREATE TABLE [dbo].[Carrinho]
-(
-	[UsuarioId] INT NOT NULL FOREIGN KEY REFERENCES Usuario(Id) PRIMARY KEY,
-	[ProdutoId] INT NOT NULL FOREIGN KEY REFERENCES Produto(Id),
-	[ValorTotal] MONEY NOT NULL,
-	[DataCriacao] DATE NOT NULL
-
-)

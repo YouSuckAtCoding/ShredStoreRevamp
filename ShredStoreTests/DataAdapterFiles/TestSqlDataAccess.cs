@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Newtonsoft.Json.Linq;
 using System.Data;
 
 namespace ShredStoreTests.DataAdapterFiles
@@ -22,11 +23,11 @@ namespace ShredStoreTests.DataAdapterFiles
         /// <param name="connectionId">Id da connection string</param>
         /// <returns>Dados</returns>
         public async Task<IEnumerable<T>> LoadData<T, U>(string StoredProcedure,
-            U parameters)
+            U parameters, CancellationToken token = default)
         {
-            using IDbConnection connection = await _dbConnectionFactory.CreateConnectionAsync();
+            using IDbConnection connection = await _dbConnectionFactory.CreateConnectionAsync(token);
 
-            return await connection.QueryAsync<T>(StoredProcedure, parameters, commandType: CommandType.StoredProcedure);
+            return await connection.QueryAsync<T>(new CommandDefinition(StoredProcedure, parameters, cancellationToken: token, commandType: CommandType.StoredProcedure));
 
         }
         /// <summary>
@@ -38,11 +39,11 @@ namespace ShredStoreTests.DataAdapterFiles
         /// <param name="connectionId">Id da connection string</param>
         /// <returns>Nada.</returns>
         public async Task SaveData<T>(string StoredProcedure,
-            T parameters)
+            T parameters, CancellationToken token = default)
         {
-            using IDbConnection connection = await _dbConnectionFactory.CreateConnectionAsync();
+            using IDbConnection connection = await _dbConnectionFactory.CreateConnectionAsync(token);
 
-            await connection.ExecuteAsync(StoredProcedure, parameters, commandType: CommandType.StoredProcedure);
+            await connection.ExecuteAsync(new CommandDefinition(StoredProcedure, parameters, cancellationToken: token, commandType:CommandType.StoredProcedure));
 
         }
     }

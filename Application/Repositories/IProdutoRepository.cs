@@ -5,9 +5,9 @@ namespace Application.Repositories
     public interface IProdutoRepository
     {
         Task DeleteProduto(int id);
-        Task<Produto?> GetProduto(int id);
-        Task<IEnumerable<Produto>> GetProdutos();
-        Task InsertProduto(Produto produto);
-        Task UpdateProduto(Produto produto);
+        Task<Product?> GetProduto(int id);
+        Task<IEnumerable<Product>> GetProdutos();
+        Task InsertProduto(Product produto);
+        Task UpdateProduto(Product produto);
     }
 }

@@ -2,15 +2,15 @@
 using Dapper;
 using FluentAssertions;
 using ShredStoreTests.DataAdapterFiles;
-using ShredStoreTests.DataAdapterFiles.UsuarioTestFiles;
+using ShredStoreTests.DataAdapterFiles.UserTestFiles;
 
 namespace ShredStoreTests
 {
-    public class UsuarioDatabaseTests : IClassFixture<SqlAccessFixture>
+    public class UserDatabaseTests : IClassFixture<SqlAccessFixture>
     {
 
         private readonly ISqlAccessConnectionFactory _dbConnectionFactory;
-        public UsuarioDatabaseTests(SqlAccessFixture fixture)
+        public UserDatabaseTests(SqlAccessFixture fixture)
         {
             _dbConnectionFactory = fixture.ConnectionFactory;
         }
@@ -18,19 +18,19 @@ namespace ShredStoreTests
         [Fact]
         public void Should_Throw_ArgumentNullException_If_Missing_Connection_String()
         {
-            var create = () => new UsuarioStorage(null!);
+            var create = () => new UserStorage(null!);
             create.Should().ThrowExactly<ArgumentNullException>();
         }
         [Theory]
-        [InlineData("spUsuario_Insert")]
-        [InlineData("spUsuario_Login")]
-        [InlineData("spUsuario_GetAll")]
-        [InlineData("spUsuario_GetById")]
-        [InlineData("spUsuario_Delete")]
-        [InlineData("spUsuario_Update")]
+        [InlineData("spUser_Insert")]
+        [InlineData("spUser_Login")]
+        [InlineData("spUser_GetAll")]
+        [InlineData("spUser_GetById")]
+        [InlineData("spUser_Delete")]
+        [InlineData("spUser_Update")]
         public async Task Should_Be_True_If_Stored_Procedure_Exists(string Sp)
         {
-            using var connection = await _dbConnectionFactory.CreateConnectionAsync();
+            using var connection = await _dbConnectionFactory.CreateConnectionAsync(default);
             string spName = Sp;
             Utility utility = new Utility();
             dynamic res = await connection.QueryAsync(utility.CreateQueryForStoredProcedureCheck(spName));
@@ -39,84 +39,80 @@ namespace ShredStoreTests
         }
 
         [Fact]
-        public async Task Should_Insert_Usuario_If_Not_Exists()
+        public async Task Should_Insert_User_If_Not_Exists()
         {
-            Usuario user = Fake.FakeDataFactory.FakeUsuarios();
-            IUsuarioStorage storage = new UsuarioStorage(_dbConnectionFactory);
+            User user = Fake.FakeDataFactory.FakeUser();
+            IUserStorage storage = new UserStorage(_dbConnectionFactory);
             await storage.InsertUser(user);
-            var res = await storage.GetUsuarios();
+            var res = await storage.GetUsers();
             res.Should().HaveCountGreaterThan(0);
-            await CleanUpUsuarios(_dbConnectionFactory);
+            await CleanUpUsers(_dbConnectionFactory);
         }
         [Fact]
-        public async Task Should_Be_Default_If_Usuario_Does_Not_Exists()
+        public async Task Should_Be_Default_If_User_Does_Not_Exists()
         {
-            IUsuarioStorage storage = new UsuarioStorage(_dbConnectionFactory);
-            var res = await storage.GetUsuario(50);
+            IUserStorage storage = new UserStorage(_dbConnectionFactory);
+            var res = await storage.GetUser(50);
             res.Should().BeSameAs(default);
-            await CleanUpUsuarios(_dbConnectionFactory);
+            await CleanUpUsers(_dbConnectionFactory);
 
         }
 
         [Fact]
         public async Task Should_Delete_User_If_Exists()
         {
-            Usuario user = Fake.FakeDataFactory.FakeUsuarios();
-            IUsuarioStorage storage = new UsuarioStorage(_dbConnectionFactory);
+            User user = Fake.FakeDataFactory.FakeUser();
+            IUserStorage storage = new UserStorage(_dbConnectionFactory);
             
             await storage.InsertUser(user);
-            var res = await storage.GetUsuarios();
-            Usuario returned = res.Where(x => x.Cpf == user.Cpf).FirstOrDefault();
-            await storage.DeleteUsuario(returned.Id);
+            var res = await storage.GetUsers();
+            User returned = res.Where(x => x.Cpf == user.Cpf).FirstOrDefault();
+            await storage.DeleteUser(returned.Id);
 
-            res = await storage.GetUsuarios();
+            res = await storage.GetUsers();
             res.Should().NotContain(x => x.Cpf == user.Cpf);
 
-            await CleanUpUsuarios(_dbConnectionFactory);
+            await CleanUpUsers(_dbConnectionFactory);
         }
         [Fact]
         public async Task Should_Be_Null_If_Login_Fails()
         {
-            Usuario user = Fake.FakeDataFactory.FakeUsuarios();
-            IUsuarioStorage storage = new UsuarioStorage(_dbConnectionFactory);
-            var res = await storage.Login(user.Nome, user.Password);
+            User user = Fake.FakeDataFactory.FakeUser();
+            IUserStorage storage = new UserStorage(_dbConnectionFactory);
+            var res = await storage.Login(user.Name, user.Password);
             res.Should().Be(null);
-            await CleanUpUsuarios(_dbConnectionFactory);
+            await CleanUpUsers(_dbConnectionFactory);
         }
         [Fact]
         public async Task Should_Return_User_If_Login_Succeeds()
         {
-            Usuario user = Fake.FakeDataFactory.FakeUsuarios();
-            IUsuarioStorage storage = new UsuarioStorage(_dbConnectionFactory);
+            User user = Fake.FakeDataFactory.FakeUser();
+            IUserStorage storage = new UserStorage(_dbConnectionFactory);
             await storage.InsertUser(user);
-            var res = await storage.Login(user.Nome, user.Password);
+            var res = await storage.Login(user.Name, user.Password);
             res.Cpf.Should().BeEquivalentTo(user.Cpf);
-            await CleanUpUsuarios(_dbConnectionFactory);
+            await CleanUpUsers(_dbConnectionFactory);
         }
         [Fact]
-        public async Task Should_Update_Usuario_If_Exists()
+        public async Task Should_Update_User_If_Exists()
         {
-            Usuario user = Fake.FakeDataFactory.FakeUsuarios();
-            IUsuarioStorage storage = new UsuarioStorage(_dbConnectionFactory);
+            User user = Fake.FakeDataFactory.FakeUser();
+            IUserStorage storage = new UserStorage(_dbConnectionFactory);
             await storage.InsertUser(user);
-            Usuario user2 = Fake.FakeDataFactory.FakeUsuarios();
-            var res = await storage.GetUsuarios();
+            User user2 = Fake.FakeDataFactory.FakeUser();
+            var res = await storage.GetUsers();
             user2.Id = res.ElementAt(0).Id;
-            await storage.UpdateUsuario(user2);
-            res = await storage.GetUsuarios();
+            await storage.UpdateUser(user2);
+            res = await storage.GetUsers();
             res.Should().Contain(x => x.Cpf == user2.Cpf);
-            await CleanUpUsuarios(_dbConnectionFactory);
+            await CleanUpUsers(_dbConnectionFactory);
         }
 
       
-
-
-
-
-        private async Task CleanUpUsuarios(ISqlAccessConnectionFactory _dbConnectionFactory)
+        private async Task CleanUpUsers(ISqlAccessConnectionFactory _dbConnectionFactory)
         {
-            string str = @"Delete from dbo.Usuario";
-            using var connection = await _dbConnectionFactory.CreateConnectionAsync();
+            string str = @"Delete from dbo.[User]";
+            using var connection = await _dbConnectionFactory.CreateConnectionAsync(default);
             await connection.QueryAsync(str);
         }
     }

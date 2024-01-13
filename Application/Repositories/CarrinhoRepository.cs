@@ -16,17 +16,16 @@ namespace Application.Repositories
         {
             sqlDataAccess = _sqlDataAccess;
         }
-        public Task InsertCarrinho(Carrinho carrinho) =>
-            sqlDataAccess.SaveData("dbo.spCarrinho_Insert", new { carrinho.UsuarioId, carrinho.DataCriacao, carrinho.ProdutoId });
+        public Task InsertCarrinho(Cart carrinho) =>
+            sqlDataAccess.SaveData("dbo.spCarrinho_Insert", new { carrinho.UserId, carrinho.CreatedDate});
 
-        public async Task<Carrinho?> GetCarrinho(int id)
+        public async Task<Cart?> GetCarrinho(int id)
         {
-            var result = await sqlDataAccess.LoadData<Carrinho, dynamic>("dbo.spCarrinho_GetById", new { Id = id });
+            var result = await sqlDataAccess.LoadData<Cart, dynamic>("dbo.spCarrinho_GetById", new { Id = id });
 
             return result.FirstOrDefault();
 
         }
-        public Task UpdateCarrinho(Carrinho Carrinho) => sqlDataAccess.SaveData("dbo.spCarrinho_Update", new { Carrinho.UsuarioId, Carrinho.ProdutoId });
 
         public Task DeleteCarrinho(int id) => sqlDataAccess.SaveData("dbo.spCarrinho_Delete", new { Id = id });
     }

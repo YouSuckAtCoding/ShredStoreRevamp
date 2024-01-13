@@ -21,47 +21,68 @@ namespace ShredStoreTests.DataAdapterFiles
 
         public async Task InitializeAsync()
         {
-            using var connection = await _connectionFactory.CreateConnectionAsync();
+            using var connection = await _connectionFactory.CreateConnectionAsync(default);
             
                 await connection.ExecuteAsync(
-                @"CREATE TABLE Usuario (
+                @"CREATE TABLE [User] (
                     Id INT NOT NULL PRIMARY KEY IDENTITY,
-	                Nome VARCHAR(20) NOT NULL,
-	                Idade INT NOT NULL,
+	                Name VARCHAR(20) NOT NULL,
+	                Age INT NOT NULL,
 	                Email varchar(50) NOT NULL,
 	                Cpf VARCHAR(11) NOT NULL,
-	                Endereco VARCHAR(50) NOT NULL,
+	                Address VARCHAR(50) NOT NULL,
 	                Password BINARY(64) NOT NULL, 
                     Salt UNIQUEIDENTIFIER NOT NULL
                 );"
                 );
             await connection.ExecuteAsync(
-                @"CREATE TABLE [dbo].[Produto]
+                @"CREATE TABLE [dbo].[Product]
                 (
                 	[Id] INT NOT NULL PRIMARY KEY IDENTITY,
-                	[Nome] VARCHAR(25) NOT NULL,
-                	[Descricao] VARCHAR(300) NOT NULL,
-                	[Valor] MONEY NOT NULL,
-                	[Tipo] VARCHAR(30) NOT NULL,
-                	[Categoria] VARCHAR(30) NOT NULL
+                	[Name] VARCHAR(25) NOT NULL,
+                	[Description] VARCHAR(300) NOT NULL,
+                	[Price] MONEY NOT NULL,
+                	[Type] VARCHAR(30) NOT NULL,
+                	[Category] VARCHAR(30) NOT NULL
                 )
                 ");
-                await CreateUsuarioStoredProcedures(connection);
-                await CreateProdutoStoredProcedures(connection);
+
+            await connection.ExecuteAsync(
+               @"CREATE TABLE [dbo].[Cart]
+                (
+                	[UserId] INT NOT NULL FOREIGN KEY REFERENCES [User](Id) PRIMARY KEY,
+                	[TotalAmount] MONEY,
+                	[CreatedDate] DATE NOT NULL
+                
+                )"
+                );
+            await connection.ExecuteAsync(@"
+                CREATE TABLE [dbo].[ItemCart]
+                (
+                	
+                    [CartId] INT NOT NULL FOREIGN KEY REFERENCES Cart(UserId),
+                    [ProductId] INT NOT NULL FOREIGN KEY REFERENCES Product(Id)
+                
+                )"
+                );
+
+                await CreateUserStoredProcedures(connection);
+                await CreateProductStoredProcedures(connection);
+                await CreateCartStoredProcedures(connection);
 
 
 
         }
 
-        private async Task CreateUsuarioStoredProcedures(IDbConnection connection)
+        private async Task CreateUserStoredProcedures(IDbConnection connection)
         {
             await connection.ExecuteAsync(
-                @"CREATE PROCEDURE [dbo].[spUsuario_Insert]
-            	@NOME VARCHAR(20),
-            	@IDADE INT,
+                @"CREATE PROCEDURE [dbo].[spUser_Insert]
+            	@Name VARCHAR(20),
+            	@Age INT,
             	@EMAIL VARCHAR(50),
             	@CPF VARCHAR(11),
-            	@ENDERECO VARCHAR(50),
+            	@Address VARCHAR(50),
             	@Password nvarchar(50)
             
                 AS
@@ -69,59 +90,59 @@ namespace ShredStoreTests.DataAdapterFiles
             	SET NOCOUNT ON
             	DECLARE @Salt UNIQUEIDENTIFIER=NEWID()
             
-            	INSERT INTO dbo.Usuario (Nome, Idade, Email, Cpf, Endereco, [Password], Salt)
-            	VALUES (@NOME, @IDADE, @EMAIL, @CPF, @ENDERECO,HASHBYTES('SHA2_512', @Password+CAST(@Salt as NVARCHAR(36))), @Salt)
+            	INSERT INTO dbo.[User] (Name, Age, Email, Cpf, Address, [Password], Salt)
+            	VALUES (@Name, @Age, @EMAIL, @CPF, @Address,HASHBYTES('SHA2_512', @Password+CAST(@Salt as NVARCHAR(36))), @Salt)
                 END"
                 );
 
             await connection.ExecuteAsync(
-                @"CREATE PROCEDURE[dbo].[spUsuario_GetAll]
+                @"CREATE PROCEDURE [dbo].[spUser_GetAll]
                 AS
                 Begin
-                    Select Id, Nome, Idade, Email, Cpf, Endereco from dbo.Usuario
+                    Select Id, Name, Age, Email, Cpf, Address from dbo.[User]
                 End
                 ");
 
             await connection.ExecuteAsync(
-                @"CREATE PROCEDURE [dbo].[spUsuario_GetById]
+                @"CREATE PROCEDURE [dbo].[spUser_GetById]
                 @Id int
                 AS
                 Begin
-                	Select Id, Nome, Idade, Email, Cpf, Endereco from dbo.Usuario
+                	Select Id, Name, Age, Email, Cpf, Address from dbo.[User]
                 	Where Id = @Id
                 End");
 
             await connection.ExecuteAsync(
-                @"CREATE PROCEDURE [dbo].[spUsuario_Delete]
+                @"CREATE PROCEDURE [dbo].[spUser_Delete]
                 @Id int
                 AS
                 Begin
-                	Delete from dbo.Usuario where Id = @Id
+                	Delete from dbo.[User] where Id = @Id
                 End	");
 
             await connection.ExecuteAsync(
-                @"CREATE PROCEDURE [dbo].[spUsuario_Update]
+                @"CREATE PROCEDURE [dbo].[spUser_Update]
             	@Id int,
-            	@Nome VARCHAR(20),
-            	@Idade INT,
+            	@Name VARCHAR(20),
+            	@Age INT,
             	@Email VARCHAR(50),
             	@Cpf VARCHAR(11),
-            	@Endereco VARCHAR(50)
+            	@Address VARCHAR(50)
                 AS
                 Begin
             
-            	Update dbo.Usuario 
-            	Set Nome = @Nome, 
-            	Idade = @Idade,
+            	Update dbo.[User]
+            	Set Name = @Name, 
+            	Age = @Age,
             	Email = @Email,
             	Cpf = @Cpf,
-            	Endereco = @Endereco
+            	Address = @Address
             	Where Id = @Id
             
                 End");
             await connection.ExecuteAsync(
-                @"CREATE PROCEDURE [dbo].[spUsuario_Login]
-            	@Nome nvarchar(50),
+                @"CREATE PROCEDURE [dbo].[spUser_Login]
+            	@Name nvarchar(50),
             	@Password nvarchar(50),
             	@ResponseMessage nvarchar(250)='' Output
             
@@ -132,15 +153,15 @@ namespace ShredStoreTests.DataAdapterFiles
             
             	Declare @SelectedId int
             
-            	IF Exists (Select Top 1 Id From dbo.Usuario Where Nome = @Nome)
+            	IF Exists (Select Top 1 Id From dbo.[User] Where Name = @Name)
             	Begin
-            		Set @SelectedId=(Select Id from dbo.Usuario Where Nome = @Nome And Password=HASHBYTES('SHA2_512',@Password+Cast(Salt As nvarchar(36))))
+            		Set @SelectedId=(Select Id from dbo.[User] Where Name = @Name And Password=HASHBYTES('SHA2_512',@Password+Cast(Salt As nvarchar(36))))
             
             		If(@SelectedId Is Null)
             			Set @ResponseMessage='Incorret Password'
             		Else
             			Set @ResponseMessage='Login Successfull'
-            			exec dbo.spUsuario_GetById @SelectedId
+            			exec dbo.spUser_GetById @SelectedId
             			
             	End
             	Else
@@ -149,77 +170,119 @@ namespace ShredStoreTests.DataAdapterFiles
                 End");
         }
 
-        private async Task CreateProdutoStoredProcedures(IDbConnection connection)
+        private async Task CreateProductStoredProcedures(IDbConnection connection)
         {
             await connection.ExecuteAsync(
-                @"CREATE PROCEDURE [dbo].[spProduto_Insert]
-            	@Nome VARCHAR(25),
-            	@Descricao varchar(300),
-            	@Valor MONEY,
-            	@Tipo VARCHAR(30),
-            	@Categoria VARCHAR(30)
+                @"CREATE PROCEDURE [dbo].[spProduct_Insert]
+            	@Name VARCHAR(25),
+            	@Description varchar(300),
+            	@Price MONEY,
+            	@Type VARCHAR(30),
+            	@Category VARCHAR(30)
             	
                 AS
                 Begin
             	
-            	INSERT INTO dbo.Produto (Nome, Descricao, Valor, Tipo, Categoria)
-            	VALUES (@Nome, @Descricao, @Valor, @Tipo, @Categoria)
+            	INSERT INTO dbo.Product (Name, Description, Price, Type, Category)
+            	VALUES (@Name, @Description, @Price, @Type, @Category)
             
                 End
                 "
                 );
 
             await connection.ExecuteAsync(
-                @"CREATE PROCEDURE [dbo].[spProduto_GetById]
+                @"CREATE PROCEDURE [dbo].[spProduct_GetById]
                 @Id int
                 AS
                 Begin
                 
-                	Select Id, Nome, Descricao, Valor, Tipo, Categoria from dbo.Produto
+                	Select Id, Name, Description, Price, Type, Category from dbo.Product
                 	Where Id = @Id
                 
                 End");
 
             await connection.ExecuteAsync(
-                @"CREATE PROCEDURE [dbo].[spProduto_GetAll]
+                @"CREATE PROCEDURE [dbo].[spProduct_GetAll]
 	
                 AS
                 Begin
                 
-                	Select Id, Nome, Descricao, Valor, Tipo, Categoria from dbo.Produto
+                	Select Id, Name, Description, Price, Type, Category from dbo.Product
                 
                 End"
                 );
             await connection.ExecuteAsync(
-                @"CREATE PROCEDURE [dbo].[spProduto_Update]
+                @"CREATE PROCEDURE [dbo].[spProduct_Update]
             	@Id int,
-            	@Nome VARCHAR(25),
-            	@Descricao varchar(300),
-            	@Valor MONEY,
-            	@Tipo VARCHAR(30),
-            	@Categoria VARCHAR(30)
+            	@Name VARCHAR(25),
+            	@Description varchar(300),
+            	@Price MONEY,
+            	@Type VARCHAR(30),
+            	@Category VARCHAR(30)
                 AS
                 Begin
             
-            	Update dbo.Produto
-            	Set Nome = @Nome,
-            	Descricao = @Descricao,
-            	Valor = @Valor,
-            	Tipo = @Tipo,
-            	Categoria = @Categoria
+            	Update dbo.Product
+            	Set Name = @Name,
+            	Description = @Description,
+            	Price = @Price,
+            	Type = @Type,
+            	Category = @Category
             
                 End
                 ");
             await connection.ExecuteAsync(
-                @"CREATE PROCEDURE [dbo].[spProduto_Delete]
+                @"CREATE PROCEDURE [dbo].[spProduct_Delete]
                 @Id int
                 AS
                 Begin
                 
-                	Delete from dbo.Produto where Id = @Id
+                	Delete from dbo.Product where Id = @Id
                 
                 End
                 ");
+        }
+        private async Task CreateCartStoredProcedures(IDbConnection connection)
+        {
+            await connection.ExecuteAsync(@"
+             CREATE PROCEDURE [dbo].[spCart_Insert]
+             	@UserId int,
+             	@CreatedDate Date
+             AS
+             Begin
+             
+             	INSERT INTO dbo.Cart (UserId, CreatedDate)
+             	VALUES (@UserId,  @CreatedDate)
+             
+             End
+             
+             
+            ");
+
+            await connection.ExecuteAsync(@"
+            CREATE PROCEDURE [dbo].[spCart_Delete]
+            	@UserId int
+            AS
+            Begin
+            
+            	Delete from dbo.Cart where UserId = @UserId
+            
+            End
+            ");
+            await connection.ExecuteAsync(@"
+            CREATE PROCEDURE [dbo].[spCart_GetById]
+            	@UserId int
+            AS
+            Begin
+            	
+            	Select UserId, SUM(prod.Price) as TotalAmount, CreatedDate from Cart
+            	JOIN dbo.ItemCart p On UserId = p.CartId
+            	JOIN dbo.Product prod On prod.Id = p.ProductId
+            	Where UserId = @UserId
+            	Group By UserId, CreatedDate
+            	
+            End
+            ");
         }
     }
 }

@@ -5,9 +5,9 @@ namespace Application.Repositories
     public interface IPedidoRepository
     {
         Task DeletePedido(int id);
-        Task<IEnumerable<Pedido>> GetPedidos();
-        Task<Pedido?> GetPedido(int id);
-        Task InsertPedido(Pedido pedido);
-        Task UpdatePedido(Pedido Pedido);
+        Task<IEnumerable<Order>> GetPedidos();
+        Task<Order?> GetPedido(int id);
+        Task InsertPedido(Order pedido);
+        Task UpdatePedido(Order Pedido);
     }
 }
