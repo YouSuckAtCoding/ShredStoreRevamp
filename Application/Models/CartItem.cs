@@ -6,12 +6,11 @@ using System.Threading.Tasks;
 
 namespace Application.Models
 {
-    public class Order
+    public class CartItem
     {
-        public int Id { get; set; }
-        public DateTime Date { get; set; }
         public int CartId { get; set; }
-        public decimal TotalAmount { get; }
-        public int UserId { get; set; }
+        public int ProductId { get; set; }
+        public int Quantity { get; set; }
+        public decimal Price { get; set; }
     }
 }

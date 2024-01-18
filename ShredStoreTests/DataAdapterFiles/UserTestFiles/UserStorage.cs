@@ -22,7 +22,6 @@ namespace ShredStoreTests.DataAdapterFiles.UserTestFiles
             var result = await _dataAccess.LoadData<User, dynamic>("dbo.spUser_GetById", new { Id = id });
 
             return result.FirstOrDefault();
-
         }
 
         public Task<IEnumerable<User>> GetUsers() => _dataAccess.LoadData<User,dynamic>("dbo.spUser_GetAll", new { });

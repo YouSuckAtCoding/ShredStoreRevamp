@@ -1,6 +1,6 @@
 ﻿CREATE PROCEDURE [dbo].[spOrder_Update]
 	@Id int,
-	@Date date
+	@Date datetime
 AS
 Begin
 	

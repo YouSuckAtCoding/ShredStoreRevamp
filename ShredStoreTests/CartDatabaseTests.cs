@@ -37,8 +37,7 @@ namespace ShredStoreTests
         {
             using var connection = await _dbConnectionFactory.CreateConnectionAsync(default);
             string spName = Sp;
-            Utility utility = new Utility();
-            dynamic res = await connection.QueryAsync(utility.CreateQueryForStoredProcedureCheck(spName));
+            dynamic res = await connection.QueryAsync(Utility.CreateQueryForStoredProcedureCheck(spName));
             string name = res[0].name;
             name.Should().Be(spName);
         }
@@ -55,7 +54,7 @@ namespace ShredStoreTests
         {
 
             User returnedUser = await SetUpCartID(_dbConnectionFactory);
-       
+
             ICartStorage CartStorage = new CartStorage(_dbConnectionFactory);
             Cart cart = Fake.FakeDataFactory.FakeCart();
             cart.UserId = returnedUser.Id;
@@ -65,7 +64,7 @@ namespace ShredStoreTests
             var check = await CartStorage.GetCart(returnedUser.Id);
             check.UserId.Should().Be(returnedUser.Id);
 
-            await CleanUpCarts(_dbConnectionFactory);
+            await Utility.CleanUpCarts(_dbConnectionFactory);
 
         }
         [Fact]
@@ -87,7 +86,7 @@ namespace ShredStoreTests
             res = await CartStorage.GetCart(returnedUser.Id);
             res.Should().BeSameAs(null);
 
-            await CleanUpCarts(_dbConnectionFactory);
+            await Utility.CleanUpCarts(_dbConnectionFactory);
 
         }
 
@@ -104,12 +103,7 @@ namespace ShredStoreTests
             return returnedUser;
 
         }
-            private async Task CleanUpCarts(ISqlAccessConnectionFactory _dbConnectionFactory)
-        {
-            string str = @"Delete from dbo.Cart";
-            using var connection = await _dbConnectionFactory.CreateConnectionAsync(default);
-            await connection.QueryAsync(str);
-        }
+      
 
     }
 }

@@ -32,8 +32,7 @@ namespace ShredStoreTests
         {
             using var connection = await _dbConnectionFactory.CreateConnectionAsync(default);
             string spName = Sp;
-            Utility utility = new Utility();
-            dynamic res = await connection.QueryAsync(utility.CreateQueryForStoredProcedureCheck(spName));
+            dynamic res = await connection.QueryAsync(Utility.CreateQueryForStoredProcedureCheck(spName));
             string name = res[0].name;
             name.Should().Be(spName);
         }
@@ -46,7 +45,7 @@ namespace ShredStoreTests
             await storage.InsertUser(user);
             var res = await storage.GetUsers();
             res.Should().HaveCountGreaterThan(0);
-            await CleanUpUsers(_dbConnectionFactory);
+            await Utility.CleanUpUsers(_dbConnectionFactory);
         }
         [Fact]
         public async Task Should_Be_Default_If_User_Does_Not_Exists()
@@ -54,7 +53,7 @@ namespace ShredStoreTests
             IUserStorage storage = new UserStorage(_dbConnectionFactory);
             var res = await storage.GetUser(50);
             res.Should().BeSameAs(default);
-            await CleanUpUsers(_dbConnectionFactory);
+            await Utility.CleanUpUsers(_dbConnectionFactory);
 
         }
 
@@ -72,7 +71,7 @@ namespace ShredStoreTests
             res = await storage.GetUsers();
             res.Should().NotContain(x => x.Cpf == user.Cpf);
 
-            await CleanUpUsers(_dbConnectionFactory);
+            await Utility.CleanUpUsers(_dbConnectionFactory);
         }
         [Fact]
         public async Task Should_Be_Null_If_Login_Fails()
@@ -81,7 +80,7 @@ namespace ShredStoreTests
             IUserStorage storage = new UserStorage(_dbConnectionFactory);
             var res = await storage.Login(user.Name, user.Password);
             res.Should().Be(null);
-            await CleanUpUsers(_dbConnectionFactory);
+            await Utility.CleanUpUsers(_dbConnectionFactory);
         }
         [Fact]
         public async Task Should_Return_User_If_Login_Succeeds()
@@ -91,29 +90,31 @@ namespace ShredStoreTests
             await storage.InsertUser(user);
             var res = await storage.Login(user.Name, user.Password);
             res.Cpf.Should().BeEquivalentTo(user.Cpf);
-            await CleanUpUsers(_dbConnectionFactory);
+            await Utility.CleanUpUsers(_dbConnectionFactory);
         }
         [Fact]
         public async Task Should_Update_User_If_Exists()
         {
             User user = Fake.FakeDataFactory.FakeUser();
             IUserStorage storage = new UserStorage(_dbConnectionFactory);
+
             await storage.InsertUser(user);
+
             User user2 = Fake.FakeDataFactory.FakeUser();
             var res = await storage.GetUsers();
+
             user2.Id = res.ElementAt(0).Id;
+
             await storage.UpdateUser(user2);
+
             res = await storage.GetUsers();
+
             res.Should().Contain(x => x.Cpf == user2.Cpf);
-            await CleanUpUsers(_dbConnectionFactory);
+            await Utility.CleanUpUsers(_dbConnectionFactory);
         }
 
-      
-        private async Task CleanUpUsers(ISqlAccessConnectionFactory _dbConnectionFactory)
-        {
-            string str = @"Delete from dbo.[User]";
-            using var connection = await _dbConnectionFactory.CreateConnectionAsync(default);
-            await connection.QueryAsync(str);
-        }
+
+
+
     }
 }

@@ -59,32 +59,26 @@ namespace ShredStoreTests.Fake
 
             return ProductFaker.Generate(10);
         }
-
-        public static Order FakePedido() 
-        {
-            Order pedido = new Order
-            {
-                Date = DateTime.Now,
-                UserId = 1,
-                CartId = 1,
-                TotalAmount = 2000
-            };
-
-            return pedido;
-            
-        }
-
         public static Cart FakeCart()
         {
             Cart Cart = new Cart
             {
                 CreatedDate = DateTime.Now,
                 UserId = 1,
-                
             };
 
             return Cart;
             
+        }
+
+        public static Order FakeOrder()
+        {
+            var orderFaker = new Faker<Order>("pt_BR")
+            .RuleFor(x => x.Date, DateTime.Now)
+            .RuleFor(x => x.UserId, 1)
+            .RuleFor(x => x.CartId, 1);
+
+            return orderFaker;
         }
     }
 }

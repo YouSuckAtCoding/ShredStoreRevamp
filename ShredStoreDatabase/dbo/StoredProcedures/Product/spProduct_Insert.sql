@@ -8,7 +8,7 @@
 AS
 Begin
 	
-	INSERT INTO dbo.Product ([Name], [Category], Price, [Type], Category)
+	INSERT INTO dbo.Product ([Name], [Description], Price, [Type], Category)
 	VALUES (@Name, @Description, @Price, @Type, @Category)
 
 End

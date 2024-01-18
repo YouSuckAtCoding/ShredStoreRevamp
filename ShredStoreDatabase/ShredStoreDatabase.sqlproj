@@ -75,7 +75,6 @@
     <Build Include="dbo\StoredProcedures\Product\spProduct_Insert.sql" />
     <Build Include="dbo\StoredProcedures\Cart\spCart_Insert.sql" />
     <Build Include="dbo\StoredProcedures\User\spUser_GetAll.sql" />
-    <Build Include="dbo\StoredProcedures\Order\spOrder_GetAll.sql" />
     <Build Include="dbo\StoredProcedures\Product\spProduct_GetAll.sql" />
     <Build Include="dbo\StoredProcedures\Cart\spCart_GetById.sql" />
     <Build Include="dbo\StoredProcedures\User\spUser_Update.sql" />
@@ -93,6 +92,9 @@
     <Build Include="dbo\StoredProcedures\CartItem\spCartItem_Insert.sql" />
     <Build Include="dbo\StoredProcedures\CartItem\spCartItem_Delete.sql" />
     <Build Include="dbo\StoredProcedures\CartItem\spCartItem_GetAll.sql" />
+    <Build Include="dbo\StoredProcedures\CartItem\spCartItem_DeleteAll.sql" />
+    <Build Include="dbo\StoredProcedures\CartItem\spCartItem_Update.sql" />
+    <Build Include="dbo\StoredProcedures\Order\spOrder_GetAllUserOrders.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ShredStoreDatabase.publish.xml" />

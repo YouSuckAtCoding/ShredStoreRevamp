@@ -3,8 +3,7 @@
 AS
 Begin
 
-	Select CartId, ProductId, prod.[Name], prod.Description, prod.Price from dbo.[CartItem]
-	Join dbo.Product prod on Prod.Id = ProductId
+	Select CartId, ProductId, Quantity from dbo.[CartItem]
 	where CartId = @CartId
 
 End

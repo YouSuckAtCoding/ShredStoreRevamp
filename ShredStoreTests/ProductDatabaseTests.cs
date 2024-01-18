@@ -31,8 +31,7 @@ namespace ShredStoreTests
         {
             using var connection = await _dbConnectionFactory.CreateConnectionAsync(default);
             string spName = Sp;
-            Utility utility = new Utility();
-            dynamic res = await connection.QueryAsync(utility.CreateQueryForStoredProcedureCheck(spName));
+            dynamic res = await connection.QueryAsync(Utility.CreateQueryForStoredProcedureCheck(spName));
             string name = res[0].name;
             name.Should().Be(spName);
         }
@@ -41,41 +40,53 @@ namespace ShredStoreTests
         {
             Product prod = Fake.FakeDataFactory.FakeProduct();
             IProductStorage storage = new ProductStorage(_dbConnectionFactory);
+
             await storage.InsertProduct(prod);
+
             var res = await storage.GetProducts();
             res.Should().HaveCountGreaterThan(0);
-            await CleanUpProducts(_dbConnectionFactory);
+
+            await Utility.CleanUpProducts(_dbConnectionFactory);
 
         }
         [Fact]
         public async Task Should_Be_Empty_If_No_Product_Exists()
         {
             IProductStorage storage = new ProductStorage(_dbConnectionFactory);
+
             var res = await storage.GetProducts();
             res.Should().BeEmpty();
-            await CleanUpProducts(_dbConnectionFactory);
+
+            await Utility.CleanUpProducts(_dbConnectionFactory);
         }
         [Fact]
         public async Task Should_Be_Default_If_Product_Doesnt_Exists()
         {
             IProductStorage storage = new ProductStorage(_dbConnectionFactory);
+
             var res = await storage.GetProduct(2);
             res.Should().BeSameAs(default);
-            await CleanUpProducts(_dbConnectionFactory);
+
+            await Utility.CleanUpProducts(_dbConnectionFactory);
         }
         [Fact]
         public async Task Should_Update_Product_If_Exists()
         {
             Product prod = Fake.FakeDataFactory.FakeProduct();
             IProductStorage storage = new ProductStorage(_dbConnectionFactory);
+
             await storage.InsertProduct(prod);
             Product prod2 = Fake.FakeDataFactory.FakeProduct();
+
             var res = await storage.GetProducts();
             prod2.Id = res.ElementAt(0).Id;
+
             await storage.UpdateProduct(prod2);
+
             res = await storage.GetProducts();
             res.Should().Contain(x => x.Description == prod2.Description);
-            await CleanUpProducts(_dbConnectionFactory);
+
+            await Utility.CleanUpProducts(_dbConnectionFactory);
         }
 
         [Fact]
@@ -92,18 +103,11 @@ namespace ShredStoreTests
             res = await storage.GetProducts();
             res.Should().NotContain(x => x.Description == prod.Description);
 
-            await CleanUpProducts(_dbConnectionFactory);
+            await Utility.CleanUpProducts(_dbConnectionFactory);
 
         }
 
 
-        private async Task CleanUpProducts(ISqlAccessConnectionFactory _dbConnectionFactory)
-        {
-            string str = @"Delete from dbo.Product";
-            using var connection = await _dbConnectionFactory.CreateConnectionAsync(default);
-            await connection.QueryAsync(str);
 
-
-        }
     }
 }
