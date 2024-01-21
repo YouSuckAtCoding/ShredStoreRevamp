@@ -8,11 +8,11 @@ Música e instrumentos sempre foram uma paixão minha, por isso a escolha de uma
 criação de vários outros tipos de lojas ou até mesmo como página para prestação de serviços diversos.
 
 # Tech Stack:
-O projeto é feito primariamente em C# com .NET 8.0.
+O projeto é feito primariamente em C# com .NET 8.0
 O front-end é feito com com Bootstrap e Js, se comunica com o banco por uma API.
-A parte de infraestrutura do projeto utiliza tecnologias como Docker para a criação do banco de dados oficial e os bancos de dados para testes com o nuget TestContainers e 
+A parte de infraestrutura do projeto utiliza tecnologias como Docker para a criação do banco de dados oficial e os bancos de dados para testes com o pacote TestContainers e 
 Dapper como ORM para a interação da aplicação com o banco.
-Para testes é utilizado o XUnit, com o nuget FluentValidations. Como estou usando esse projeto para aprender e praticar testes, o projeto possui diversos testes unitários e de integração
+Para testes é utilizado o XUnit, com o pacote Fluent Validations. Como estou usando esse projeto para aprender e praticar testes, o projeto possui diversos testes unitários e de integração
 para marioria das funcionalidades. 
 
 # Documentação (Em desenvolvimento)
