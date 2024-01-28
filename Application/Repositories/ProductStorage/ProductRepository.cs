@@ -17,7 +17,7 @@ namespace Application.Repositories.ProductStorage
             sqlDataAccess = _sqlDataAccess;
         }
         public Task InsertProduct(Product Product) =>
-           sqlDataAccess.SaveData("dbo.spProduct_Insert", new { Product.Name, Product.Description, Product.Price, Product.Type, Product.Category });
+           sqlDataAccess.SaveData("dbo.spProduct_Insert", new { Product.Name, Product.Description, Product.Price, Product.Type, Product.Category, Product.Brand, Product.ImageName });
 
         public Task<IEnumerable<Product>> GetProducts() => sqlDataAccess.LoadData<Product, dynamic>("dbo.spProduct_GetAll", new { });
 
@@ -28,7 +28,7 @@ namespace Application.Repositories.ProductStorage
             return result.FirstOrDefault();
 
         }
-        public Task UpdateProduct(Product Product) => sqlDataAccess.SaveData("dbo.spProduct_Update", new { Product.Id, Product.Name, Product.Description, Product.Price, Product.Type, Product.Category });
+        public Task UpdateProduct(Product Product) => sqlDataAccess.SaveData("dbo.spProduct_Update", new { Product.Id, Product.Name, Product.Description, Product.Price, Product.Type, Product.Category, Product.Brand, Product.ImageName });
 
         public Task DeleteProduct(int id) => sqlDataAccess.SaveData("dbo.spProduct_Delete", new { Id = id });
 

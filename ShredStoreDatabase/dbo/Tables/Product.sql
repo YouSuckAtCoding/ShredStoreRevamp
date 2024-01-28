@@ -5,5 +5,7 @@
 	[Description] VARCHAR(300) NOT NULL,
 	[Price] MONEY NOT NULL,
 	[Type] VARCHAR(30) NOT NULL,
-	[Category] VARCHAR(30) NOT NULL
+	[Category] VARCHAR(30) NOT NULL,
+	 [Brand] NVARCHAR(50) NOT NULL, 
+	 [ImageName] NVARCHAR(50) NOT NULL
 )

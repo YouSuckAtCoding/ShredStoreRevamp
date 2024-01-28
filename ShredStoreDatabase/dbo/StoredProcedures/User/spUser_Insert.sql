@@ -11,6 +11,6 @@ BEGIN
 	SET NOCOUNT ON
 	DECLARE @Salt UNIQUEIDENTIFIER=NEWID()
 
-	INSERT INTO dbo.[User] ([Name], Age, Email, Cpf, Address, [Password], Salt)
-	VALUES (@Name, @Age, @Email, @Cpf, @Address,HASHBYTES('SHA2_512', @Password+CAST(@Salt as NVARCHAR(36))), @Salt)
+	INSERT INTO dbo.[User] ([Name], Age, Email, Cpf, Address, [Password], Salt, [Role])
+	VALUES (@Name, @Age, @Email, @Cpf, @Address,HASHBYTES('SHA2_512', @Password+CAST(@Salt as NVARCHAR(36))), @Salt, 'User')
 END

@@ -6,6 +6,7 @@
 	[Email] varchar(50) NOT NULL,
 	[Cpf] VARCHAR(11) NOT NULL,
 	[Address] VARCHAR(50) NOT NULL,
+	[Role] VARCHAR(50) NOT NULL,
 	[Password] BINARY(64) NOT NULL, 
-    [Salt] UNIQUEIDENTIFIER NOT NULL 
+    [Salt] UNIQUEIDENTIFIER NOT NULL
 )

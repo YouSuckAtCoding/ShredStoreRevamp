@@ -3,7 +3,7 @@
 AS
 Begin
 
-	Select Id, [Name], [Description], Price, [Type], Category from dbo.Product
+	Select Id, [Name], [Description], Price, [Type], Category, Brand, ImageName from dbo.Product
 	Where Id = @Id
 
 End

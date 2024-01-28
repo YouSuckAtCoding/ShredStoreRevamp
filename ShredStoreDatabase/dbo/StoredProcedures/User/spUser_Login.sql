@@ -1,5 +1,5 @@
 ﻿CREATE PROCEDURE [dbo].[spUser_Login]
-	@Name nvarchar(50),
+	@Email nvarchar(50),
 	@Password nvarchar(50),
 	@ResponseMessage nvarchar(250)='' Output
 
@@ -10,9 +10,9 @@ Begin
 
 	Declare @SelectedId int
 
-	IF Exists (Select Top 1 Id From dbo.[User] Where [Name] = @Name)
+	IF Exists (Select Top 1 Id From dbo.[User] Where [Email] = @Email)
 	Begin
-		Set @SelectedId=(Select Id from dbo.[User] Where [Name] = @Name And Password=HASHBYTES('SHA2_512',@Password+Cast(Salt As nvarchar(36))))
+		Set @SelectedId=(Select Id from dbo.[User] Where [Email] = @Email And Password=HASHBYTES('SHA2_512',@Password+Cast(Salt As nvarchar(36))))
 
 		If(@SelectedId Is Null)
 			Set @ResponseMessage='Incorret Password'

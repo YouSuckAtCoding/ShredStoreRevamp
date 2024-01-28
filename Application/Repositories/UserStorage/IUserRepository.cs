@@ -1,14 +1,15 @@
 ﻿using Application.Models;
+using Contracts.Request;
 
 namespace Application.Repositories.UserStorage
 {
     public interface IUserRepository
     {
-        Task DeleteUser(int id);
-        Task<User?> GetUser(int id);
-        Task<IEnumerable<User>> GetUsers();
-        Task InsertUser(User User);
-        Task<User?> Login(string Name, string Password);
-        Task UpdateUser(User user);
+        Task DeleteUser(int id,CancellationToken token);
+        Task<User?> GetUser(int id,CancellationToken token);
+        Task<IEnumerable<User>> GetUsers(CancellationToken token);
+        Task InsertUser(User User,CancellationToken token);
+        Task<User?> Login(LoginUserRequest user,CancellationToken token);
+        Task UpdateUser(User user,CancellationToken token);
     }
 }

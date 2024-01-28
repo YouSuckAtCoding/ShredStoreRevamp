@@ -1,4 +1,5 @@
 ﻿using Application.Models;
+using Contracts.Request;
 using Dapper;
 using DatabaseAccess;
 
@@ -13,27 +14,26 @@ namespace Application.Repositories.UserStorage
         {
             sqlDataAccess = _sqlDataAccess;
         }
-        public Task DeleteUser(int id) => sqlDataAccess.SaveData("dbo.spUser_Delete", new { Id = id });
+        public Task DeleteUser(int id, CancellationToken token) => sqlDataAccess.SaveData("dbo.spUser_Delete", new { Id = id }, token:token);
 
-        public async Task<User?> GetUser(int id)
+        public async Task<User?> GetUser(int id, CancellationToken token)
         {
-            var result = await sqlDataAccess.LoadData<User, dynamic>("dbo.spUser_GetById", new { Id = id });
+            var result = await sqlDataAccess.LoadData<User, dynamic>("dbo.spUser_GetById", new { Id = id }, token: token);
             return result.FirstOrDefault();
         }
 
-        public Task<IEnumerable<User>> GetUsers() => sqlDataAccess.LoadData<User, dynamic>("dbo.spUser_GetAll", new { });
+        public Task<IEnumerable<User>> GetUsers(CancellationToken token) => sqlDataAccess.LoadData<User, dynamic>("dbo.spUser_GetAll", new { }, token: token);
 
-        public Task InsertUser(User User) =>
-            sqlDataAccess.SaveData("dbo.spUser_Insert", new { User.Name, User.Age, User.Email, User.Cpf, User.Address, User.Password });
-
-        public async Task<User?> Login(string Name, string Password)
+        public Task InsertUser(User User, CancellationToken token) =>
+            sqlDataAccess.SaveData("dbo.spUser_Insert", new { User.Name, User.Age, User.Email, User.Cpf, User.Address, User.Password }, token: token);
+        public async Task<User?> Login(LoginUserRequest request, CancellationToken token)
         {
             var p = new DynamicParameters();
-            p.Add("@Name", Name);
-            p.Add("@Password", Password);
+            p.Add("@Email", request.Email);
+            p.Add("@Password", request.Password);
             p.Add("@ResponseMessage", "", dbType: System.Data.DbType.String, direction: System.Data.ParameterDirection.Output);
 
-            var user = await sqlDataAccess.LoadData<User, dynamic>("dbo.spUser_Login", p);
+            var user = await sqlDataAccess.LoadData<User, dynamic>("dbo.spUser_Login", p, token: token);
 
             if (user.Any())
             {
@@ -43,7 +43,7 @@ namespace Application.Repositories.UserStorage
                 return null;
 
         }
-        public Task UpdateUser(User user) => sqlDataAccess.SaveData("dbo.spUser_Update", new { user.Id, user.Name, user.Age, user.Email, user.Cpf, user.Address });
+        public Task UpdateUser(User user, CancellationToken token) => sqlDataAccess.SaveData("dbo.spUser_Update", new { user.Id, user.Name, user.Age, user.Email, user.Cpf, user.Address }, token: token);
 
     };
 

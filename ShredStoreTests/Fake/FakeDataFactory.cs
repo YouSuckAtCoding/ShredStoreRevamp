@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Application.Models;
 using Bogus;
 using Bogus.Extensions.Brazil;
+using Contracts.Request;
 
 namespace ShredStoreTests.Fake
 {
@@ -18,7 +19,19 @@ namespace ShredStoreTests.Fake
             .RuleFor(x => x.Email, f => f.Internet.Email(f.Person.FirstName).ToLower())
             .RuleFor(x => x.Cpf, f => f.Person.Cpf(false))
             .RuleFor(x => x.Address, f => f.Address.StreetAddress())
-            .RuleFor(x => x.Age, f => f.Random.Number(25))
+            .RuleFor(x => x.Age, f => f.Random.Number(16,110))
+            .RuleFor(x => x.Password, f => f.Random.AlphaNumeric(25));
+
+            return userFaker;
+        }
+        public static CreateUserRequest FakeCreateUserRequest()
+        {
+            var userFaker = new Faker<CreateUserRequest>("pt_BR")
+            .RuleFor(x => x.Name, f => f.Name.FullName(Bogus.DataSets.Name.Gender.Male))
+            .RuleFor(x => x.Email, f => f.Internet.Email(f.Person.FirstName).ToLower())
+            .RuleFor(x => x.Cpf, f => f.Person.Cpf(false))
+            .RuleFor(x => x.Address, f => f.Address.StreetAddress())
+            .RuleFor(x => x.Age, f => f.Random.Number(16, 110))
             .RuleFor(x => x.Password, f => f.Random.AlphaNumeric(25));
 
             return userFaker;

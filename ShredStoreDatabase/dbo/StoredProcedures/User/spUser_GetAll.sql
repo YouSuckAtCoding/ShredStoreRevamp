@@ -2,5 +2,5 @@
 	
 AS
 Begin
-	Select Id, [Name], Age, Email, Cpf, Address from dbo.[User]
+	Select Id, [Name], Age, Email, Cpf, [Address], [Role] from dbo.[User]
 End

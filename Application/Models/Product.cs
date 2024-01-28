@@ -14,6 +14,8 @@ namespace Application.Models
         public decimal Price { get; set; }
         public string Type { get; set; }
         public string Category { get; set; }
+        public string Brand { get; set; }
+        public string ImageName { get; set; }
 
     }
 }
