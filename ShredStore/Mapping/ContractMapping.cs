@@ -34,7 +34,7 @@ namespace ShredStore.Mapping
         }
         public static UserResponse MapToUserResponse(this User user)
         {
-            UserResponse response = new UserResponse
+            return new UserResponse
             {
                 Id = user.Id,
                 Name = user.Name,
@@ -44,7 +44,16 @@ namespace ShredStore.Mapping
                 Role = user.Role,
                 Cpf = user.Cpf
             };
-            return response;
+            
+        }
+
+        public static LoginUserRequest MapToLoginUserRequest(this ResetPasswordUserRequest user)
+        {
+            return new LoginUserRequest
+            {
+                Email = user.Email,
+                Password = user.Password
+            };
         }
 
         

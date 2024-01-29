@@ -28,6 +28,7 @@ namespace ShredStoreTests
         [InlineData("spUser_GetById")]
         [InlineData("spUser_Delete")]
         [InlineData("spUser_Update")]
+        [InlineData("spUser_ResetPasswordByEmail")]
         public async Task Should_Be_True_If_Stored_Procedure_Exists(string Sp)
         {
             using var connection = await _dbConnectionFactory.CreateConnectionAsync(default);

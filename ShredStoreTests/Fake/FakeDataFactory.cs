@@ -36,6 +36,15 @@ namespace ShredStoreTests.Fake
 
             return userFaker;
         }
+
+        public static ResetPasswordUserRequest FakeResetPasswordUserRequest()
+        {
+            var userFaker = new Faker<ResetPasswordUserRequest>("pt_Br")
+                .RuleFor(x => x.Email, "teste@gmail.com")
+                .RuleFor(x => x.Password, f => f.Random.AlphaNumeric(25));
+            return userFaker;            
+        }
+
         public static IEnumerable<User> FakeUsers()
         {
             var userFaker = new Faker<User>("pt_BR")

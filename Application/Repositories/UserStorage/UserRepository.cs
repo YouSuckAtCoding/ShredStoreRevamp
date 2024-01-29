@@ -43,6 +43,10 @@ namespace Application.Repositories.UserStorage
                 return null;
 
         }
+
+        public Task ResetPassword(ResetPasswordUserRequest request, CancellationToken token)
+            => sqlDataAccess.SaveData("dbo.spUser_ResetPasswordByEmail", new { request.Email, request.NewPassword }, token: token);
+
         public Task UpdateUser(User user, CancellationToken token) => sqlDataAccess.SaveData("dbo.spUser_Update", new { user.Id, user.Name, user.Age, user.Email, user.Cpf, user.Address }, token: token);
 
     };

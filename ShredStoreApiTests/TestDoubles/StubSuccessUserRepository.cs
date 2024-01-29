@@ -41,6 +41,11 @@ namespace ShredStoreApiTests.TestDoubles
             return Task.FromResult(res)!;
         }
 
+        public Task<bool> ResetPassword(ResetPasswordUserRequest request, CancellationToken token)
+        {
+            return Task.FromResult(true)!;
+        }
+
         public Task<User> UpdateUser(User request, CancellationToken token)
         {
             throw new NotImplementedException();

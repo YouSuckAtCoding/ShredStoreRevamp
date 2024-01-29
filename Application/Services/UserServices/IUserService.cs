@@ -11,6 +11,7 @@ namespace Application.Services.UserServices
         Task<IEnumerable<User>> GetUsers(CancellationToken token);
         Task<bool> InsertUser(User user, CancellationToken token);
         Task<User?> Login(LoginUserRequest user, CancellationToken token);
+        Task<bool> ResetPassword(ResetPasswordUserRequest request, CancellationToken token);
         Task<User> UpdateUser(User request, CancellationToken token);
     }
 }

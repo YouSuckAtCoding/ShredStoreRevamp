@@ -10,12 +10,14 @@ namespace Application.Services.UserServices
         private readonly IUserRepository _userRepository;
         private readonly IValidator<User> _userValidator;
         private readonly IValidator<LoginUserRequest> _loginValidator;
+        private readonly IValidator<ResetPasswordUserRequest> _resetValidator;
 
-        public UserService(IUserRepository userRepository, IValidator<User> userValidator, IValidator<LoginUserRequest> loginValidator)
+        public UserService(IUserRepository userRepository, IValidator<User> userValidator, IValidator<LoginUserRequest> loginValidator, IValidator<ResetPasswordUserRequest> resetValidator)
         {
             _userRepository = userRepository;
             _userValidator = userValidator;
             _loginValidator = loginValidator;
+            _resetValidator = resetValidator;
         }
 
         public async Task<bool> DeleteUser(int id, CancellationToken token)
@@ -55,6 +57,13 @@ namespace Application.Services.UserServices
             await _loginValidator.ValidateAndThrowAsync(user, token);
             var result = await _userRepository.Login(user, token);
             return result is null ? null : result;
+        }
+
+        public async Task<bool> ResetPassword(ResetPasswordUserRequest request, CancellationToken token)
+        {
+            await _resetValidator.ValidateAndThrowAsync(request);
+            await _userRepository.ResetPassword(request, token);
+            return true;
         }
 
         public async Task<User> UpdateUser(User request, CancellationToken token)

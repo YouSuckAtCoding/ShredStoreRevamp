@@ -1,16 +1,13 @@
 ﻿using Application.Models;
-using Application.Repositories.UserStorage;
 using Application.Services.UserServices;
 using Contracts.Request;
 using Contracts.Response;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ShredStore.Mapping;
-using static ShredStore.ApiEndpoints;
 
 namespace ShredStore.Controllers
 {
-    
+
     [ApiController]
     public class UserController : ControllerBase
     {
@@ -22,6 +19,8 @@ namespace ShredStore.Controllers
         }
 
         [HttpGet(ApiEndpoints.UserEndpoints.Login)]
+        [ProducesResponseType(typeof(UserResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<UserResponse>> Login([FromBody] LoginUserRequest user, CancellationToken token)
         {
 
@@ -36,6 +35,7 @@ namespace ShredStore.Controllers
         }
 
         [HttpGet(ApiEndpoints.UserEndpoints.GetAll)]
+        [ProducesResponseType(typeof(UsersResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAll(CancellationToken token)
         {
             var result = await _userService.GetUsers(token);
@@ -43,6 +43,8 @@ namespace ShredStore.Controllers
         }
 
         [HttpPost(ApiEndpoints.UserEndpoints.Create)]
+        [ProducesResponseType(typeof(UserResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserRequest request, CancellationToken token)
         {
             User user = request.MapToUser();
@@ -55,6 +57,8 @@ namespace ShredStore.Controllers
 
         }
         [HttpGet(ApiEndpoints.UserEndpoints.Get)]
+        [ProducesResponseType(typeof(UserResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Get([FromRoute] int id, CancellationToken token)
         {
             User? user = await _userService.GetUser(id, token);
@@ -68,22 +72,40 @@ namespace ShredStore.Controllers
         }
 
         [HttpPut(ApiEndpoints.UserEndpoints.Update)]
+        [ProducesResponseType(typeof(UserResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateUserRequest request, CancellationToken token)
         {
             User user = request.MapToUser();
 
             User updated = await _userService.UpdateUser(user, token);
 
-            return Ok(updated);
+            return Ok(updated);         
+        }
 
-                            
+        [HttpPut(ApiEndpoints.UserEndpoints.ResetPassword)]
+        [ProducesResponseType(typeof(UserResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordUserRequest request, CancellationToken token)
+        {
+            LoginUserRequest login = request.MapToLoginUserRequest();
+            var result = await _userService.Login(login, token);
+            if(result is not null)
+            {
+                await _userService.ResetPassword(request, token);
+                return Ok();
+            }
+            return NotFound();
+            
+            
         }
 
         [HttpDelete(ApiEndpoints.UserEndpoints.Delete)]
+        [ProducesResponseType(typeof(UserResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete([FromRoute] int id, CancellationToken token)
         {
             var result = await _userService.DeleteUser(id, token);
-            return result ? Ok() : BadRequest();
+            return result ? Ok() : NotFound();
         }
     }
 }

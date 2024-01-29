@@ -10,6 +10,7 @@ namespace Application.Repositories.UserStorage
         Task<IEnumerable<User>> GetUsers(CancellationToken token);
         Task InsertUser(User User,CancellationToken token);
         Task<User?> Login(LoginUserRequest user,CancellationToken token);
+        Task ResetPassword(ResetPasswordUserRequest request, CancellationToken token);
         Task UpdateUser(User user,CancellationToken token);
     }
 }

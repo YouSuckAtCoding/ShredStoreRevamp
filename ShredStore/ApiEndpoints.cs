@@ -14,6 +14,7 @@
             public const string Update = $"{Base}/update";
             public const string Delete = $"{Base}/{{id:int}}";
             public const string Login = $"{Base}/login";
+            public const string ResetPassword = $"{Base}/reset";
         }
     }
 }
