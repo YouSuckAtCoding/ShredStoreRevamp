@@ -7,6 +7,7 @@ using Application.Models;
 using Bogus;
 using Bogus.Extensions.Brazil;
 using Contracts.Request;
+using Contracts.Request.ProductRequests;
 
 namespace ShredStoreTests.Fake
 {
@@ -65,11 +66,24 @@ namespace ShredStoreTests.Fake
             .RuleFor(x => x.Price, f => f.Random.Number(100, 2000))
             .RuleFor(x => x.Type, f => f.Random.Word())
             .RuleFor(x => x.Category, f => f.Random.Word())
+            .RuleFor(x => x.Brand, f => f.Random.Word())
+            .RuleFor(x => x.ImageName, f => f.Random.Word())
             .RuleFor(x => x.Description, f => f.Random.Words());
 
             return ProductFaker;
         }
-
+        public static CreateProductRequest FakeCreateProductRequest()
+        {
+            var productFaker = new Faker<CreateProductRequest>("pt_BR")
+            .RuleFor(x => x.Name, f => f.Name.FirstName())
+            .RuleFor(x => x.Price, f => f.Random.Number(100, 2000))
+            .RuleFor(x => x.Type, f => f.Random.Word())
+            .RuleFor(x => x.Category, f => f.Random.Word())
+            .RuleFor(x => x.Brand, f => f.Random.Word())
+            .RuleFor(x => x.ImageName, f => f.Random.Word())
+            .RuleFor(x => x.Description, f => f.Random.Words(15));
+            return productFaker;
+        }
         public static IEnumerable<Product> FakeProducts()
         {
             var ProductFaker = new Faker<Product>("pt_BR")

@@ -1,17 +1,9 @@
-﻿using Application.Repositories.UserStorage;
-using Application.Services.UserServices;
-using DatabaseAccess;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using ShredStore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Application;
 
 namespace ShredStoreApiTests
 {
@@ -36,6 +28,19 @@ namespace ShredStoreApiTests
 
             });
 
+        }
+      
+    }
+
+    public static class CreateApi
+    {
+        public static ApiFactory CreateOfficialApi()
+        {
+            var api = new ApiFactory(services =>
+            {
+                services.AddApplication();
+            });
+            return api;
         }
     }
 }

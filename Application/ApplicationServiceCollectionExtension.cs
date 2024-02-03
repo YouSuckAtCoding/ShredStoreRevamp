@@ -1,4 +1,6 @@
-﻿using Application.Repositories.UserStorage;
+﻿using Application.Repositories.ProductStorage;
+using Application.Repositories.UserStorage;
+using Application.Services.ProductServices;
 using Application.Services.UserServices;
 using DatabaseAccess;
 using FluentValidation;
@@ -17,6 +19,8 @@ namespace Application
         {
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IProductRepository, ProductRepository>();
+            services.AddTransient<IProductService, ProductService>();
             services.AddTransient<ISqlDataAccess, SqlDataAccess>();
             services.AddValidatorsFromAssemblyContaining<IApplicationMarker>(ServiceLifetime.Singleton);
             return services;

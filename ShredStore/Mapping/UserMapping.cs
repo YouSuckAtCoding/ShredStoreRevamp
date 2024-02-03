@@ -1,10 +1,10 @@
 ﻿using Application.Models;
 using Contracts.Request;
-using Contracts.Response;
+using Contracts.Response.UserResponses;
 
 namespace ShredStore.Mapping
 {
-    public static class ContractMapping
+    public static class UserMapping
     {
         public static User MapToUser(this CreateUserRequest request)
         {
@@ -19,6 +19,7 @@ namespace ShredStore.Mapping
 
             };
         }
+
         public static User MapToUser(this UpdateUserRequest request)
         {
             return new User
@@ -32,6 +33,7 @@ namespace ShredStore.Mapping
 
             };
         }
+
         public static UserResponse MapToUserResponse(this User user)
         {
             return new UserResponse
@@ -46,7 +48,6 @@ namespace ShredStore.Mapping
             };
             
         }
-
         public static LoginUserRequest MapToLoginUserRequest(this ResetPasswordUserRequest user)
         {
             return new LoginUserRequest

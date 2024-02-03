@@ -99,5 +99,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ShredStoreDatabase.publish.xml" />
+    <None Include="ShredStoreOfficialDatabase.publish.xml" />
   </ItemGroup>
 </Project>

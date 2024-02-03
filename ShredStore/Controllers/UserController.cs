@@ -1,7 +1,7 @@
 ﻿using Application.Models;
 using Application.Services.UserServices;
 using Contracts.Request;
-using Contracts.Response;
+using Contracts.Response.UserResponses;
 using Microsoft.AspNetCore.Mvc;
 using ShredStore.Mapping;
 
@@ -79,7 +79,7 @@ namespace ShredStore.Controllers
 
             User updated = await _userService.UpdateUser(user, token);
 
-            return Ok(updated);         
+            return Ok(updated.MapToUserResponse());         
         }
 
         [HttpPut(ApiEndpoints.UserEndpoints.ResetPassword)]
@@ -100,7 +100,7 @@ namespace ShredStore.Controllers
         }
 
         [HttpDelete(ApiEndpoints.UserEndpoints.Delete)]
-        [ProducesResponseType(typeof(UserResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete([FromRoute] int id, CancellationToken token)
         {

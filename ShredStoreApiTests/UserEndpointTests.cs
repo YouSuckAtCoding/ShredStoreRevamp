@@ -31,7 +31,7 @@ namespace ShredStoreApiTests
         [Fact]
         public async Task Should_Return_All_Users_Real_GetAll_Endpoint()
         {
-            using var client = CreateOfficialApi().CreateClient();
+            using var client = CreateApi.CreateOfficialApi().CreateClient();
             var response = await client.GetAsync(ApiEndpointsTest.User.GetAll);
             var result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             var users = JsonSerializer.Deserialize<IEnumerable<User>>(result, jsonSerializerOptions);
@@ -39,9 +39,9 @@ namespace ShredStoreApiTests
             users.Should().NotBeEmpty();
         }
         [Fact]
-        public async Task Should_Return_200_From_Insert_User()
+        public async Task Should_Insert_User()
         {
-            using var client = CreateOfficialApi().CreateClient();
+            using var client = CreateApi.CreateOfficialApi().CreateClient();
             var request = FakeDataFactory.FakeCreateUserRequest();
 
             var jsonString = JsonSerializer.Serialize(request);
@@ -68,7 +68,7 @@ namespace ShredStoreApiTests
         [Fact]
         public async Task Should_Return_User_From_Login_Real_Endpoint()
         {
-            using var client = CreateOfficialApi().CreateClient();
+            using var client = CreateApi.CreateOfficialApi().CreateClient();
             HttpRequestMessage requestMessage = SetLogin(client);
 
             var response = client.SendAsync(requestMessage).ConfigureAwait(false);
@@ -82,7 +82,7 @@ namespace ShredStoreApiTests
         [Fact]
         public async Task Should_Return_401_From_Real_Login_Endpoint()
         {
-            using var client = CreateOfficialApi().CreateClient();
+            using var client = CreateApi.CreateOfficialApi().CreateClient();
             HttpRequestMessage requestMessage = SetLogin(client, true);
 
             var response = client.SendAsync(requestMessage).ConfigureAwait(false);
@@ -105,7 +105,7 @@ namespace ShredStoreApiTests
         [Fact]
         public async Task Should_Return_User_From_Get_Endpoint()
         {
-            using var client = CreateOfficialApi().CreateClient();
+            using var client = CreateApi.CreateOfficialApi().CreateClient();
             string url = SetGetUrl(4);
             var response = await client.GetAsync(url);
             var result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -117,7 +117,7 @@ namespace ShredStoreApiTests
         [Fact]
         public async Task Should_Update_User_Name_Real_Update_Endpoint()
         {
-            using var client = CreateOfficialApi().CreateClient();
+            using var client = CreateApi.CreateOfficialApi().CreateClient();
 
             string url = SetGetUrl(4);
             var getResponse = await client.GetAsync(url);
@@ -162,7 +162,7 @@ namespace ShredStoreApiTests
         [Fact]
         public async Task Should_Delete_User_Real_Delete_Endpoint()
         {
-            using var client = CreateOfficialApi().CreateClient();
+            using var client = CreateApi.CreateOfficialApi().CreateClient();
             string url = SetDeleteUrl(2);
             await client.DeleteAsync(url);
 
@@ -186,7 +186,7 @@ namespace ShredStoreApiTests
         [Fact]
         public async Task Should_Reset_User_Passwrod_ResetPassword_Endpoint()
         {
-            using var client = CreateOfficialApi().CreateClient();
+            using var client = CreateApi.CreateOfficialApi().CreateClient();
 
             var newUser = FakeDataFactory.FakeCreateUserRequest();
             var jsonString = JsonSerializer.Serialize(newUser);
@@ -270,14 +270,7 @@ namespace ShredStoreApiTests
             return requestMessage;
         }
 
-        private ApiFactory CreateOfficialApi()
-        {
-            var api = new ApiFactory(services =>
-            {
-                services.AddApplication();
-            });
-            return api;
-        }
+  
         private ApiFactory CreateApiWithUserRepository<T>()
            where T : class, IUserService
         {

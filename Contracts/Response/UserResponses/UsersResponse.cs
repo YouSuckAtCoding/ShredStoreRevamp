@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Contracts.Response
+namespace Contracts.Response.UserResponses
 {
     public class UsersResponse
     {

@@ -4,10 +4,10 @@ namespace Application.Repositories.ProductStorage
 {
     public interface IProductRepository
     {
-        Task DeleteProduct(int id);
-        Task<Product?> GetProduct(int id);
-        Task<IEnumerable<Product>> GetProducts();
-        Task InsertProduct(Product Product);
-        Task UpdateProduct(Product Product);
+        Task DeleteProduct(int id, CancellationToken token);
+        Task<Product?> GetProduct(int id, CancellationToken token);
+        Task<IEnumerable<Product>> GetProducts(CancellationToken token);
+        Task InsertProduct(Product Product, CancellationToken token);
+        Task UpdateProduct(Product Product, CancellationToken token);
     }
 }
