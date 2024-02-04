@@ -1,10 +1,11 @@
 ﻿CREATE PROCEDURE [dbo].[spCart_Insert]
-	@UserId int
+	@UserId int,
+	@CreatedDate date
 AS
 Begin
 
 	INSERT INTO dbo.Cart (UserId, CreatedDate)
-	VALUES (@UserId,  GETDATE())
+	VALUES (@UserId,  @CreatedDate)
 
 End
 

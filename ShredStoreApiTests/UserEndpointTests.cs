@@ -25,19 +25,26 @@ namespace ShredStoreApiTests
         public async Task Should_Return_200_From_GetAll_Endpoint()
         {
             using var client = CreateApiWithUserRepository<StubSuccessUserRepository>().CreateClient();
-            var response = await client.GetAsync(ApiEndpointsTest.User.GetAll);
+            var response = await client.GetAsync(ApiEndpointsTest.UserEndpoints.GetAll);
             response.Should().HaveStatusCode(HttpStatusCode.OK);
         }
         [Fact]
         public async Task Should_Return_All_Users_Real_GetAll_Endpoint()
         {
             using var client = CreateApi.CreateOfficialApi().CreateClient();
-            var response = await client.GetAsync(ApiEndpointsTest.User.GetAll);
-            var result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            var users = JsonSerializer.Deserialize<IEnumerable<User>>(result, jsonSerializerOptions);
+            IEnumerable<User>? users = await GetAllUsers(client).ConfigureAwait(false);
 
             users.Should().NotBeEmpty();
         }
+
+        private static async Task<IEnumerable<User>?> GetAllUsers(HttpClient client)
+        {
+            var response = await client.GetAsync(ApiEndpointsTest.UserEndpoints.GetAll);
+            var result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var users = JsonSerializer.Deserialize<IEnumerable<User>>(result, jsonSerializerOptions);
+            return users;
+        }
+
         [Fact]
         public async Task Should_Insert_User()
         {
@@ -47,7 +54,7 @@ namespace ShredStoreApiTests
             var jsonString = JsonSerializer.Serialize(request);
 
             var httpContent = new StringContent(jsonString, Encoding.UTF8, "application/json");
-            var response = await client.PostAsync(ApiEndpointsTest.User.Create, httpContent);
+            var response = await client.PostAsync(ApiEndpointsTest.UserEndpoints.Create, httpContent);
             response.Should().HaveStatusCode(HttpStatusCode.OK);
         }
 
@@ -96,7 +103,7 @@ namespace ShredStoreApiTests
         public async Task Should_Return_200_From_Get_Endpoint()
         {
             using var client = CreateApiWithUserRepository<StubSuccessUserRepository>().CreateClient();
-            string url = SetGetUrl(2);
+            string url = Utility.SetGet_Or_DeleteUrl(2, ApiEndpoints.UserEndpoints.Get);
             var response = await client.GetAsync(url);
             response.Should().HaveStatusCode(HttpStatusCode.OK);
 
@@ -106,7 +113,7 @@ namespace ShredStoreApiTests
         public async Task Should_Return_User_From_Get_Endpoint()
         {
             using var client = CreateApi.CreateOfficialApi().CreateClient();
-            string url = SetGetUrl(4);
+            string url = Utility.SetGet_Or_DeleteUrl(4, ApiEndpoints.UserEndpoints.Delete);
             var response = await client.GetAsync(url);
             var result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             var user = JsonSerializer.Deserialize<User>(result, jsonSerializerOptions);
@@ -119,7 +126,7 @@ namespace ShredStoreApiTests
         {
             using var client = CreateApi.CreateOfficialApi().CreateClient();
 
-            string url = SetGetUrl(4);
+            string url = Utility.SetGet_Or_DeleteUrl(4, ApiEndpoints.UserEndpoints.Delete);
             var getResponse = await client.GetAsync(url);
             var getResult = await getResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
             var returned = JsonSerializer.Deserialize<User>(getResult, jsonSerializerOptions)!;
@@ -141,7 +148,7 @@ namespace ShredStoreApiTests
 
             var httpContent = new StringContent(jsonString, Encoding.UTF8, "application/json");
 
-            var response = await client.PutAsync(ApiEndpointsTest.User.Update, httpContent);
+            var response = await client.PutAsync(ApiEndpointsTest.UserEndpoints.Update, httpContent);
 
             var result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             var user = JsonSerializer.Deserialize<User>(result, jsonSerializerOptions);
@@ -154,7 +161,7 @@ namespace ShredStoreApiTests
         public async Task Should_Return_200_From_Delete_Endpoint()
         {
             using var client = CreateApiWithUserRepository<StubSuccessUserRepository>().CreateClient();
-            string url = SetDeleteUrl(2);
+            string url = Utility.SetGet_Or_DeleteUrl(2, ApiEndpoints.UserEndpoints.Delete);
             var response = await client.DeleteAsync(url);
             response.Should().HaveStatusCode(HttpStatusCode.OK);
         }
@@ -163,10 +170,10 @@ namespace ShredStoreApiTests
         public async Task Should_Delete_User_Real_Delete_Endpoint()
         {
             using var client = CreateApi.CreateOfficialApi().CreateClient();
-            string url = SetDeleteUrl(2);
+            string url = Utility.SetGet_Or_DeleteUrl(2, ApiEndpoints.UserEndpoints.Delete);
             await client.DeleteAsync(url);
 
-            var response = await client.GetAsync(ApiEndpointsTest.User.GetAll);
+            var response = await client.GetAsync(ApiEndpointsTest.UserEndpoints.GetAll);
             var result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             var users = JsonSerializer.Deserialize<IEnumerable<User>>(result, jsonSerializerOptions);
 
@@ -179,7 +186,7 @@ namespace ShredStoreApiTests
         {
             using var client = CreateApiWithUserRepository<StubSuccessUserRepository>().CreateClient();
             HttpRequestMessage requestMessage = SetResetPassword(client, FakeDataFactory.FakeCreateUserRequest());
-            var response = await client.PutAsync(ApiEndpointsTest.User.ResetPassword, requestMessage.Content);
+            var response = await client.PutAsync(ApiEndpointsTest.UserEndpoints.ResetPassword, requestMessage.Content);
             response.Should().HaveStatusCode(HttpStatusCode.OK);
         }
 
@@ -191,10 +198,10 @@ namespace ShredStoreApiTests
             var newUser = FakeDataFactory.FakeCreateUserRequest();
             var jsonString = JsonSerializer.Serialize(newUser);
             var httpContent = new StringContent(jsonString, Encoding.UTF8, "application/json");
-            await client.PostAsync(ApiEndpointsTest.User.Create, httpContent);
+            await client.PostAsync(ApiEndpointsTest.UserEndpoints.Create, httpContent);
 
             HttpRequestMessage requestMessage = SetResetPassword(client, newUser);
-            var response = await client.PutAsync(ApiEndpointsTest.User.ResetPassword, requestMessage.Content);
+            var response = await client.PutAsync(ApiEndpointsTest.UserEndpoints.ResetPassword, requestMessage.Content);
 
             LoginUserRequest request = new LoginUserRequest
             {
@@ -206,7 +213,7 @@ namespace ShredStoreApiTests
             requestMessage = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(client.BaseAddress + ApiEndpointsTest.User.Login),
+                RequestUri = new Uri(client.BaseAddress + ApiEndpointsTest.UserEndpoints.Login),
                 Content = new StringContent(json, encoding: Encoding.UTF8, "application/json")
             };
 
@@ -215,19 +222,6 @@ namespace ShredStoreApiTests
             var loggeduser = JsonSerializer.Deserialize<User>(responseInfo, jsonSerializerOptions);
             loggeduser.Id.Should().BeGreaterThan(0);
 
-        }
-
-        private static string SetDeleteUrl(int id)
-        {
-            string url = ApiEndpointsTest.User.Get;
-            url = url.Replace("{id}", $"{id}");
-            return url;
-        }
-        private static string SetGetUrl(int id)
-        {
-            string url = ApiEndpointsTest.User.Get;
-            url = url.Replace("{id}", $"{id}");
-            return url;
         }
         private static HttpRequestMessage SetResetPassword(HttpClient client, CreateUserRequest user)
         {
@@ -242,7 +236,7 @@ namespace ShredStoreApiTests
             var requestMessage = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(client.BaseAddress + ApiEndpointsTest.User.Login),
+                RequestUri = new Uri(client.BaseAddress + ApiEndpointsTest.UserEndpoints.Login),
                 Content = new StringContent(json, encoding: Encoding.UTF8, "application/json")
             };
             return requestMessage;
@@ -264,7 +258,7 @@ namespace ShredStoreApiTests
             var requestMessage = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(client.BaseAddress + ApiEndpointsTest.User.Login),
+                RequestUri = new Uri(client.BaseAddress + ApiEndpointsTest.UserEndpoints.Login),
                 Content = new StringContent(json, encoding: Encoding.UTF8, "application/json")
             };
             return requestMessage;

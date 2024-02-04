@@ -4,9 +4,9 @@ namespace Application.Repositories.CartStorage
 {
     public interface ICartRepository
     {
-        Task DeleteCarrinho(int UserId);
-        Task<Cart?> GetCarrinho(int UserId);
-        Task InsertCarrinho(Cart carrinho);
+        Task DeleteCart(int UserId, CancellationToken token);
+        Task<Cart?> GetCart(int UserId, CancellationToken token);
+        Task InsertCart(Cart cart, CancellationToken token);
 
     }
 }

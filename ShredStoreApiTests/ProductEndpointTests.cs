@@ -84,7 +84,7 @@ namespace ShredStoreApiTests
         {
             using var client = CreateApiWithProductRepository<StubSuccessProductRepository>().CreateClient();
 
-            var response = await client.GetAsync(SetGetUrl(2));
+            var response = await client.GetAsync(Utility.SetGet_Or_DeleteUrl(2, ApiEndpoints.ProductEndpoints.Get));
 
             response.Should().HaveStatusCode(HttpStatusCode.OK);
         }
@@ -96,7 +96,7 @@ namespace ShredStoreApiTests
 
             IEnumerable<Product>? products = await ReturnAllProducts(client).ConfigureAwait(false);
 
-            var response = await client.GetAsync(SetGetUrl(products!.First().Id));
+            var response = await client.GetAsync(Utility.SetGet_Or_DeleteUrl(products!.First().Id, ApiEndpoints.ProductEndpoints.Get));
             var responseInfo = await response.Content.ReadAsStringAsync();
 
             var product = JsonSerializer.Deserialize<ProductResponse>(responseInfo, jsonSerializerOptions);
@@ -109,7 +109,7 @@ namespace ShredStoreApiTests
         {
             using var client = CreateApiWithProductRepository<StubSuccessProductRepository>().CreateClient();
 
-            string url = SetGetUrl(2);
+            string url = Utility.SetGet_Or_DeleteUrl(2, ApiEndpoints.ProductEndpoints.Get);
             
             var getResponse = await client.GetAsync(url);
             
@@ -145,7 +145,7 @@ namespace ShredStoreApiTests
 
             IEnumerable<Product>? products = await ReturnAllProducts(client).ConfigureAwait(false);
 
-            var getResponse = await client.GetAsync(SetGetUrl(products!.First().Id));
+            var getResponse = await client.GetAsync(Utility.SetGet_Or_DeleteUrl(products!.First().Id, ApiEndpoints.ProductEndpoints.Get));
 
             var getResult = await getResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
 
@@ -181,7 +181,7 @@ namespace ShredStoreApiTests
         {
             using var client = CreateApiWithProductRepository<StubSuccessProductRepository>().CreateClient();
 
-            var response = await client.DeleteAsync(SetDeleteUrl(2));
+            var response = await client.DeleteAsync(Utility.SetGet_Or_DeleteUrl(2, ApiEndpoints.ProductEndpoints.Delete));
 
             response.Should().HaveStatusCode(HttpStatusCode.OK);
         }
@@ -193,9 +193,9 @@ namespace ShredStoreApiTests
 
             IEnumerable<Product>? products = await ReturnAllProducts(client).ConfigureAwait(false);
 
-            await client.DeleteAsync(SetDeleteUrl(products!.First().Id));
+            await client.DeleteAsync(Utility.SetGet_Or_DeleteUrl(products.First().Id, ApiEndpoints.ProductEndpoints.Delete));
 
-            string url = SetGetUrl(products!.First().Id);
+            string url = Utility.SetGet_Or_DeleteUrl(products.First().Id, ApiEndpoints.ProductEndpoints.Delete);
 
             var getResponse = await client.GetAsync(url);
 
@@ -218,20 +218,7 @@ namespace ShredStoreApiTests
             return products;
         }
 
-        private static string SetDeleteUrl(int id)
-        {
-            string url = ApiEndpointsTest.ProductEndpoints.Delete;
-            url = url.Replace("{id:int}", $"{id}");
-            return url;
-        }
-        private static string SetGetUrl(int id)
-        {
-            string url = ApiEndpointsTest.ProductEndpoints.Get;
-            url = url.Replace("{id}", $"{id}");
-            return url;
-        }
-
-        private ApiFactory CreateApiWithProductRepository<T>()
+            private ApiFactory CreateApiWithProductRepository<T>()
       where T : class, IProductService
         {
             var api = new ApiFactory(services =>

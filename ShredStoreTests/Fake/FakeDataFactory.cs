@@ -7,6 +7,7 @@ using Application.Models;
 using Bogus;
 using Bogus.Extensions.Brazil;
 using Contracts.Request;
+using Contracts.Request.CartRequests;
 using Contracts.Request.ProductRequests;
 
 namespace ShredStoreTests.Fake
@@ -115,6 +116,14 @@ namespace ShredStoreTests.Fake
             .RuleFor(x => x.CartId, 1);
 
             return orderFaker;
+        }
+
+        public static CreateCartRequest FakeCreateCartRequest()
+        {
+            var CartRequestFaker = new Faker<CreateCartRequest>("pt_BR")
+                .RuleFor(x => x.UserId, 1)
+                .RuleFor(x => x.CreatedDate, DateTime.UtcNow);
+            return CartRequestFaker;
         }
     }
 }
