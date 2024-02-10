@@ -1,6 +1,8 @@
-﻿using Application.Repositories.CartStorage;
+﻿using Application.Repositories.CartItemStorage;
+using Application.Repositories.CartStorage;
 using Application.Repositories.ProductStorage;
 using Application.Repositories.UserStorage;
+using Application.Services.CartItemServices;
 using Application.Services.CartServices;
 using Application.Services.ProductServices;
 using Application.Services.UserServices;
@@ -25,6 +27,8 @@ namespace Application
             services.AddTransient<IProductService, ProductService>();
             services.AddTransient<ICartRepository, CartRepository>();
             services.AddTransient<ICartService, CartService>();
+            services.AddTransient<ICartItemRepository, CartItemRepository>();
+            services.AddTransient<ICartItemService, CartItemService>();
             services.AddTransient<ISqlDataAccess, SqlDataAccess>();
             services.AddValidatorsFromAssemblyContaining<IApplicationMarker>(ServiceLifetime.Singleton);
             return services;

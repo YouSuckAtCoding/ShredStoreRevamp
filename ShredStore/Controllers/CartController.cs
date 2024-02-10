@@ -21,13 +21,13 @@ namespace ShredStore.Controllers
         }
 
         [HttpPost(ApiEndpoints.CartEndpoints.Create)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Create([FromBody] CreateCartRequest request, CancellationToken token)
         {
             Cart cart = request.MapToCart();
             bool result = await _cartService.Create(cart, token);
-            return result ? Ok(result) : BadRequest();
+            return result ? Created("shredstore.com", cart) : BadRequest();
         }
 
         [HttpGet(ApiEndpoints.CartEndpoints.Get)]

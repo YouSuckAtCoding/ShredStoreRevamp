@@ -16,18 +16,18 @@ namespace Application.Repositories
         {
             sqlDataAccess = _sqlDataAccess;
         }
-        public Task InsertOrder(Order Order) =>
-       sqlDataAccess.SaveData("dbo.spOrder_Insert", new { Date = DateTime.Now, Order.CartId, Order.UserId });
+        public Task InsertOrder(Order Order, CancellationToken token) =>
+       sqlDataAccess.SaveData("dbo.spOrder_Insert", new { Date = DateTime.Now, Order.CartId, Order.UserId }, token: token);
 
-        public Task<IEnumerable<Order>> GetOrders(int UserId) => sqlDataAccess.LoadData<Order, dynamic>("dbo.spOrder_GetAllUserOrders", new { UserId = UserId });
+        public Task<IEnumerable<Order>> GetOrders(int UserId, CancellationToken token) => sqlDataAccess.LoadData<Order, dynamic>("dbo.spOrder_GetAllUserOrders", new { UserId }, token: token);
 
-        public async Task<Order?> GetOrder(int id)
+        public async Task<Order?> GetOrder(int id, CancellationToken token)
         {
-            var result = await sqlDataAccess.LoadData<Order, dynamic>("dbo.spOrder_GetById", new { Id = id });
+            var result = await sqlDataAccess.LoadData<Order, dynamic>("dbo.spOrder_GetById", new { Id = id }, token: token);
             return result.FirstOrDefault();
         }
-        public Task UpdateOrder(Order Order) => sqlDataAccess.SaveData("dbo.spOrder_Update", new { Order.Id, Order.Date });
+        public Task UpdateOrder(Order Order, CancellationToken token) => sqlDataAccess.SaveData("dbo.spOrder_Update", new { Order.Id, Order.Date }, token: token);
 
-        public Task DeleteOrder(int id) => sqlDataAccess.SaveData("dbo.spOrder_Delete", new { Id = id });
+        public Task DeleteOrder(int id, CancellationToken token) => sqlDataAccess.SaveData("dbo.spOrder_Delete", new { Id = id }, token: token);
     }
 }

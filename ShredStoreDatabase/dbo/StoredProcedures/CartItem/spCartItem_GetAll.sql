@@ -3,7 +3,7 @@
 AS
 Begin
 
-	Select CartId, ProductId, Quantity from dbo.[CartItem]
+	Select CartId, ProductId, Quantity, Price from dbo.[CartItem]
 	where CartId = @CartId
 
 End

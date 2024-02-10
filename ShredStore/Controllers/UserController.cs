@@ -43,7 +43,7 @@ namespace ShredStore.Controllers
         }
 
         [HttpPost(ApiEndpoints.UserEndpoints.Create)]
-        [ProducesResponseType(typeof(UserResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserRequest request, CancellationToken token)
         {
@@ -51,7 +51,7 @@ namespace ShredStore.Controllers
             
             bool result = await _userService.InsertUser(user, token);
             if(result)
-                return Ok(result);
+                return Created("shredstore.com", user);
 
             return BadRequest();
 

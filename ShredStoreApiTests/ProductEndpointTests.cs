@@ -62,7 +62,7 @@ namespace ShredStoreApiTests
             var response = await client.PostAsync(ApiEndpointsTest.ProductEndpoints.Create, httpContent);
             var responseInfo = response.Content.ReadAsStringAsync();
 
-            response.Should().HaveStatusCode(HttpStatusCode.OK);
+            response.Should().HaveStatusCode(HttpStatusCode.Created);
         }
 
         [Fact]
@@ -76,7 +76,7 @@ namespace ShredStoreApiTests
             var httpContent = new StringContent(jsonString, Encoding.UTF8, "application/json");
             var response = await client.PostAsync(ApiEndpointsTest.ProductEndpoints.Create, httpContent);
 
-            response.Should().HaveStatusCode(HttpStatusCode.OK);
+            response.Should().HaveStatusCode(HttpStatusCode.Created);
 
         }
         [Fact]
@@ -193,9 +193,9 @@ namespace ShredStoreApiTests
 
             IEnumerable<Product>? products = await ReturnAllProducts(client).ConfigureAwait(false);
 
-            await client.DeleteAsync(Utility.SetGet_Or_DeleteUrl(products.First().Id, ApiEndpoints.ProductEndpoints.Delete));
+            await client.DeleteAsync(Utility.SetGet_Or_DeleteUrl(products.Last().Id, ApiEndpoints.ProductEndpoints.Delete));
 
-            string url = Utility.SetGet_Or_DeleteUrl(products.First().Id, ApiEndpoints.ProductEndpoints.Delete);
+            string url = Utility.SetGet_Or_DeleteUrl(products.Last().Id, ApiEndpoints.ProductEndpoints.Delete);
 
             var getResponse = await client.GetAsync(url);
 
@@ -204,7 +204,6 @@ namespace ShredStoreApiTests
             var returned = JsonSerializer.Deserialize<Product>(getResult, jsonSerializerOptions)!;
 
             returned.Id.Should().Be(0);
-
 
         }
 

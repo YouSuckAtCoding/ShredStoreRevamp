@@ -36,5 +36,17 @@
             public const string Get = $"{Base}/{{id}}";
             public const string Delete = $"{Base}/{{id:int}}";
         }
+
+        public static class CartItemEndpoints
+        {
+            private const string Base = $"{ApiBase}/item";
+
+            public const string Create = Base;
+            public const string Get = $"{Base}/{{itemId}}/{{cartId}}";
+            public const string GetAll = $"{Base}/{{cartId}}";
+            public const string Update = $"{Base}/update";
+            public const string Delete = $"{Base}/{{itemId}}/{{cartId}}";
+            public const string DeleteAll = $"{Base}/{{cartId}}";
+        }
     }
 }

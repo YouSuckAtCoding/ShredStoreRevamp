@@ -55,7 +55,7 @@ namespace ShredStoreApiTests
 
             var httpContent = new StringContent(jsonString, Encoding.UTF8, "application/json");
             var response = await client.PostAsync(ApiEndpointsTest.UserEndpoints.Create, httpContent);
-            response.Should().HaveStatusCode(HttpStatusCode.OK);
+            response.Should().HaveStatusCode(HttpStatusCode.Created);
         }
 
         [Fact]

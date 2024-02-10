@@ -49,8 +49,7 @@ namespace ShredStoreTests
             {
                 ProductId = 50,
                 CartId = 1,
-                Quantity = 5,
-                Price = 90
+                Quantity = 5
 
             };
 
@@ -67,8 +66,7 @@ namespace ShredStoreTests
             {
                 ProductId = 1,
                 CartId = 2,
-                Quantity = 1,
-                Price = 50
+                Quantity = 1
             };
 
             ICartItemStorage cartItemStorage = new CartItemStorage(_dbConnectionFactory);
@@ -91,7 +89,6 @@ namespace ShredStoreTests
                 CartId = 1,
                 Quantity = 1
             };
-            cartItem.Price = prod.Price * cartItem.Quantity;
             ICartItemStorage cartItemStorage = new CartItemStorage(_dbConnectionFactory);
             await cartItemStorage.InsertCartItem(cartItem);
             var res = await cartItemStorage.GetCartItems(1);
@@ -125,7 +122,6 @@ namespace ShredStoreTests
                     Quantity = 1
                     
                 };
-                cartItem.Price = product.Price * cartItem.Quantity;
                 await cartItemStorage.InsertCartItem(cartItem);
             }
             

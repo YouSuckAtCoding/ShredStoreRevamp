@@ -4,10 +4,10 @@ namespace Application.Repositories
 {
     public interface IOrderRepository
     {
-        Task DeleteOrder(int id);
-        Task<Order?> GetOrder(int id);
-        Task<IEnumerable<Order>> GetOrders(int UserId);
-        Task InsertOrder(Order Order);
-        Task UpdateOrder(Order Order);
+        Task DeleteOrder(int id, CancellationToken token);
+        Task<Order?> GetOrder(int id, CancellationToken token);
+        Task<IEnumerable<Order>> GetOrders(int UserId, CancellationToken token);
+        Task InsertOrder(Order Order, CancellationToken token);
+        Task UpdateOrder(Order Order, CancellationToken token);
     }
 }

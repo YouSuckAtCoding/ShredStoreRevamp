@@ -39,7 +39,7 @@ namespace ShredStoreApiTests
             var response = await client.PostAsync(ApiEndpointsTest.CartEndpoints.Create, httpContent);
             var responseInfo = response.Content.ReadAsStringAsync();
 
-            response.Should().HaveStatusCode(HttpStatusCode.OK);
+            response.Should().HaveStatusCode(HttpStatusCode.Created);
         }
 
         [Fact]
@@ -47,7 +47,7 @@ namespace ShredStoreApiTests
         {
             using var client = CreateApi.CreateOfficialApi().CreateClient();
 
-            var users = await GetAllUsers(client);
+            var users = await Utility.GetAllUsers(client);
 
             CreateCartRequest request = new CreateCartRequest
             {
@@ -62,7 +62,7 @@ namespace ShredStoreApiTests
             var response = await client.PostAsync(ApiEndpointsTest.CartEndpoints.Create, httpContent);
             var responseInfo = response.Content.ReadAsStringAsync();
 
-            response.Should().HaveStatusCode(HttpStatusCode.OK);
+            response.Should().HaveStatusCode(HttpStatusCode.Created);
         }
 
         [Fact]
@@ -135,12 +135,6 @@ namespace ShredStoreApiTests
             });
             return api;
         }
-        private static async Task<IEnumerable<User>?> GetAllUsers(HttpClient client)
-        {
-            var response = await client.GetAsync(ApiEndpointsTest.UserEndpoints.GetAll);
-            var result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            var users = JsonSerializer.Deserialize<IEnumerable<User>>(result, jsonSerializerOptions);
-            return users;
-        }
+       
     }
 }

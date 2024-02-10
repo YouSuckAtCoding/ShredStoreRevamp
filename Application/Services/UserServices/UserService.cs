@@ -66,7 +66,7 @@ namespace Application.Services.UserServices
             return true;
         }
 
-        public async Task<User> UpdateUser(User request, CancellationToken token)
+        public async Task<User?> UpdateUser(User request, CancellationToken token)
         {
             await _userRepository.UpdateUser(request, token);
             return await _userRepository.GetUser(request.Id, token);

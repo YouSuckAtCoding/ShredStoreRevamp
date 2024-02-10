@@ -96,6 +96,7 @@
     <Build Include="dbo\StoredProcedures\CartItem\spCartItem_Update.sql" />
     <Build Include="dbo\StoredProcedures\Order\spOrder_GetAllUserOrders.sql" />
     <Build Include="dbo\StoredProcedures\User\spUser_ResetPasswordByEmail.sql" />
+    <Build Include="dbo\StoredProcedures\CartItem\spCartItem_GetById.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ShredStoreDatabase.publish.xml" />

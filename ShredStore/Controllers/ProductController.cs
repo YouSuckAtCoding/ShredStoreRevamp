@@ -43,13 +43,13 @@ namespace ShredStore.Controllers
         }
 
         [HttpPost(ApiEndpoints.ProductEndpoints.Create)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Create([FromBody] CreateProductRequest request, CancellationToken token)
         {
             var product = request.MapToProduct();
             bool res = await _productService.Create(product, token);
-            return res ? Ok(res) : BadRequest();
+            return res ? Created("shredstore.com", product) : BadRequest();
         }
 
         [HttpPut(ApiEndpoints.ProductEndpoints.Update)]
