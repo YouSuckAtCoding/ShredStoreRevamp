@@ -19,16 +19,16 @@ namespace Application.Repositories.CartItemStorage
 
         public Task<IEnumerable<CartItem>> GetCartItems(int id, CancellationToken token)
         {
-            var result = sqlDataAccess.LoadData<CartItem, dynamic>("dbo.spCartItem_GetAll", new { CartId = id });
+            var result = sqlDataAccess.LoadData<CartItem, dynamic>("dbo.spCartItem_GetAll", new { CartId = id }, token:token);
             return result;
         }
         public Task InsertCartItem(CartItem cartItem, CancellationToken token) =>
-            sqlDataAccess.SaveData("dbo.spCartItem_Insert", new { cartItem.CartId, cartItem.ProductId, cartItem.Quantity });
+            sqlDataAccess.SaveData("dbo.spCartItem_Insert", new { cartItem.CartId, cartItem.ProductId, cartItem.Quantity }, token: token);
         public Task UpdateCartItem(int productId, int quantity, int cartId, CancellationToken token) =>
-         sqlDataAccess.SaveData("dbo.spCartItem_Update", new { ProductId = productId, Quantity = quantity, CartId = cartId });
+         sqlDataAccess.SaveData("dbo.spCartItem_Update", new { ProductId = productId, Quantity = quantity, CartId = cartId }, token: token);
 
-        public Task DeleteCartItem(int productId, int cartId, CancellationToken token) => sqlDataAccess.SaveData("dbo.spCartItem_Delete", new { ProductId = productId, CartId = cartId });
-        public Task DeleteAllCartItem(int cartId, CancellationToken token) => sqlDataAccess.SaveData("dbo.spCartItem_DeleteAll", new { CartId = cartId });
+        public Task DeleteCartItem(int productId, int cartId, CancellationToken token) => sqlDataAccess.SaveData("dbo.spCartItem_Delete", new { ProductId = productId, CartId = cartId }, token: token);
+        public Task DeleteAllCartItem(int cartId, CancellationToken token) => sqlDataAccess.SaveData("dbo.spCartItem_DeleteAll", new { CartId = cartId }, token: token);
 
         public async Task<CartItem?> GetCartItem(int itemId, int cartId, CancellationToken token)
         {

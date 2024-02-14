@@ -21,6 +21,8 @@ namespace ShredStoreApiTests
             string url = endpoint;
             url = url.Replace( "{id}", $"{id}");
             url = url.Replace("{id:int}", $"{id}");
+            url = url.Replace("{userId}", $"{id}");
+            url = url.Replace("{orderId}", $"{id}");
             return url;
         }
 

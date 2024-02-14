@@ -1,0 +1,10 @@
+﻿CREATE TABLE [dbo].[OrderItem]
+(
+	[Id] INT NOT NULL PRIMARY KEY IDENTITY,
+	[OrderId] INT NOT NULL FOREIGN KEY REFERENCES [Order](Id),
+	[ProductId] INT NOT NULL FOREIGN KEY REFERENCES [Product](Id),
+	[Quantity] INT NOT NULL,
+	[Price] money NOT NULL,
+	
+
+)

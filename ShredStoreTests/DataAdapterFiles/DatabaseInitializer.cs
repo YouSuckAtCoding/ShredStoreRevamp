@@ -27,9 +27,9 @@ namespace ShredStoreTests.DataAdapterFiles
         public async Task InitializeAsync()
         {
             using var connection = await _connectionFactory.CreateConnectionAsync(default);
-            
-                 connection.Execute(
-                @"CREATE TABLE [User] (
+
+            connection.Execute(
+           @"CREATE TABLE [User] (
                     Id INT NOT NULL PRIMARY KEY IDENTITY,
 	                Name VARCHAR(20) NOT NULL,
 	                Age INT NOT NULL,
@@ -39,9 +39,9 @@ namespace ShredStoreTests.DataAdapterFiles
 	                Password BINARY(64) NOT NULL, 
                     Salt UNIQUEIDENTIFIER NOT NULL
                 );"
-                );
-             connection.Execute(
-                @"CREATE TABLE [dbo].[Product]
+           );
+            connection.Execute(
+               @"CREATE TABLE [dbo].[Product]
                 (
                 	[Id] INT NOT NULL PRIMARY KEY IDENTITY,
                 	[Name] VARCHAR(25) NOT NULL,
@@ -52,15 +52,15 @@ namespace ShredStoreTests.DataAdapterFiles
                 )
                 ");
 
-             connection.Execute(
-               @"CREATE TABLE [dbo].[Cart]
+            connection.Execute(
+              @"CREATE TABLE [dbo].[Cart]
                 (
                 	[UserId] INT NOT NULL FOREIGN KEY REFERENCES [User](Id) PRIMARY KEY,
                 	[TotalAmount] MONEY,
                 	[CreatedDate] DATETIME NOT NULL
                 
                 )"
-            );
+           );
             connection.Execute(
             @"CREATE TABLE[dbo].[CartItem]
             (
@@ -69,22 +69,30 @@ namespace ShredStoreTests.DataAdapterFiles
               [Quantity] INT NOT NULL,
               [Price] money NOT NULL
             )");
-             connection.Execute(@"
+            connection.Execute(
+              @"CREATE TABLE [dbo].[Payment]
+                (
+                	[Id] INT NOT NULL PRIMARY KEY
+                )
+                INSERT INTO dbo.Payment (Id) Values(1);
+                ");
+
+            connection.Execute(@"
                 CREATE TABLE [dbo].[Order]
                 (
                 	[Id] INT NOT NULL PRIMARY KEY IDENTITY,
-                	[Date] DATETIME NOT NULL,
-                	[CartId] INT NOT NULL FOREIGN KEY REFERENCES Cart(UserId),
+                	[CreatedDate] DATETIME NOT NULL,
                 	[TotalAmount] MONEY NOT NULL,
-                	[UserId] INT NOT NULL FOREIGN KEY REFERENCES [User](Id)
+                	[UserId] INT NOT NULL FOREIGN KEY REFERENCES [User](Id),
+                	[PaymentId] INT NOT NULL FOREIGN KEY REFERENCES[Payment](Id)
                 
                 )");
-
-                CreateUserStoredProcedures(connection);
-                CreateProductStoredProcedures(connection);
-                CreateCartStoredProcedures(connection);
-                CreateCarttemStoredProcedures(connection);
-                CreateOrderStorageProcedures(connection);
+          
+            CreateUserStoredProcedures(connection);
+            CreateProductStoredProcedures(connection);
+            CreateCartStoredProcedures(connection);
+            CreateCarttemStoredProcedures(connection);
+            CreateOrderStorageProcedures(connection);
 
 
 
@@ -92,8 +100,8 @@ namespace ShredStoreTests.DataAdapterFiles
 
         private void CreateUserStoredProcedures(IDbConnection connection)
         {
-             connection.Execute(
-                @"CREATE PROCEDURE [dbo].[spUser_Insert]
+            connection.Execute(
+               @"CREATE PROCEDURE [dbo].[spUser_Insert]
             	@Name VARCHAR(20),
             	@Age INT,
             	@EMAIL VARCHAR(50),
@@ -109,18 +117,18 @@ namespace ShredStoreTests.DataAdapterFiles
             	INSERT INTO dbo.[User] (Name, Age, Email, Cpf, Address, [Password], Salt)
             	VALUES (@Name, @Age, @EMAIL, @CPF, @Address,HASHBYTES('SHA2_512', @Password+CAST(@Salt as NVARCHAR(36))), @Salt)
                 END"
-                );
+               );
 
-             connection.Execute(
-                @"CREATE PROCEDURE [dbo].[spUser_GetAll]
+            connection.Execute(
+               @"CREATE PROCEDURE [dbo].[spUser_GetAll]
                 AS
                 Begin
                     Select Id, Name, Age, Email, Cpf, Address from dbo.[User]
                 End
                 ");
 
-             connection.Execute(
-                @"CREATE PROCEDURE [dbo].[spUser_GetById]
+            connection.Execute(
+               @"CREATE PROCEDURE [dbo].[spUser_GetById]
                 @Id int
                 AS
                 Begin
@@ -128,16 +136,16 @@ namespace ShredStoreTests.DataAdapterFiles
                 	Where Id = @Id
                 End");
 
-             connection.Execute(
-                @"CREATE PROCEDURE [dbo].[spUser_Delete]
+            connection.Execute(
+               @"CREATE PROCEDURE [dbo].[spUser_Delete]
                 @Id int
                 AS
                 Begin
                 	Delete from dbo.[User] where Id = @Id
                 End	");
 
-             connection.Execute(
-                @"CREATE PROCEDURE [dbo].[spUser_Update]
+            connection.Execute(
+               @"CREATE PROCEDURE [dbo].[spUser_Update]
             	@Id int,
             	@Name VARCHAR(20),
             	@Age INT,
@@ -156,8 +164,8 @@ namespace ShredStoreTests.DataAdapterFiles
             	Where Id = @Id
             
                 End");
-             connection.Execute(
-                @"CREATE PROCEDURE [dbo].[spUser_Login]
+            connection.Execute(
+               @"CREATE PROCEDURE [dbo].[spUser_Login]
             	@Name nvarchar(50),
             	@Password nvarchar(50),
             	@ResponseMessage nvarchar(250)='' Output
@@ -201,8 +209,8 @@ namespace ShredStoreTests.DataAdapterFiles
         }
         private void CreateProductStoredProcedures(IDbConnection connection)
         {
-             connection.Execute(
-                @"CREATE PROCEDURE [dbo].[spProduct_Insert]
+            connection.Execute(
+               @"CREATE PROCEDURE [dbo].[spProduct_Insert]
             	@Name VARCHAR(25),
             	@Description varchar(300),
             	@Price MONEY,
@@ -217,10 +225,10 @@ namespace ShredStoreTests.DataAdapterFiles
             
                 End
                 "
-                );
+               );
 
-             connection.Execute(
-                @"CREATE PROCEDURE [dbo].[spProduct_GetById]
+            connection.Execute(
+               @"CREATE PROCEDURE [dbo].[spProduct_GetById]
                 @Id int
                 AS
                 Begin
@@ -230,8 +238,8 @@ namespace ShredStoreTests.DataAdapterFiles
                 
                 End");
 
-             connection.Execute(
-                @"CREATE PROCEDURE [dbo].[spProduct_GetAll]
+            connection.Execute(
+               @"CREATE PROCEDURE [dbo].[spProduct_GetAll]
 	
                 AS
                 Begin
@@ -239,9 +247,9 @@ namespace ShredStoreTests.DataAdapterFiles
                 	Select Id, Name, Description, Price, Type, Category from dbo.Product
                 
                 End"
-                );
-             connection.Execute(
-                @"CREATE PROCEDURE [dbo].[spProduct_Update]
+               );
+            connection.Execute(
+               @"CREATE PROCEDURE [dbo].[spProduct_Update]
             	@Id int,
             	@Name VARCHAR(25),
             	@Description varchar(300),
@@ -260,8 +268,8 @@ namespace ShredStoreTests.DataAdapterFiles
             
                 End
                 ");
-             connection.Execute(
-                @"CREATE PROCEDURE [dbo].[spProduct_Delete]
+            connection.Execute(
+               @"CREATE PROCEDURE [dbo].[spProduct_Delete]
                 @Id int
                 AS
                 Begin
@@ -273,7 +281,7 @@ namespace ShredStoreTests.DataAdapterFiles
         }
         private void CreateCartStoredProcedures(IDbConnection connection)
         {
-             connection.Execute(@"
+            connection.Execute(@"
              CREATE PROCEDURE [dbo].[spCart_Insert]
              	@UserId int,
              	@CreatedDate Datetime
@@ -288,7 +296,7 @@ namespace ShredStoreTests.DataAdapterFiles
              
             ");
 
-             connection.Execute(@"
+            connection.Execute(@"
             CREATE PROCEDURE [dbo].[spCart_Delete]
             	@UserId int
             AS
@@ -298,7 +306,7 @@ namespace ShredStoreTests.DataAdapterFiles
             
             End
             ");
-             connection.Execute(@"
+            connection.Execute(@"
                 CREATE PROCEDURE [dbo].[spCart_GetById]
                 	@UserId int
                 AS
@@ -311,8 +319,8 @@ namespace ShredStoreTests.DataAdapterFiles
         }
         private void CreateCarttemStoredProcedures(IDbConnection connection)
         {
-             connection.Execute(
-                @"CREATE PROCEDURE [dbo].[spCartItem_Insert]
+            connection.Execute(
+               @"CREATE PROCEDURE [dbo].[spCartItem_Insert]
             	@CartId int, 
             	@ProductId int,
             	@Quantity int,
@@ -325,8 +333,8 @@ namespace ShredStoreTests.DataAdapterFiles
             
             End");
 
-             connection.Execute(
-                @"CREATE PROCEDURE [dbo].[spCartItem_GetAll]
+            connection.Execute(
+               @"CREATE PROCEDURE [dbo].[spCartItem_GetAll]
                 	@CartId int
                 AS
                 Begin
@@ -337,8 +345,8 @@ namespace ShredStoreTests.DataAdapterFiles
                 End
                 
                 ");
-             connection.Execute(
-                @"CREATE PROCEDURE [dbo].[spCartItem_DeleteAll]
+            connection.Execute(
+               @"CREATE PROCEDURE [dbo].[spCartItem_DeleteAll]
                 	@CartId int
                 AS
                 	
@@ -348,8 +356,8 @@ namespace ShredStoreTests.DataAdapterFiles
                 	Where CartId = @CartId;
                 
                 End");
-             connection.Execute(
-                @"
+            connection.Execute(
+               @"
                 CREATE PROCEDURE [dbo].[spCartItem_Delete]
                 	@ProductId int,
                 	@CartId int
@@ -361,8 +369,8 @@ namespace ShredStoreTests.DataAdapterFiles
                 		Where ProductId = @ProductId and CartId = @CartId;
                 End");
 
-             connection.Execute(
-                @"
+            connection.Execute(
+               @"
                 CREATE PROCEDURE [dbo].[spCartItem_Update]
                 		@ProductId int,
                 	@Quantity int,
@@ -378,35 +386,35 @@ namespace ShredStoreTests.DataAdapterFiles
         }
         private void CreateOrderStorageProcedures(IDbConnection connection)
         {
-             connection.Execute(@"
+            connection.Execute(@"
                 CREATE PROCEDURE [dbo].[spOrder_Insert]
-            	@Date datetime,
-            	@CartId int,
-            	@UserId int
+            	@CreatedDate datetime,
+            	@UserId int, 
+            	@TotalAmount money,
+                @PaymentId int
             
             AS
             Begin
             
-            	Declare @TotalAmount money
-            	SET @TotalAmount = (Select SUM(Price) from dbo.CartItem where CartId = @CartId);
-            	
-            	INSERT INTO dbo.[Order] ([Date], CartId, TotalAmount, UserId)
-            	Values (@Date, @CartId, @TotalAmount, @UserId)
+            	INSERT INTO dbo.[Order] ([CreatedDate], UserId, TotalAmount, PaymentId)
+            	Values (@CreatedDate, @UserId, @TotalAmount, @PaymentId)
             
             End");
-             connection.Execute(@"
+
+            connection.Execute(@"
                 CREATE PROCEDURE [dbo].[spOrder_Update]
-                	@Id int,
-                	@Date datetime
-                AS
-                Begin
-                	
-                	Update dbo.[Order]
-                	Set [Date] = @Date
-                	Where Id = @Id
-                
-                End");
-             connection.Execute(@"
+            	@Id int,
+            	@CreatedDate datetime
+            AS
+            Begin
+            	
+            	Update dbo.[Order]
+            	Set [CreatedDate] = @CreatedDate
+            	Where Id = @Id
+            
+            End");
+
+            connection.Execute(@"
                 CREATE PROCEDURE [dbo].[spOrder_Delete]
                 	@Id int
                 AS
@@ -415,27 +423,28 @@ namespace ShredStoreTests.DataAdapterFiles
                 	Delete from dbo.[Order] where Id = @Id
                 
                 End");
-             connection.Execute(@"
-                CREATE PROCEDURE [dbo].[spOrder_GetById]
-                	@Id int
-                AS
-                Begin
-                
-                	Select Id, [Date], CartId, TotalAmount, UserId from dbo.[Order]
-                	Where Id = @Id
-                
-                End");
             connection.Execute(@"
-                CREATE PROCEDURE [dbo].[spOrder_GetAllUserOrders]
-                	@UserId int
-                AS
-                Begin
-                
-                	Select Id, [Date], CartId, TotalAmount, UserId from dbo.[Order]
-                	Where UserId = @UserId
-                
-                End");
+               CREATE PROCEDURE [dbo].[spOrder_GetById]
+            	@Id int
+            AS
+            Begin
             
+            	Select Id, [CreatedDate], UserId, TotalAmount from dbo.[Order]
+            	Where Id = @Id
+            
+            End");
+
+            connection.Execute(@"
+               CREATE PROCEDURE [dbo].[spOrder_GetAllUserOrders]
+               	@UserId int
+               AS
+               Begin
+               
+               	Select Id, [CreatedDate], TotalAmount, UserId from dbo.[Order]
+               	Where UserId = @UserId
+               
+               End");
+
         }
     }
 }

@@ -113,11 +113,15 @@ namespace ShredStoreApiTests
         public async Task Should_Return_User_From_Get_Endpoint()
         {
             using var client = CreateApi.CreateOfficialApi().CreateClient();
-            string url = Utility.SetGet_Or_DeleteUrl(4, ApiEndpoints.UserEndpoints.Delete);
+            var users = await Utility.GetAllUsers(client);
+            
+            string url = Utility.SetGet_Or_DeleteUrl(users!.Last().Id, ApiEndpoints.UserEndpoints.Delete);
+            
             var response = await client.GetAsync(url);
             var result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            
             var user = JsonSerializer.Deserialize<User>(result, jsonSerializerOptions);
-            user!.Id.Should().Be(4);
+            user!.Id.Should().Be(users!.Last().Id);
 
         }
 
@@ -125,12 +129,14 @@ namespace ShredStoreApiTests
         public async Task Should_Update_User_Name_Real_Update_Endpoint()
         {
             using var client = CreateApi.CreateOfficialApi().CreateClient();
+            var users = await Utility.GetAllUsers(client);
 
-            string url = Utility.SetGet_Or_DeleteUrl(4, ApiEndpoints.UserEndpoints.Delete);
+            string url = Utility.SetGet_Or_DeleteUrl(users!.Last().Id, ApiEndpoints.UserEndpoints.Delete);
+            
             var getResponse = await client.GetAsync(url);
+            
             var getResult = await getResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
             var returned = JsonSerializer.Deserialize<User>(getResult, jsonSerializerOptions)!;
-
 
             returned.Name = "KappaClaus";
 
@@ -170,14 +176,29 @@ namespace ShredStoreApiTests
         public async Task Should_Delete_User_Real_Delete_Endpoint()
         {
             using var client = CreateApi.CreateOfficialApi().CreateClient();
-            string url = Utility.SetGet_Or_DeleteUrl(2, ApiEndpoints.UserEndpoints.Delete);
+
+            var userRequest = FakeDataFactory.FakeCreateUserRequest();
+
+            var jsonUserString = JsonSerializer.Serialize(userRequest);
+
+            var httpContent = new StringContent(jsonUserString, Encoding.UTF8, "application/json");
+            
+            await client.PostAsync(ApiEndpointsTest.UserEndpoints.Create, httpContent);
+
+            var users = await Utility.GetAllUsers(client);
+
+            int id = users!.Last().Id;
+
+            string url = Utility.SetGet_Or_DeleteUrl(id, ApiEndpoints.UserEndpoints.Delete);
+           
             await client.DeleteAsync(url);
 
-            var response = await client.GetAsync(ApiEndpointsTest.UserEndpoints.GetAll);
-            var result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            var users = JsonSerializer.Deserialize<IEnumerable<User>>(result, jsonSerializerOptions);
+            var response = await client.GetAsync(Utility.SetGet_Or_DeleteUrl(id, ApiEndpointsTest.UserEndpoints.Get));
 
-            users.Should().NotContain(x => x.Id == 2);
+            var result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var user = JsonSerializer.Deserialize<User>(result, jsonSerializerOptions);
+
+            user.Id.Should().Be(0);
 
         }
 

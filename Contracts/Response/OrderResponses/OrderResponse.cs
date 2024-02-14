@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Models
+namespace Contracts.Response.OrderResponses
 {
-    public class Order
+    public class OrderResponse
     {
         public int Id { get; set; }
         public DateTime CreatedDate { get; set; }

@@ -47,5 +47,26 @@
             public const string Delete = $"{Base}/{{itemId}}/{{cartId}}";
             public const string DeleteAll = $"{Base}/{{cartId}}";
         }
+        public static class OrderEndpoints
+        {
+            private const string Base = $"{ApiBase}/order";
+
+            public const string Create = Base;
+            public const string Get = $"{Base}/Id={{orderId}}";
+            public const string GetAll = $"{Base}/{{userId}}";
+            public const string Update = $"{Base}/update";
+            public const string Delete = $"{Base}/{{orderId}}";
+        }
+        public static class OrderItemEndpoints
+        {
+            private const string Base = $"{ApiBase}/orderItem";
+
+            public const string Create = Base;
+            public const string Get = $"{Base}/{{itemId}}/{{orderId}}";
+            public const string GetAll = $"{Base}/{{orderId}}";
+            public const string Update = $"{Base}/update";
+            public const string Delete = $"{Base}/{{itemId}}/{{orderId}}";
+            public const string DeleteAll = $"{Base}/{{orderId}}";
+        }
     }
 }

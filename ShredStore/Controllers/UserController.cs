@@ -73,7 +73,7 @@ namespace ShredStore.Controllers
 
         [HttpPut(ApiEndpoints.UserEndpoints.Update)]
         [ProducesResponseType(typeof(UserResponse), StatusCodes.Status200OK)]
-        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateUserRequest request, CancellationToken token)
+        public async Task<IActionResult> Update([FromBody] UpdateUserRequest request, CancellationToken token)
         {
             User user = request.MapToUser();
 

@@ -1,11 +1,13 @@
 ﻿CREATE PROCEDURE [dbo].[spOrder_Update]
 	@Id int,
-	@Date datetime
+	@CreatedDate datetime,
+	@TotalAmount money
 AS
 Begin
 	
 	Update dbo.[Order]
-	Set [Date] = @Date
+	Set [CreatedDate] = @CreatedDate,
+	TotalAmount = @TotalAmount
 	Where Id = @Id
 
 End

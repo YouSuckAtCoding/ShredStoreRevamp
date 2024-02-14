@@ -46,10 +46,11 @@ namespace ShredStoreTests
             await SetUpMultipleCartItems();
             IOrderStorage orderStorage = new OrderStorage(_dbConnectionFactory);
             Order order = FakeDataFactory.FakeOrder();
+            order.PaymentId = 1;
             await orderStorage.InsertOrder(order);
 
             var res = await orderStorage.GetOrders(order.UserId);
-            res.First().CartId.Should().Be(order.CartId);
+            res.First().UserId.Should().Be(order.UserId);
 
             await Utility.CleanUpOrders(_dbConnectionFactory);
             await Utility.ClearCartItems(_dbConnectionFactory);
@@ -63,7 +64,10 @@ namespace ShredStoreTests
 
             IOrderStorage orderStorage = new OrderStorage(_dbConnectionFactory);
             Order order = FakeDataFactory.FakeOrder();
+            order.PaymentId = 1;
+            order.TotalAmount = expected;
             await orderStorage.InsertOrder(order);
+            order.PaymentId = 1;
 
             var res = await orderStorage.GetOrders(order.UserId);
             res.First().TotalAmount.Should().Be(expected);
@@ -79,8 +83,9 @@ namespace ShredStoreTests
             await SetUpMultipleCartItems();
             IOrderStorage orderStorage = new OrderStorage(_dbConnectionFactory);
             Order order = FakeDataFactory.FakeOrder();
+            order.PaymentId = 1;
             await orderStorage.InsertOrder(order);
-
+            
             var res = await orderStorage.GetOrders(order.UserId);
 
             await orderStorage.DeleteOrder(res.First().Id);
@@ -99,18 +104,19 @@ namespace ShredStoreTests
             await SetUpMultipleCartItems();
             IOrderStorage orderStorage = new OrderStorage(_dbConnectionFactory);
             Order order = FakeDataFactory.FakeOrder();
+            order.PaymentId = 1;
             await orderStorage.InsertOrder(order);
-
+            
             var res = await orderStorage.GetOrders(order.UserId);
 
             order.Id = res.First().Id;
             DateTime newDate = new DateTime(2019, 05, 09, 09, 15, 00);
-            order.Date = newDate;
+            order.CreatedDate = newDate;
             await orderStorage.UpdateOrder(order);
 
             res = await orderStorage.GetOrders(order.UserId);
 
-            res.First().Date.Should().Be(newDate);
+            res.First().CreatedDate.Should().Be(newDate);
 
             await Utility.CleanUpOrders(_dbConnectionFactory);
             await Utility.ClearCartItems(_dbConnectionFactory);
@@ -120,16 +126,13 @@ namespace ShredStoreTests
         {
 
             User user = FakeDataFactory.FakeUser();
-            IUserStorage userStorage = new UserStorage(_dbConnectionFactory);
-            await userStorage.InsertUser(user);
-
-            IProductStorage productStorage = new ProductStorage(_dbConnectionFactory);
             Product product = FakeDataFactory.FakeProduct();
-            await productStorage.InsertProduct(product);
-
             Cart cart = FakeDataFactory.FakeCart();
-            ICartStorage cartStorage = new CartStorage(_dbConnectionFactory);
-            await cartStorage.InsertCart(cart);
+
+
+            
+
+            await SetUpRecordsOnDatabase(user, product, cart);
 
             ICartItemStorage cartItemStorage = new CartItemStorage(_dbConnectionFactory);
 
@@ -145,6 +148,26 @@ namespace ShredStoreTests
             return product.Price * cartItem.Quantity;
 
         }
+
+        private async Task SetUpRecordsOnDatabase(User user, Product product, Cart cart)
+        {
+            IUserStorage userStorage = new UserStorage(_dbConnectionFactory);
+            await userStorage.InsertUser(user);
+
+            IProductStorage productStorage = new ProductStorage(_dbConnectionFactory);
+            await productStorage.InsertProduct(product);
+
+            ICartStorage cartStorage = new CartStorage(_dbConnectionFactory);
+            Cart carts = await cartStorage.GetCart(1);
+            int cartId = 0;
+            if (carts is null)
+            {
+                await cartStorage.InsertCart(cart);
+                cartId = 1;
+            }
+            else cartId = carts.UserId;
+        }
+
         private async Task SetUpMultipleCartItems()
         {
             Cart cart = FakeDataFactory.FakeCart();
@@ -154,8 +177,19 @@ namespace ShredStoreTests
             IUserStorage userStorage = new UserStorage(_dbConnectionFactory);
             await userStorage.InsertUser(user);
 
+            var users = await userStorage.GetUsers();
+
             ICartStorage cartStorage = new CartStorage(_dbConnectionFactory);
-            await cartStorage.InsertCart(cart);
+            Cart carts = await cartStorage.GetCart(1);
+            int cartId = 0;
+            if (carts is null)
+            {
+                await cartStorage.InsertCart(cart);
+                cartId = 1;
+            }
+            else cartId = carts.UserId;
+
+            
 
             IProductStorage productStorage = new ProductStorage(_dbConnectionFactory);
 
@@ -173,7 +207,7 @@ namespace ShredStoreTests
                 CartItem cartItem = new CartItem
                 {
                     ProductId = product.Id,
-                    CartId = 1,
+                    CartId = cartId,
                     Quantity = 4
                 };
                 cartItem.Price = product.Price * cartItem.Quantity;

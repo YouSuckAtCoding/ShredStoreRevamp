@@ -3,7 +3,7 @@
 AS
 Begin
 
-	Select Id, [Date], CartId, TotalAmount, UserId from dbo.[Order]
+	Select Id, [CreatedDate], UserId, TotalAmount from dbo.[Order]
 	Where Id = @Id
 
 End

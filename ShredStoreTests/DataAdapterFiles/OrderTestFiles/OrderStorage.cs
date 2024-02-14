@@ -18,16 +18,16 @@ namespace ShredStoreTests.DataAdapterFiles.OrderTestFiles
             _dataAccess = new TestSqlDataAccess(dbConnectionFactory);
         }
         public Task InsertOrder(Order Order) =>
-        _dataAccess.SaveData("dbo.spOrder_Insert", new { Date = DateTime.Now, Order.CartId, Order.UserId });
+        _dataAccess.SaveData("dbo.spOrder_Insert", new { Order.CreatedDate, Order.UserId, Order.TotalAmount, Order.PaymentId});
 
-        public Task<IEnumerable<Order>> GetOrders(int UserId) => _dataAccess.LoadData<Order, dynamic>("dbo.spOrder_GetAllUserOrders", new { UserId = UserId });
+        public Task<IEnumerable<Order>> GetOrders(int UserId) => _dataAccess.LoadData<Order, dynamic>("dbo.spOrder_GetAllUserOrders", new { UserId });
 
         public async Task<Order?> GetOrder(int id)
         {
             var result = await _dataAccess.LoadData<Order, dynamic>("dbo.spOrder_GetById", new { Id = id });
             return result.FirstOrDefault();
         }
-        public Task UpdateOrder(Order Order) => _dataAccess.SaveData("dbo.spOrder_Update", new { Order.Id, Order.Date});
+        public Task UpdateOrder(Order Order) => _dataAccess.SaveData("dbo.spOrder_Update", new { Order.Id, Order.CreatedDate});
 
         public Task DeleteOrder(int id) => _dataAccess.SaveData("dbo.spOrder_Delete", new { Id = id });
     }

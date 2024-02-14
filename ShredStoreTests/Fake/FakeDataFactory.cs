@@ -8,6 +8,7 @@ using Bogus;
 using Bogus.Extensions.Brazil;
 using Contracts.Request;
 using Contracts.Request.CartRequests;
+using Contracts.Request.OrderRequests;
 using Contracts.Request.ProductRequests;
 
 namespace ShredStoreTests.Fake
@@ -22,7 +23,7 @@ namespace ShredStoreTests.Fake
             .RuleFor(x => x.Cpf, f => f.Person.Cpf(false))
             .RuleFor(x => x.Address, f => f.Address.StreetAddress())
             .RuleFor(x => x.Age, f => f.Random.Number(16,110))
-            .RuleFor(x => x.Password, f => f.Random.AlphaNumeric(25));
+            .RuleFor(x => x.Password, f => f.Random.AlphaNumeric(15));
 
             return userFaker;
         }
@@ -34,7 +35,7 @@ namespace ShredStoreTests.Fake
             .RuleFor(x => x.Cpf, f => f.Person.Cpf(false))
             .RuleFor(x => x.Address, f => f.Address.StreetAddress())
             .RuleFor(x => x.Age, f => f.Random.Number(16, 110))
-            .RuleFor(x => x.Password, f => f.Random.AlphaNumeric(25));
+            .RuleFor(x => x.Password, f => f.Random.AlphaNumeric(15));
 
             return userFaker;
         }
@@ -43,7 +44,7 @@ namespace ShredStoreTests.Fake
         {
             var userFaker = new Faker<ResetPasswordUserRequest>("pt_Br")
                 .RuleFor(x => x.Email, "teste@gmail.com")
-                .RuleFor(x => x.Password, f => f.Random.AlphaNumeric(25));
+                .RuleFor(x => x.Password, f => f.Random.AlphaNumeric(15));
             return userFaker;            
         }
 
@@ -55,7 +56,7 @@ namespace ShredStoreTests.Fake
             .RuleFor(x => x.Cpf, f => f.Person.Cpf(false))
             .RuleFor(x => x.Address, f => f.Address.StreetAddress())
             .RuleFor(x => x.Age, f => f.Random.Number(25))
-            .RuleFor(x => x.Password, f => f.Random.AlphaNumeric(25));
+            .RuleFor(x => x.Password, f => f.Random.AlphaNumeric(15));
 
             return userFaker.Generate(10);
         }
@@ -111,9 +112,31 @@ namespace ShredStoreTests.Fake
         public static Order FakeOrder()
         {
             var orderFaker = new Faker<Order>("pt_BR")
-            .RuleFor(x => x.Date, DateTime.Now)
+            .RuleFor(x => x.CreatedDate, DateTime.Now)
             .RuleFor(x => x.UserId, 1)
-            .RuleFor(x => x.CartId, 1);
+            .RuleFor(x => x.TotalAmount, 1000)
+            .RuleFor(x => x.PaymentId, 3);
+
+            return orderFaker;
+        }
+
+        public static IEnumerable<Order> FakeOrders()
+        {
+            var orderFaker = new Faker<Order>("pt_BR")
+            .RuleFor(x => x.CreatedDate, DateTime.Now)
+            .RuleFor(x => x.UserId, 1)
+            .RuleFor(x => x.TotalAmount, 1000)
+            .RuleFor(x => x.PaymentId, 3);
+
+            return orderFaker.Generate(10);
+        }
+        public static CreateOrderRequest FakeCreateOrderRequest()
+        {
+            var orderFaker = new Faker<CreateOrderRequest>("pt_BR")
+            .RuleFor(x => x.CreatedDate, DateTime.Now)
+            .RuleFor(x => x.UserId, 1)
+            .RuleFor(x => x.TotalAmount, 1000)
+            .RuleFor(x => x.PaymentId, 3);
 
             return orderFaker;
         }
