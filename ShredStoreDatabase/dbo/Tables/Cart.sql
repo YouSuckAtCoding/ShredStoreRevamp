@@ -1,0 +1,6 @@
+﻿CREATE TABLE [dbo].[Cart]
+(
+	[UserId] INT NOT NULL FOREIGN KEY REFERENCES [User](Id) PRIMARY KEY,
+	[CreatedDate] DATETIME NOT NULL
+
+)

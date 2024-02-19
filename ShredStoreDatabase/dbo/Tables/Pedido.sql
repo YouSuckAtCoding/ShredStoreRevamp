@@ -1,9 +1,0 @@
-﻿CREATE TABLE [dbo].[Pedido]
-(
-	[Id] INT NOT NULL PRIMARY KEY IDENTITY,
-	[Data] DATE NOT NULL,
-	[CarrinhoId] INT NOT NULL FOREIGN KEY REFERENCES Carrinho(UsuarioId),
-	[Valor] MONEY NOT NULL,
-	[UsuarioId] INT NOT NULL FOREIGN KEY REFERENCES Usuario(Id)
-
-)

@@ -4,6 +4,6 @@ namespace ShredStoreTests.DataAdapterFiles
 {
     public interface ISqlAccessConnectionFactory
     {
-        Task<IDbConnection> CreateConnectionAsync();
+        Task<IDbConnection> CreateConnectionAsync(CancellationToken token);
     }
 }
