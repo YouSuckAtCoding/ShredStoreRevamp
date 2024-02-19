@@ -4,7 +4,7 @@
 	@Quantity int	
 AS
 	
-	If(( Select count(*) from [OrderItems] where ProductId = @ProductId) = 1)
+	If(( Select count(*) from [OrderItem] where ProductId = @ProductId and OrderId = @OrderId) = 1)
 
 	Begin
 		Exec spOrderItem_Update @ProductId,@Quantity, @OrderId

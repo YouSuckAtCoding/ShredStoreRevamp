@@ -130,6 +130,7 @@ namespace ShredStoreTests.Fake
 
             return orderFaker.Generate(10);
         }
+        
         public static CreateOrderRequest FakeCreateOrderRequest()
         {
             var orderFaker = new Faker<CreateOrderRequest>("pt_BR")
@@ -147,6 +148,17 @@ namespace ShredStoreTests.Fake
                 .RuleFor(x => x.UserId, 1)
                 .RuleFor(x => x.CreatedDate, DateTime.UtcNow);
             return CartRequestFaker;
+        }
+
+        public static IEnumerable<OrderItem> FakeOrderItems()
+        {
+            var fakeItem = new Faker<OrderItem>("pt_BR")
+                .RuleFor(x => x.OrderId, 1)
+                .RuleFor(x => x.ProductId, 1)
+                .RuleFor(x => x.Id, 1)
+                .RuleFor(x => x.Price, 1000)
+                .RuleFor(x => x.Quantity, 1000);
+            return fakeItem.Generate(10);
         }
     }
 }

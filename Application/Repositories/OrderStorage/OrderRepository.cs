@@ -30,5 +30,8 @@ namespace Application.Repositories
         public Task UpdateOrder(Order Order, CancellationToken token) => sqlDataAccess.SaveData("dbo.spOrder_Update", new { Order.Id, Order.CreatedDate, Order.TotalAmount}, token: token);
 
         public Task DeleteOrder(int id, CancellationToken token) => sqlDataAccess.SaveData("dbo.spOrder_Delete", new { Id = id }, token: token);
+
+        public Task<IEnumerable<Order>> GetAllOrders(CancellationToken token) => sqlDataAccess.LoadData<Order, dynamic>("dbo.spOrder_GetAll", new { }, token: token);
+
     }
 }

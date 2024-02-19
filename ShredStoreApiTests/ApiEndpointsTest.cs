@@ -54,6 +54,7 @@
             public const string Create = Base;
             public const string Get = $"{Base}/Id={{orderId}}";
             public const string GetAll = $"{Base}/{{userId}}";
+            public const string GetAllOrders = $"{Base}";
             public const string Update = $"{Base}/update";
             public const string Delete = $"{Base}/{{orderId}}";
         }

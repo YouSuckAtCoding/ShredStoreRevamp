@@ -28,6 +28,11 @@ namespace Application.Services.OrderServices
                    
         }
 
+        public async Task<IEnumerable<Order>> GetAllOrders(CancellationToken token)
+        {
+            return await _orderRepository.GetAllOrders(token);
+        }
+
         public async Task<Order?> GetOrder(int id, CancellationToken token)
         {
             return await _orderRepository.GetOrder(id, token);

@@ -106,6 +106,7 @@
     <Build Include="dbo\Tables\Payment.sql" />
     <Build Include="dbo\StoredProcedures\OrderItem\spOrderItem_GetById.sql" />
     <Build Include="dbo\StoredProcedures\OrderItem\spOrderItem_DeleteAll.sql" />
+    <Build Include="dbo\StoredProcedures\Order\spOrder_GetAll.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ShredStoreDatabase.publish.xml" />

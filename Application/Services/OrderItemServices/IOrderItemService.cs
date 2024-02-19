@@ -9,6 +9,6 @@ namespace Application.Services.OrderItemServices
         Task<bool> DeleteItem(int itemId, int cartId, CancellationToken token);
         Task<OrderItem> GetOrderItem(int itemId, int cartId, CancellationToken token);
         Task<IEnumerable<OrderItem>> GetOrderItems(int cartId, CancellationToken token);
-        Task UpdateOrderItem(int itemId, int cartId, int quantity, CancellationToken token);
+        Task<OrderItem?> UpdateOrderItem(int itemId, int cartId, int quantity, CancellationToken token);
     }
 }

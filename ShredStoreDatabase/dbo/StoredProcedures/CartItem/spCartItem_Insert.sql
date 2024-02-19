@@ -6,7 +6,7 @@ AS
 
 	SET IDENTITY_INSERT dbo.[CartItem] ON
 	
-	If(( Select count(*) from CartItem where ProductId = @ProductId) = 1)
+	If(( Select count(*) from CartItem where ProductId = @ProductId and CartId = @CartId) = 1)
 
 	Begin
 		Exec spCartItem_Update @ProductId,@Quantity, @CartId

@@ -29,6 +29,15 @@ namespace ShredStore.Controllers
             return Ok(result);
         }
 
+        [HttpGet(ApiEndpoints.OrderEndpoints.GetAllOrders)]
+        [ProducesResponseType(typeof(OrdersResponse), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAll(CancellationToken token)
+        {
+            var result = await _orderService.GetAllOrders(token);
+            return Ok(result);
+        }
+
+
         [HttpPost(ApiEndpoints.OrderEndpoints.Create)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

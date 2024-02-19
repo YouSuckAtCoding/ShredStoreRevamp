@@ -27,43 +27,44 @@ namespace Application.Services.OrderItemServices
             return true;
         }
 
-        public async Task<bool> DeleteAlltems(int cartId, CancellationToken token)
+        public async Task<bool> DeleteAlltems(int orderId, CancellationToken token)
         {
-            var result = await _orderRepository.GetOrder(cartId, token);
+            var result = await _orderRepository.GetOrder(orderId, token);
 
             if (result is null)
                 return false;
 
-            await _orderItemRepository.DeleteAllOrderItem(cartId, token);
+            await _orderItemRepository.DeleteAllOrderItem(orderId, token);
             return true;
         }
 
-        public async Task<bool> DeleteItem(int itemId, int cartId, CancellationToken token)
+        public async Task<bool> DeleteItem(int itemId, int orderId, CancellationToken token)
         {
-            var result = await _orderItemRepository.GetOrderItem(itemId, cartId, token);
+            var result = await _orderItemRepository.GetOrderItem(itemId, orderId, token);
 
             if (result is null)
                 return false;
 
-            await _orderItemRepository.DeleteOrderItem(itemId, cartId, token);
+            await _orderItemRepository.DeleteOrderItem(itemId, orderId, token);
             return true;
         }
 
-        public async Task<OrderItem> GetOrderItem(int itemId, int cartId, CancellationToken token)
+        public async Task<OrderItem> GetOrderItem(int itemId, int orderId, CancellationToken token)
         {
-            var result = await _orderItemRepository.GetOrderItem(itemId, cartId, token);
+            var result = await _orderItemRepository.GetOrderItem(itemId, orderId, token);
             return result;
         }
 
-        public async Task<IEnumerable<OrderItem>> GetOrderItems(int cartId, CancellationToken token)
+        public async Task<IEnumerable<OrderItem>> GetOrderItems(int orderId, CancellationToken token)
         {
-            IEnumerable<OrderItem> result = await _orderItemRepository.GetOrderItems(cartId, token);
+            IEnumerable<OrderItem> result = await _orderItemRepository.GetOrderItems(orderId, token);
             return result;
         }
 
-        public async Task UpdateOrderItem(int itemId, int cartId, int quantity, CancellationToken token)
+        public async Task<OrderItem?> UpdateOrderItem(int itemId, int orderId, int quantity, CancellationToken token)
         {
-            await _orderItemRepository.UpdateOrderItem(itemId, quantity, cartId, token);
+            await _orderItemRepository.UpdateOrderItem(itemId, quantity, orderId, token);
+            return await _orderItemRepository.GetOrderItem(itemId, orderId, token);
 
         }
     }

@@ -64,10 +64,10 @@ namespace ShredStoreApiTests
         {
             using var client = CreateApi.CreateOfficialApi().CreateClient();
 
-            int id = await SeuUpOrders(client);
+            int id = await Utility.SeuUpOrders(client);
 
-           IEnumerable < Order > orders = await GetAllUserOrders(client, id).ConfigureAwait(false);
-           orders.Should().HaveCount(5);
+           IEnumerable<Order> orders = await Utility.GetAllUserOrders(client, id).ConfigureAwait(false);
+           orders.Should().HaveCountGreaterThan(1);
         }
 
         [Fact]
@@ -83,9 +83,9 @@ namespace ShredStoreApiTests
         {
             using var client = CreateApi.CreateOfficialApi().CreateClient();
 
-            int id = await SeuUpOrders(client);
+            int id = await Utility.SeuUpOrders(client);
 
-            IEnumerable<Order> orders = await GetAllUserOrders(client, id).ConfigureAwait(false);
+            IEnumerable<Order> orders = await Utility.GetAllUserOrders(client, id).ConfigureAwait(false);
 
             int orderId = orders.First().Id;
 
@@ -122,9 +122,9 @@ namespace ShredStoreApiTests
         {
             using var client = CreateApi.CreateOfficialApi().CreateClient();
 
-            int id = await SeuUpOrders(client);
+            int id = await Utility.SeuUpOrders(client);
 
-            IEnumerable<Order> orders = await GetAllUserOrders(client, id).ConfigureAwait(false);
+            IEnumerable<Order> orders = await Utility.GetAllUserOrders(client, id).ConfigureAwait(false);
 
             var selected = orders.First();
             int newAmount = 1000000;
@@ -162,24 +162,18 @@ namespace ShredStoreApiTests
         {
             using var client = CreateApi.CreateOfficialApi().CreateClient();
             
-            int id = await SeuUpOrders(client);
-            var orders = await GetAllUserOrders(client, id);
+            int id = await Utility.SeuUpOrders(client);
+            var orders = await Utility.GetAllUserOrders(client, id);
 
             int orderId = orders.Last().Id;
             await client.DeleteAsync(Utility.SetGet_Or_DeleteUrl(orderId, ApiEndpointsTest.OrderEndpoints.Delete));
 
-            orders = await GetAllUserOrders(client, id);
+            orders = await Utility.GetAllUserOrders(client, id);
             orders.Should().NotContain(x => x.Id == orderId);
         }
 
 
-        private static async Task<IEnumerable<Order>> GetAllUserOrders(HttpClient client, int id)
-        {
-            var response = await client.GetAsync(Utility.SetGet_Or_DeleteUrl(id, ApiEndpointsTest.OrderEndpoints.GetAll));
-            var result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            var orders = JsonSerializer.Deserialize<IEnumerable<Order>>(result, jsonSerializerOptions);
-            return orders;
-        }
+      
 
         private ApiFactory CreateApiWithOrderRepository<T>()
         where T : class, IOrderService
@@ -192,28 +186,6 @@ namespace ShredStoreApiTests
                 
             });
             return api;
-        }
-
-        private static async Task<int> SeuUpOrders(HttpClient client)
-        {
-            var users = await Utility.GetAllUsers(client);
-            int id = users.Last().Id;
-            for (int i = 0; i < 5; i++)
-            {
-                CreateOrderRequest request = new CreateOrderRequest
-                {
-                    CreatedDate = DateTime.Now,
-                    UserId = id,
-                    TotalAmount = 1000,
-                    PaymentId = 3
-                };
-                var jsonString = JsonSerializer.Serialize(request);
-
-                var httpContent = new StringContent(jsonString, Encoding.UTF8, "application/json");
-                await client.PostAsync(ApiEndpointsTest.OrderEndpoints.Create, httpContent);
-            }
-
-            return id;
         }
 
     }

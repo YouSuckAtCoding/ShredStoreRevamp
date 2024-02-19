@@ -35,6 +35,8 @@ namespace Application
             services.AddTransient<ICartItemService, CartItemService>();
             services.AddTransient<IOrderRepository, OrderRepository>();
             services.AddTransient<IOrderService, OrderService>();
+            services.AddTransient<IOrderItemRepository, OrderItemRepository>();
+            services.AddTransient<IOrderItemService, OrderItemService>();
             services.AddTransient<ISqlDataAccess, SqlDataAccess>();
             services.AddValidatorsFromAssemblyContaining<IApplicationMarker>(ServiceLifetime.Singleton);
             return services;

@@ -4,7 +4,7 @@
 AS
 Begin
 
-	Select OrderId, ProductId, Quantity, Price from dbo.[OrderItem]
+	Select Id, OrderId, ProductId, Quantity, Price from dbo.[OrderItem]
 	where OrderId = @OrderId and ProductId = @ProductId
 
 End

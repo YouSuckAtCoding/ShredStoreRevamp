@@ -11,6 +11,12 @@ namespace ShredStoreApiTests.TestDoubles
             return Task.FromResult(true);
         }
 
+        public Task<IEnumerable<Order>> GetAllOrders(CancellationToken token)
+        {
+            var fake = FakeDataFactory.FakeOrders();
+            return Task.FromResult(fake);
+        }
+
         public Task<Order?> GetOrder(int id, CancellationToken token)
         {
             var fake = FakeDataFactory.FakeOrder();
