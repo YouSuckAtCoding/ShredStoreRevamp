@@ -1,0 +1,27 @@
+version: '3.4'
+
+services:
+  shredstore:
+    image: ${DOCKER_REGISTRY-}shredstore
+    build:
+      context: .
+      dockerfile: ShredStore/Dockerfile
+    ports:
+      - "1410:8080"
+    depends_on:
+      - db
+      - redis
+  
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    ports:
+      - "1469:1433"
+    environment:
+      SA_PASSWORD: "Numsey@Password!"
+      ACCEPT_EULA: "Y"
+  
+  redis:
+    image: redis:latest
+    ports:
+      - "1402:6379"
+     

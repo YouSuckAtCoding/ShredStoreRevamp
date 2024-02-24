@@ -25,7 +25,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseAccess", "DatabaseA
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01 - Presentation", "01 - Presentation", "{C4FED58A-792D-4480-9AA8-6A7755B30D9F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShredStoreApiTests", "ShredStoreApiTests\ShredStoreApiTests.csproj", "{027BC7C2-2904-44DB-B202-11424AFF5F23}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShredStoreApiTests", "ShredStoreApiTests\ShredStoreApiTests.csproj", "{027BC7C2-2904-44DB-B202-11424AFF5F23}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShredStorePresentation", "ShredStorePresentation\ShredStorePresentation.csproj", "{5180C91B-71BF-469B-B847-1D28BA1775BD}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{E85AC719-18AC-44B4-BBE2-559A13356BF5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,6 +67,14 @@ Global
 		{027BC7C2-2904-44DB-B202-11424AFF5F23}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{027BC7C2-2904-44DB-B202-11424AFF5F23}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{027BC7C2-2904-44DB-B202-11424AFF5F23}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5180C91B-71BF-469B-B847-1D28BA1775BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5180C91B-71BF-469B-B847-1D28BA1775BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5180C91B-71BF-469B-B847-1D28BA1775BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5180C91B-71BF-469B-B847-1D28BA1775BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E85AC719-18AC-44B4-BBE2-559A13356BF5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E85AC719-18AC-44B4-BBE2-559A13356BF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E85AC719-18AC-44B4-BBE2-559A13356BF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E85AC719-18AC-44B4-BBE2-559A13356BF5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -75,6 +87,7 @@ Global
 		{B62FDB55-2EF3-4951-B7E9-133869244297} = {DD26EC7F-0494-4F18-B646-9C705EB2F540}
 		{AAF35ABC-A0F0-4473-AC87-B336654E3893} = {7646897C-B98A-4ECE-A94D-0F18809FECC1}
 		{027BC7C2-2904-44DB-B202-11424AFF5F23} = {DD26EC7F-0494-4F18-B646-9C705EB2F540}
+		{5180C91B-71BF-469B-B847-1D28BA1775BD} = {C4FED58A-792D-4480-9AA8-6A7755B30D9F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C353204C-4F55-414F-A66F-6C3C559ED27F}

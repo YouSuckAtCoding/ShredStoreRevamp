@@ -15,8 +15,8 @@ namespace ShredStore.Mapping
                 Address = request.Address,
                 Age = request.Age,
                 Email = request.Email,
-                Password = request.Password
-
+                Password = request.Password,
+                Role = request.Role
             };
         }
 
@@ -29,7 +29,8 @@ namespace ShredStore.Mapping
                 Cpf = request.Cpf,
                 Address = request.Address,
                 Age = request.Age,
-                Email = request.Email
+                Email = request.Email,
+                Role = request.Role
 
             };
         }

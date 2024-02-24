@@ -25,7 +25,7 @@ namespace Application.Repositories.UserStorage
         public Task<IEnumerable<User>> GetUsers(CancellationToken token) => sqlDataAccess.LoadData<User, dynamic>("dbo.spUser_GetAll", new { }, token: token);
 
         public Task InsertUser(User User, CancellationToken token) =>
-            sqlDataAccess.SaveData("dbo.spUser_Insert", new { User.Name, User.Age, User.Email, User.Cpf, User.Address, User.Password }, token: token);
+            sqlDataAccess.SaveData("dbo.spUser_Insert", new { User.Name, User.Age, User.Email, User.Cpf, User.Address, User.Password , User.Role}, token: token);
         public async Task<User?> Login(LoginUserRequest request, CancellationToken token)
         {
             var p = new DynamicParameters();

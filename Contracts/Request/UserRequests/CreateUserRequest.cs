@@ -14,5 +14,6 @@ namespace Contracts.Request
         public string Cpf { get; set; }
         public string Address { get; set; }
         public string Password { get; set; }
+        public string Role { get; set; }
     }
 }

@@ -1,0 +1,147 @@
+﻿﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - ShredStore</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/_Layout.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/ShredStore.styles.css" asp-append-version="true" />
+    <script src="https://kit.fontawesome.com/8f0f0e8e3d.js" crossorigin="anonymous"></script>
+</head>
+<body class="bg-secondary bg-gradient">
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark bg-gradient border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">ShredStore</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Categories
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item text-light" asp-controller="Home" asp-action="Category" asp-route-Category="Eletric Guitar">Guitars</a></li>
+                                <li><a class="dropdown-item text-light" asp-controller="Home" asp-action="Category" asp-route-Category="Acoustic Guitar">Acoustics</a></li>
+                                <li><a class="dropdown-item text-light" asp-controller="Home" asp-action="Category" asp-route-Category="Pedals">Pedals</a></li>
+                                <li><a class="dropdown-item text-light" asp-controller="Home" asp-action="Category" asp-route-Category="Amplifier">Amps</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-light" asp-controller="Home" asp-action="Category" asp-route-Category="Acessories">Accessories</a></li>
+                                <li><a class="dropdown-item text-light" asp-controller="Home" asp-action="Category" asp-route-Category="Strings">Strings</a></li>
+                                
+                            </ul>
+                        </li>
+
+                    </ul>
+                    <div class="d-flex">
+                        @{
+                            string loggedCheck = @Accessor.HttpContext.Session.GetString("_Name");
+                            if (loggedCheck != null)
+                            {
+                                if (loggedCheck != "")
+                                {
+                                    <a class="nav-link text-light" id="hoverLink" asp-controller="CartOperations" asp-action="GetCart"><i class="fa-solid fa-cart-shopping"></i></a>
+                                    <a class="nav-link text-light" id="hoverLink" asp-controller="User" asp-action="UserDetails" asp-route-Id=@Accessor.HttpContext.Session.GetInt32("_Id")>@loggedCheck</a>
+                                    <a class="nav-link text-light" id="hoverLink" asp-controller="User" asp-action="Logout">Logout</a>
+
+                                }
+                                else
+                                {
+                                    <a class="nav-link text-light" id="hoverLink" asp-controller="User" asp-action="CreateAccount">Create an Account</a>
+                                    <a class="nav-link text-light" id="hoverLink" asp-controller="User" asp-action="Login">Login</a>
+                                }
+
+                            }
+                            else
+                            {
+                                <a class="nav-link text-light" id="hoverLink" asp-controller="User" asp-action="CreateAccount">Create an Account</a>
+                                <a class="nav-link text-light" id="hoverLink" asp-controller="User" asp-action="Login">Login</a>
+
+                            }
+                        }
+                    </div>
+
+
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            <ul class="nav justify-content-center">
+                <li class="nav-item">
+                    <a class="nav-link text-light fs-3" id="hoverLink" asp-controller="Home" asp-action="Category" asp-route-Category="Eletric Guitar">Guitars</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-light fs-3" id="hoverLink" asp-controller="Home" asp-action="Category" asp-route-Category="Acoustic Guitar">Acoustics</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-light fs-3" id="hoverLink" asp-controller="Home" asp-action="Category" asp-route-Category="Amplifier">Amps</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-light fs-3" id="hoverLink" asp-controller="Home" asp-action="Category" asp-route-Category="Pedals">Pedals</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-light fs-3" id="hoverLink" asp-controller="Home" asp-action="Category" asp-route-Category="Accessories">Accessories</a>
+                </li>
+
+            </ul>
+            <div class="d-flex justify-content-center mt-5 mb-5">
+                <form asp-action="Index" asp-controller="Home" class="d-flex w-50">
+                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="Search">
+                    <button class="btn btn-outline-light" type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+                </form>
+            </div>
+            <div id="HomeCarousel" class="carousel slide bg-white" data-bs-ride="carousel">
+                <div class="carousel-indicators">
+                    <button type="button" data-bs-target="#HomeCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                    <button type="button" data-bs-target="#HomeCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                    <button type="button" data-bs-target="#HomeCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                </div>
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <img src="~/Images/Jason.png" class="d-block w-100" alt="Carousel 1">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="~/Images/Loomis.png" class="d-block w-100" alt="Carousel 2">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="~/Images/Vai.png" class="d-block w-100" alt="Carousel 3">
+                    </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#HomeCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon bg-primary" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#HomeCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon bg-primary" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted bg-dark bg-gradient">
+        <div class="container d-flex flex-row justify-content-center">
+            <a class="nav-link text-light" id="hoverLink">2024 ₢ Shred Store</a>
+            <a class="nav-link text-light" id="hoverLink" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <a class="nav-link text-light" id="hoverLink" asp-controller="Home" asp-action="AboutUs">About Us</a>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
