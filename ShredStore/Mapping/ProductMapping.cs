@@ -11,6 +11,7 @@ namespace ShredStore.Mapping
         {
             return new Product
             {
+                UserId = request.UserId,
                 Name = request.Name,
                 Description = request.Description,
                 Price = request.Price,

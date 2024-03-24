@@ -49,29 +49,10 @@ namespace ShredStoreApiTests
         {
             var client = CreateApi.CreateOfficialApi().CreateClient();
 
-            IEnumerable<Product>? products = await Utility.ReturnAllProducts(client).ConfigureAwait(false);
-
-            var response = await client.GetAsync(Utility.SetGet_Or_DeleteUrl(products!.First().Id, ApiEndpoints.ProductEndpoints.Get));
-            var responseInfo = await response.Content.ReadAsStringAsync();
-
-            var product = JsonSerializer.Deserialize<ProductResponse>(responseInfo, jsonSerializerOptions);
-
-            CreateCartItemRequest request = new CreateCartItemRequest
-            {
-                CartId = 1,
-                ProductId = 30,
-                Quantity = 4
-
-            };
-            var jsonString = JsonSerializer.Serialize(request);
-
-            var httpContent = new StringContent(jsonString, Encoding.UTF8, "application/json");
-
-            var result = await client.PostAsync(ApiEndpointsTest.CartItemEndpoints.Create, httpContent);
+            HttpResponseMessage result = await InsertCartItem(client).ConfigureAwait(false);
             result.StatusCode.Should().Be(System.Net.HttpStatusCode.Created);
 
         }
-
         [Fact]
         public async Task Should_Return_200_From_GetAll_Endpoint()
         {
@@ -102,7 +83,12 @@ namespace ShredStoreApiTests
         public async Task Should_Return_Item_From_Real_Get_Endpoint()
         {
             var client = CreateApi.CreateOfficialApi().CreateClient();
-            var response = await client.GetAsync(Utility.SetCartItem_GetUrl(30, 1, ApiEndpoints.CartItemEndpoints.Get));
+            HttpResponseMessage result = await InsertCartItem(client).ConfigureAwait(false);
+            var products = await Utility.ReturnAllProducts(client);
+            var users = await Utility.GetAllUsers(client);
+            int userId = users.First().Id;
+            int productId = products.First().Id;
+            var response = await client.GetAsync(Utility.SetCartItem_GetUrl(productId, userId, ApiEndpoints.CartItemEndpoints.Get));
             var responseInfo = await response.Content.ReadAsStringAsync();
 
             var item = JsonSerializer.Deserialize<CartItem>(responseInfo, jsonSerializerOptions);
@@ -112,6 +98,7 @@ namespace ShredStoreApiTests
         public async Task Should_Return_200_From_Update_Endpoint()
         {
             var client = CreateApiWithCartItemRepository<StubSuccessCartItemRepository>().CreateClient();
+            var users = await Utility.GetAllUsers(client);
             UpdateCartItemRequest request = new UpdateCartItemRequest
             {
                 CartId = 1,
@@ -129,10 +116,15 @@ namespace ShredStoreApiTests
         public async Task Should_Update_Cart_Item_From_Real_Update_Endpoint()
         {
             var client = CreateApi.CreateOfficialApi().CreateClient();
+            HttpResponseMessage result = await InsertCartItem(client).ConfigureAwait(false);
+            var products = await Utility.ReturnAllProducts(client);
+            var users = await Utility.GetAllUsers(client);
+            int userId = users.First().Id;
+            int productId = products.First().Id;
             UpdateCartItemRequest request = new UpdateCartItemRequest
             {
-                CartId = 1,
-                ProductId = 30,
+                CartId = userId,
+                ProductId = productId,
                 Quantity = 8
 
             };
@@ -228,7 +220,7 @@ namespace ShredStoreApiTests
 
             int cartId = users!.Last().Id;
 
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < users.Count() / 10; i++)
             {
                 CreateCartItemRequest request = new CreateCartItemRequest
                 {
@@ -276,6 +268,26 @@ namespace ShredStoreApiTests
             });
             return api;
         }
-      
+
+        private static async Task<HttpResponseMessage> InsertCartItem(HttpClient client)
+        {
+            IEnumerable<Product>? products = await Utility.ReturnAllProducts(client).ConfigureAwait(false);
+
+            var users = await Utility.GetAllUsers(client);
+
+            CreateCartItemRequest request = new CreateCartItemRequest
+            {
+                CartId = users.First().Id,
+                ProductId = products.First().Id,
+                Quantity = 4
+
+            };
+            var jsonString = JsonSerializer.Serialize(request);
+
+            var httpContent = new StringContent(jsonString, Encoding.UTF8, "application/json");
+
+            var result = await client.PostAsync(ApiEndpointsTest.CartItemEndpoints.Create, httpContent);
+            return result;
+        }
     }
 }

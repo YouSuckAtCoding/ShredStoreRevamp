@@ -46,3 +46,34 @@ button.accept-policy {
     white-space: nowrap;
     line-height: 60px;
 }
+
+#UserContainer, #YourProducts {
+    height: 250px;
+    overflow-y: scroll;
+}
+
+    #UserContainer, #YourProducts::-webkit-scrollbar {
+        display: none;
+    }
+
+#ProductList {
+    height: 250px;
+    overflow-x: scroll;
+    overflow-y: hidden;
+}
+
+    #ProductList::-webkit-scrollbar {
+        display: none;
+    }
+
+#Card-Img{
+    width: 200px;
+    height: 150px;
+}
+
+#card-container {
+    width: 200px;
+    height: 250px;
+}
+
+   

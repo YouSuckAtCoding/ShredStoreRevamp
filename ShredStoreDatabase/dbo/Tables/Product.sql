@@ -7,5 +7,6 @@
 	[Type] VARCHAR(30) NOT NULL,
 	[Category] VARCHAR(30) NOT NULL,
 	 [Brand] NVARCHAR(50) NOT NULL, 
-	 [ImageName] NVARCHAR(50) NOT NULL
+	 [ImageName] NVARCHAR(50) NOT NULL,
+	 [UserId] int NOT NULL FOREIGN KEY REFERENCES [User](Id)
 )

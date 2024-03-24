@@ -45,6 +45,18 @@ namespace Application.Services.ProductServices
             return products;
         }
 
+        public async Task<IEnumerable<Product>> GetProductsByCategory(string category, CancellationToken token)
+        {
+            IEnumerable<Product> products = await _productRepository.GetProductsByCategory(category, token);
+            return products;
+        }
+
+        public async Task<IEnumerable<Product>> GetProductsByUser(int id, CancellationToken token)
+        {
+            IEnumerable<Product> products = await _productRepository.GetProductsByUserId(id, token);
+            return products;
+        }
+
         public async Task<Product?> UpdateProduct(Product product, CancellationToken token)
         {
             await _productValidator.ValidateAndThrowAsync(product, token);

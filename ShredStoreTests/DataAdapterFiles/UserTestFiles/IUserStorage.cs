@@ -8,7 +8,7 @@ namespace ShredStoreTests.DataAdapterFiles.UserTestFiles
         Task<User?> GetUser(int id);
         Task<IEnumerable<User>> GetUsers();
         Task InsertUser(User User);
-        Task<User?> Login(string Name, string Password);
+        Task<User?> Login(string Email, string Password);
         Task UpdateUser(User user);
     }
 }

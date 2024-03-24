@@ -18,6 +18,7 @@ namespace ShredStoreTests.DataAdapterFiles
         public async Task InitializeAsync()
         {
             await _msSqlContainer.StartAsync();
+
             ConnectionFactory = new SqlAccessConnectionFactory(_msSqlContainer.GetConnectionString());
             await new DatabaseInitializer(ConnectionFactory).InitializeAsync();
         }

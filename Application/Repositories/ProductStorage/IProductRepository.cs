@@ -9,5 +9,7 @@ namespace Application.Repositories.ProductStorage
         Task<IEnumerable<Product>> GetProducts(CancellationToken token);
         Task InsertProduct(Product Product, CancellationToken token);
         Task UpdateProduct(Product Product, CancellationToken token);
+        Task<IEnumerable<Product>> GetProductsByCategory(string category, CancellationToken token);
+        Task<IEnumerable<Product>> GetProductsByUserId(int id, CancellationToken token);
     }
 }

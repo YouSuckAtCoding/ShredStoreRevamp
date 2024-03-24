@@ -1,13 +1,15 @@
-﻿@model UserViewResponse
+﻿@using Contracts.Response.ProductsResponses
+@using Contracts.Response.UserResponses
+@model UserResponse
 
 @{
     Layout = config.GetValue<string>("PageLayouts:SecondaryLayout");
     ViewData["Title"] = "User Details";
-    IEnumerable<ProductViewResponse> products = ViewBag.UserProducts;
+    IEnumerable<ProductResponse> products = ViewBag.UserProducts;
 }
 <div class="d-flex flex-column justify-content-center">
-<div class="d-flex justify-content-evenly border border-dark rounded mt-5 mb-5" id="IndexMain">
-    <div class="d-flex justify-content-center flex-column ms-5 me-5">
+    <div class="d-flex justify-content-evenly mt-5 mb-5" id="IndexMain">
+        <div class="d-flex justify-content-center flex-column ms-5 me-5">
             <div class="mt-3 mb-3">
                 <h2 class="text-light">User Details</h2>
             </div>
@@ -20,46 +22,50 @@
             <div class="mt-3 mb-3">
                 <h3 class="text-light">Role: @Model.Role</h3>
             </div>
-    </div>
-    <div class="d-flex justify-content-center flex-column ms-5 me-5">
-        <a class="btn btn-outline-light mt-3 mb-3" asp-area="" asp-controller="User" asp-action="EditAccount">Edit User Detalis</a>
-        <a class="btn btn-outline-light mt-3 mb-3" asp-area="" asp-controller="User" asp-action="ChangePassword">Change Your Password</a>
-        <a class="btn btn-outline-light mt-3 mb-3" asp-area="" asp-controller="User" asp-action="DeleteAccount">Delete Account</a>
-        @if(Accessor.HttpContext.Session.GetString("_Role") == null || Accessor.HttpContext.Session.GetString("_Role") == "Customer"){
-            
-        }
-        else{
-            <a class="btn btn-outline-light mt-3 mb-3" asp-area="" asp-controller="ShredStore" asp-action="PublishProduct">Publish Product</a>
-        }
+        </div>
+        <div class="d-flex justify-content-center flex-column ms-5 me-5">
+            @if (Model.Name == "Admin")
+            {
+                <a class="btn btn-outline-light mt-3 mb-3" asp-area="" asp-controller="User" asp-action="Admin">Admin Page</a>
 
-        
+            }
+            else
+            {
+                <a class="btn btn-outline-light mt-3 mb-3" asp-area="" asp-controller="User" asp-action="EditAccount">Edit User Detalis</a>
+                <a class="btn btn-outline-light mt-3 mb-3" asp-area="" asp-controller="User" asp-action="ChangePassword">Change Your Password</a>
+                <a class="btn btn-outline-light mt-3 mb-3" asp-area="" asp-controller="User" asp-action="DeleteAccount">Delete Account</a>
+            }
+            
+            @if (Accessor.HttpContext.Session.GetString("_Role") == null || Accessor.HttpContext.Session.GetString("_Role") != "Customer")
+            {
+                <a class="btn btn-outline-light mt-3 mb-3" asp-area="" asp-controller="Product" asp-action="PublishProduct">Publish Product</a>
+            }
+        </div>
     </div>
-</div>
-<div class="text-center border border-dark rounded mt-5 mb-5" id="YourProducts">
-    <h1 class="text-light mb-5 mt-2">Your Products</h1>
-        <div class="d-flex justify-content-evenly flex-wrap mb-5">
+    <div class="text-center mt-5 mb-5" >
+        <h1 class="text-light mb-5 mt-2">Your Products</h1>
+        <div class="d-flex justify-content-evenly flex-wrap mb-5" id="YourProducts">
             @if (!products.Any())
             {
                 <h4 class="text-light mb-5 mt-2">You don´t have any products.</h4>
             }
             else
             {
-                @foreach(var item in products)
+                @foreach (var item in products)
                 {
-                    <div class="card me-2 bg-secondary bg-gradient" style="width: 18rem;">
-                        <img src="~/Images/@item.ImageName" class="card-img-top" alt="...">
-                    <div class="card-body">
-                        <h5 class="card-title text-light">@item.Name</h5>
-                        <p class="card-text text-light">Price: $@float.Parse(item.Price.ToString()) </p>
-                        <a asp-controller="ShredStore" asp-action="ProductDetails" asp-route-id=@item.Id class="btn btn-outline-light">Check it out!</a>
-                        <a asp-controller="ShredStore" asp-action="Delete" asp-route-id=@item.Id class="btn btn-outline-light">Delete Product</a>
-                        <a asp-controller="ShredStore" asp-action="EditProduct" asp-route-id=@item.Id class="btn btn-outline-light">Edit Product</a>
-                    </div>
+                    <div class="card me-2 bg-secondary bg-gradient" id="card-container">
+                        <img src="~/Images/@item.ImageName" class="card-img-top" alt="..." id="Card-Img">
+                        <div class="card-body">
+                            <h5 class="card-title text-light">@item.Name</h5>
+                            <p class="card-text text-light">Price: $@float.Parse(item.Price.ToString()) </p>
+                            <a asp-controller="Product" asp-action="Delete" asp-route-id=@item.Id class="btn btn-outline-light btn-sm">Delete Product</a>
+                            <a asp-controller="Product" asp-action="EditProduct" asp-route-id=@item.Id class="btn btn-outline-light btn-sm">Edit Product</a>
+                        </div>
                     </div>
                 }
-                
+
             }
-        
+
         </div>
-</div>
+    </div>
 </div>

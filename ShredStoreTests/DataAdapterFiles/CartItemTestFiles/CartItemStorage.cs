@@ -24,7 +24,7 @@ namespace ShredStoreTests.DataAdapterFiles.CartItemTestFiles
             return result;
         }
         public Task InsertCartItem(CartItem cartItem) =>
-            _dataAccess.SaveData("dbo.spCartItem_Insert", new { cartItem.CartId, cartItem.ProductId, cartItem.Quantity , cartItem.Price});
+            _dataAccess.SaveData("dbo.spCartItem_Insert", new { cartItem.CartId, cartItem.ProductId, cartItem.Quantity});
 
         public Task UpdateCartItem(int productId, int quantity, int cartId) =>
             _dataAccess.SaveData("dbo.spCartItem_Update", new { ProductId = productId, Quantity = quantity, CartId = cartId });

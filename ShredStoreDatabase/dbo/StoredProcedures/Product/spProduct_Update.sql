@@ -18,5 +18,6 @@ Begin
 	Category = @Category,
 	Brand = @Brand,
 	ImageName = @ImageName
+	Where Id = @Id
 
 End

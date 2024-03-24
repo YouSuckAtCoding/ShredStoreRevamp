@@ -1,11 +1,11 @@
-﻿@model UserUpdateViewRequest
+﻿@model UpdateUserRequest
 
 @{
     Layout = config.GetValue<string>("PageLayouts:SecondaryLayout");
     ViewData["Title"] = "Edit Account";
 }
 
-<div class="text-center border border-dark rounded mt-5 mb-5 w-50" id="IndexMain">
+<div class="text-center mt-5 mb-5 w-50" id="IndexMain">
     <h2 class="text-light">Edit your account</h2>
     <div class="row d-flex justify-content-center">
         <form asp-action="EditAccount">

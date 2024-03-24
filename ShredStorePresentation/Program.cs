@@ -1,3 +1,4 @@
+using ShredStorePresentation;
 using ShredStorePresentation.StartUp;
 
 var builder = WebApplication.CreateBuilder(args);

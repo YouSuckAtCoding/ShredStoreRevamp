@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="~/css/_Layout.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/ShredStore.styles.css" asp-append-version="true" />
     <script src="https://kit.fontawesome.com/208c9d7d9a.js" crossorigin="anonymous"></script>
+    
 </head>
 <body class="bg-secondary bg-gradient">
     <header>
@@ -48,15 +49,15 @@
                                 if (loggedCheck != "")
                                 {
                                     <a class="nav-link text-light" id="hoverLink" asp-controller="CartOperations" asp-action="GetCart"><i class="fa-solid fa-cart-shopping"></i></a>
-                                    <a class="nav-link text-light" id="hoverLink" asp-controller="UserOperations" asp-action="UserDetails" asp-route-Id=@Accessor.HttpContext.Session.GetInt32("_Id")>@loggedCheck</a>
-                                    <a class="nav-link text-light" id="hoverLink" asp-controller="UserOperations" asp-action="Logout">Logout</a>
+                                    <a class="nav-link text-light" id="hoverLink" asp-controller="User" asp-action="UserDetails" asp-route-Id=@Accessor.HttpContext.Session.GetInt32("_Id")>@loggedCheck</a>
+                                    <a class="nav-link text-light" id="hoverLink" asp-controller="User" asp-action="Logout">Logout</a>
                                 }
 
                             }
                             else
                             {
-                                <a class="nav-link text-light" id="hoverLink" asp-controller="UserOperations" asp-action="CreateAccount">Create an Account</a>
-                                <a class="nav-link text-light" id="hoverLink" asp-controller="UserOperations" asp-action="Login">Login</a>
+                                <a class="nav-link text-light" id="hoverLink" asp-controller="User" asp-action="CreateAccount">Create an Account</a>
+                                <a class="nav-link text-light" id="hoverLink" asp-controller="User" asp-action="Login">Login</a>
 
                             }
                         }
@@ -82,6 +83,7 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/Scripts.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

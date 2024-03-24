@@ -43,12 +43,11 @@ namespace ShredStoreTests
 
         [Fact]
         public async Task Should_Throw_SqlExecption_If_Product_Doenst_Exists()
-        {
-            await SetUpCartItem();
+        {            
             CartItem cartItem = new CartItem
             {
                 ProductId = 50,
-                CartId = 1,
+                CartId = await GenerateCartId(),
                 Quantity = 5
 
             };
@@ -78,20 +77,16 @@ namespace ShredStoreTests
         public async Task Should_Insert_Item_If_Doenst_Exists()
         {
 
-            Product prod = FakeDataFactory.FakeProduct();
-            IProductStorage productStorage = new ProductStorage(_dbConnectionFactory);
-
-            await productStorage.InsertProduct(prod);
-
+            int productId = await GenerateProductId();
             CartItem cartItem = new CartItem
             {
-                ProductId = 1,
-                CartId = 1,
+                ProductId = productId,
+                CartId = await GenerateCartId(),
                 Quantity = 1
             };
             ICartItemStorage cartItemStorage = new CartItemStorage(_dbConnectionFactory);
             await cartItemStorage.InsertCartItem(cartItem);
-            var res = await cartItemStorage.GetCartItems(1);
+            var res = await cartItemStorage.GetCartItems(cartItem.CartId);
 
             res.Should().HaveCount(1);
             await Utility.ClearCartItems(_dbConnectionFactory);
@@ -100,66 +95,50 @@ namespace ShredStoreTests
         [Fact]
         public async Task Should_Insert_Multiple_Cart_Items()
         {
-
-            IEnumerable<Product> prods = FakeDataFactory.FakeProducts();
-            IProductStorage productStorage = new ProductStorage(_dbConnectionFactory);
-
-            foreach(Product product in prods)
-            {
-                await productStorage.InsertProduct(product);
-            }
-
-            IEnumerable<Product> products = await productStorage.GetProducts();
-
+            IEnumerable<Product> products = await InsertMultipleProducts();
             ICartItemStorage cartItemStorage = new CartItemStorage(_dbConnectionFactory);
-
-            foreach(Product product in products)
+            int cartId = await GenerateCartId();
+            foreach (Product product in products)
             {
                 CartItem cartItem = new CartItem
                 {
                     ProductId = product.Id,
-                    CartId = 1,
+                    CartId = cartId,
                     Quantity = 1
-                    
+
                 };
                 await cartItemStorage.InsertCartItem(cartItem);
             }
-            
-            var res = await cartItemStorage.GetCartItems(1);
+
+            var res = await cartItemStorage.GetCartItems(cartId);
             res.Should().HaveCountGreaterThanOrEqualTo(10);
 
             await Utility.ClearCartItems(_dbConnectionFactory);
         }
 
+       
 
         [Fact]
         public async Task Should_Delete_CartItem()
         {
-            
-
-            Product prod = FakeDataFactory.FakeProduct();
-            IProductStorage productStorage = new ProductStorage(_dbConnectionFactory);
-
-            await productStorage.InsertProduct(prod);
-
-            var returned = await productStorage.GetProducts();
-
+            int productId = await GenerateProductId();
             CartItem cartItem = new CartItem
             {
-                ProductId = returned.First().Id,
-                CartId = 1,
+                ProductId = productId,
+                CartId = await GenerateCartId(),
                 Quantity = 1
             };
+
             ICartItemStorage cartItemStorage = new CartItemStorage(_dbConnectionFactory);
             await cartItemStorage.InsertCartItem(cartItem);
-
-            await cartItemStorage.DeleteCartItem(returned.First().Id,1);
-
-            var res = await cartItemStorage.GetCartItems(1);
+            await cartItemStorage.DeleteCartItem(productId, cartItem.CartId);
+            var res = await cartItemStorage.GetCartItems(cartItem.CartId);
 
             res.Should().HaveCount(0);
             await Utility.ClearCartItems(_dbConnectionFactory);
         }
+
+     
         [Fact]
         public async Task Should_Be_Empty_After_Delete_All()
         {
@@ -174,25 +153,19 @@ namespace ShredStoreTests
         public async Task Should_Change_Item_Quantity()
         {
 
-            Product prod = FakeDataFactory.FakeProduct();
-            IProductStorage productStorage = new ProductStorage(_dbConnectionFactory);
-
-            await productStorage.InsertProduct(prod);
-
+            int productId = await GenerateProductId();
             CartItem cartItem = new CartItem
             {
-                ProductId = 2,
-                CartId = 1,
+                ProductId = productId,
+                CartId = await GenerateCartId(),
                 Quantity = 5
 
             };
 
             ICartItemStorage cartItemStorage = new CartItemStorage(_dbConnectionFactory);
             await cartItemStorage.InsertCartItem(cartItem);
-
-            await cartItemStorage.UpdateCartItem(2, 1, 1);
-
-            IEnumerable<CartItem> items = await cartItemStorage.GetCartItems(1);
+            await cartItemStorage.UpdateCartItem(productId, 1, cartItem.CartId);
+            IEnumerable<CartItem> items = await cartItemStorage.GetCartItems(cartItem.CartId);
 
             var res = items.First();
             res.Quantity.Should().Be(1);
@@ -200,16 +173,41 @@ namespace ShredStoreTests
             await Utility.ClearCartItems(_dbConnectionFactory);
         }
 
-        private async Task SetUpCartItem()
+        private async Task<int> GenerateCartId()
         {
             Cart cart = FakeDataFactory.FakeCart();
-            User user = FakeDataFactory.FakeUser();
-
-            IUserStorage userStorage = new UserStorage(_dbConnectionFactory);
-            await userStorage.InsertUser(user);
+            cart.UserId = await Utility.GenerateUserId(_dbConnectionFactory);
 
             ICartStorage cartStorage = new CartStorage(_dbConnectionFactory);
             await cartStorage.InsertCart(cart);
+            return cart.UserId;
+
+        }
+
+        private async Task<int> GenerateProductId()
+        {
+            int userId = await Utility.GenerateUserId(_dbConnectionFactory);
+            Product prod = FakeDataFactory.FakeProduct();
+            IProductStorage productStorage = new ProductStorage(_dbConnectionFactory);
+            prod.UserId = userId;
+
+            await productStorage.InsertProduct(prod);
+
+            var returned = await productStorage.GetProducts();
+            return returned.First().Id;
+        }
+        private async Task<IEnumerable<Product>> InsertMultipleProducts()
+        {
+            int userId = await Utility.GenerateUserId(_dbConnectionFactory);
+            IEnumerable<Product> prods = FakeDataFactory.FakeProducts();
+            IProductStorage productStorage = new ProductStorage(_dbConnectionFactory);
+            foreach (Product product in prods)
+            {
+                product.UserId = userId;
+                await productStorage.InsertProduct(product);
+            }
+            IEnumerable<Product> products = await productStorage.GetProducts();
+            return products;
         }
     }
 }

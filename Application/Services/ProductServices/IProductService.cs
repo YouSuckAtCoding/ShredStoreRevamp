@@ -8,6 +8,8 @@ namespace Application.Services.ProductServices
         Task<bool> DeleteProduct(int id, CancellationToken token);
         Task<Product?> GetProduct(int id, CancellationToken token);
         Task<IEnumerable<Product>> GetProducts(CancellationToken token);
+        Task<IEnumerable<Product>> GetProductsByCategory(string category, CancellationToken token);
+        Task<IEnumerable<Product>> GetProductsByUser(int id, CancellationToken token);
         Task<Product?> UpdateProduct(Product product, CancellationToken token);
     }
 }

@@ -27,12 +27,12 @@ namespace ShredStoreTests.DataAdapterFiles.UserTestFiles
         public Task<IEnumerable<User>> GetUsers() => _dataAccess.LoadData<User,dynamic>("dbo.spUser_GetAll", new { });
 
         public Task InsertUser(User User) =>
-            _dataAccess.SaveData("dbo.spUser_Insert", new { User.Name, User.Age, User.Email, User.Cpf, User.Address, User.Password });
+            _dataAccess.SaveData("dbo.spUser_Insert", new { User.Name, User.Age, User.Email, User.Cpf, User.Address, User.Password, User.Role });
 
-        public async Task<User?> Login(string Name, string Password)
+        public async Task<User?> Login(string Email, string Password)
         {
             var p = new DynamicParameters();
-            p.Add("@Name", Name);
+            p.Add("@Email", Email);
             p.Add("@Password", Password);
             p.Add("@ResponseMessage", "", dbType: System.Data.DbType.String, direction: System.Data.ParameterDirection.Output);
 
@@ -46,7 +46,7 @@ namespace ShredStoreTests.DataAdapterFiles.UserTestFiles
                 return null;
 
         }
-        public Task UpdateUser(User user) => _dataAccess.SaveData("dbo.spUser_Update", new { user.Id, user.Name, user.Age, user.Email, user.Cpf, user.Address });
+        public Task UpdateUser(User user) => _dataAccess.SaveData("dbo.spUser_Update", new { user.Id, user.Name, user.Age, user.Email, user.Cpf, user.Address});
 
 
     }

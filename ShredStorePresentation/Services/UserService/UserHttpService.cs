@@ -1,5 +1,6 @@
-﻿using ShredStorePresentation.Models.User.Request;
-using ShredStorePresentation.Models.User.Response;
+﻿using Contracts.Request;
+using Contracts.Response.ProductsResponses;
+using Contracts.Response.UserResponses;
 using System.Net;
 using System.Text.Json;
 
@@ -22,7 +23,7 @@ namespace ShredStorePresentation.Services.UserService
             httpClient.BaseAddress = new Uri(config.GetValue<string>("ApiUri")!);
         }
 
-        public async Task<UserViewResponse> Login(UserLoginViewRequest user)
+        public async Task<UserResponse> Login(LoginUserRequest user)
         {
             var json = JsonSerializer.Serialize(user);
 
@@ -39,13 +40,13 @@ namespace ShredStorePresentation.Services.UserService
 
             var result = await responseInfo.Content.ReadAsStringAsync();
 
-            var loggeduser = JsonSerializer.Deserialize<UserViewResponse>(result, jsonSerializerOptions);
+            var loggeduser = JsonSerializer.Deserialize<UserResponse>(result, jsonSerializerOptions);
 
             return loggeduser;
 
         }
 
-        public async Task<bool> Create(UserRegistrationViewRequest user)
+        public async Task<bool> Create(CreateUserRequest user)
         {
             var httpResponseMessage = await httpClient.PostAsJsonAsync(ApiEndpoints.UserEndpoints.Create, user);
 
@@ -54,20 +55,25 @@ namespace ShredStorePresentation.Services.UserService
         }
 
 
-        public async Task<UserViewResponse> EditUser(UserUpdateViewRequest user)
+        public async Task<UserResponse> EditUser(UpdateUserRequest user)
         {
             var httpResponseMessage = await httpClient.PutAsJsonAsync(ApiEndpoints.UrlGenerator.SetUrlParameters(user.Id, ApiEndpoints.UserEndpoints.Update), user);
 
             var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
 
-            var edited = await JsonSerializer.DeserializeAsync<UserViewResponse>(contentStream, jsonSerializerOptions);
+            var edited = await JsonSerializer.DeserializeAsync<UserResponse>(contentStream, jsonSerializerOptions);
 
             return edited;
         }
-
-        public async Task<UserViewResponse> GetById(int id)
+        public async Task<IEnumerable<UserResponse>> GetAll()
         {
-            var result = await httpClient.GetFromJsonAsync<UserViewResponse>(ApiEndpoints.UrlGenerator.SetUrlParameters(id, ApiEndpoints.UserEndpoints.Get));
+            var uses = await httpClient.GetFromJsonAsync<IEnumerable<UserResponse>>(ApiEndpoints.UserEndpoints.GetAll, cancellationToken: default);
+            return uses;
+
+        }
+        public async Task<UserResponse> GetById(int id)
+        {
+            var result = await httpClient.GetFromJsonAsync<UserResponse>(ApiEndpoints.UrlGenerator.SetUrlParameters(id, ApiEndpoints.UserEndpoints.Get));
             return result;
         }
 
@@ -77,7 +83,7 @@ namespace ShredStorePresentation.Services.UserService
             return httpResponseMessage.StatusCode == System.Net.HttpStatusCode.OK ? true : false;
         }
 
-        public async Task<bool> ResetUserPassword(UserResetPasswordViewRequest request)
+        public async Task<bool> ResetUserPassword(ResetPasswordUserRequest request)
         {
             var httpResponseMessage = await httpClient.PutAsJsonAsync(ApiEndpoints.UserEndpoints.ResetPassword, request);
 

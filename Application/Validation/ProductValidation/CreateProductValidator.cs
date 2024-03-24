@@ -18,6 +18,7 @@ namespace Application.Validation.ProductValidation
             RuleFor(x => x.Type).NotEmpty().WithMessage("Please insert the product type");
             RuleFor(x => x.Category).NotEmpty().WithMessage("Please insert a category");
             RuleFor(x => x.Brand).NotEmpty().WithMessage("Please insert a brand name");
+            RuleFor(x => x.ImageName).NotEmpty();
 
         }
     }
