@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/_Layout.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/CartItems.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/ShredStore.styles.css" asp-append-version="true" />
     <script src="https://kit.fontawesome.com/208c9d7d9a.js" crossorigin="anonymous"></script>
     
@@ -35,7 +36,6 @@
                                 <li><a class="dropdown-item text-light" asp-controller="Home" asp-action="Category" asp-route-Category="Pedals">Pedals</a></li>
                                 <li><a class="dropdown-item text-light" asp-controller="Home" asp-action="Category" asp-route-Category="Amplifier">Amps</a></li>
                                 <li><a class="dropdown-item text-light" asp-controller="Home" asp-action="Category" asp-route-Category="Acessories">Accessories</a></li>
-                                <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item text-light" asp-controller="Home" asp-action="Category" asp-route-Category="Acoustic Guitar">Acoustics</a></li>
                             </ul>
                         </li>
@@ -48,7 +48,7 @@
                             {
                                 if (loggedCheck != "")
                                 {
-                                    <a class="nav-link text-light" id="hoverLink" asp-controller="CartOperations" asp-action="GetCart"><i class="fa-solid fa-cart-shopping"></i></a>
+                                    <a class="nav-link text-light" id="hoverLink" asp-controller="Cart" asp-action="CartItems"><i class="fa-solid fa-cart-shopping"></i></a>
                                     <a class="nav-link text-light" id="hoverLink" asp-controller="User" asp-action="UserDetails" asp-route-Id=@Accessor.HttpContext.Session.GetInt32("_Id")>@loggedCheck</a>
                                     <a class="nav-link text-light" id="hoverLink" asp-controller="User" asp-action="Logout">Logout</a>
                                 }

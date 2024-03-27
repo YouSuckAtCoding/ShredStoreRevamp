@@ -173,6 +173,31 @@ namespace ShredStoreTests
             await Utility.ClearCartItems(_dbConnectionFactory);
         }
 
+        [Fact]
+        public async Task Should_Return_Products_From_Cart_Items()
+        {
+            IProductStorage storage = new ProductStorage(_dbConnectionFactory);
+            IEnumerable<Product> products = await InsertMultipleProducts();
+            ICartItemStorage cartItemStorage = new CartItemStorage(_dbConnectionFactory);
+            int cartId = await GenerateCartId();
+            foreach (Product product in products)
+            {
+                CartItem cartItem = new CartItem
+                {
+                    ProductId = product.Id,
+                    CartId = cartId,
+                    Quantity = 1
+
+                };
+                await cartItemStorage.InsertCartItem(cartItem);
+            }
+
+            var result = await storage.GetCartProducts(cartId, default);
+            result.Count().Should().BeGreaterThan(0);
+
+
+        }
+
         private async Task<int> GenerateCartId()
         {
             Cart cart = FakeDataFactory.FakeCart();

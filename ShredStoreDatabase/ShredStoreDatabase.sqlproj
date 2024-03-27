@@ -112,6 +112,7 @@
     <Build Include="dbo\StoredProcedures\Product\spProduct_GetByUserId.sql" />
     <Build Include="dbo\StoredProcedures\Payment\spPayment_Insert.sql" />
     <Build Include="dbo\StoredProcedures\Payment\spPayment_GetAll.sql" />
+    <Build Include="dbo\StoredProcedures\Product\spProduct_GetByCartId.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ShredStoreDatabase.publish.xml" />

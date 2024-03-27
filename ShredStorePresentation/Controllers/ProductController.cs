@@ -23,11 +23,11 @@ namespace ShredStorePresentation.Controllers
             this._cache = _cache;
             _imageService = imageService;
         }
-        public async Task<IActionResult> ProductDetails(int Id)
+        public async Task<IActionResult> ProductDetails(int Id, CancellationToken token)
         {
             try
             {
-                var selected = await _product.GetById(Id);
+                var selected = await _product.GetById(Id, token);
                 return View(selected);
             }
             catch (Exception ex)
@@ -50,7 +50,7 @@ namespace ShredStorePresentation.Controllers
         // POST: ShredStoreController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> PublishProduct(CreateProductViewRequest productInfo)
+        public async Task<IActionResult> PublishProduct(CreateProductViewRequest productInfo, CancellationToken token)
         {
             SetProductDropdowns();            
             if (ModelState.IsValid)
@@ -58,7 +58,7 @@ namespace ShredStorePresentation.Controllers
                 try
                 {
                     productInfo.ImageName = await _imageService.UploadImage(productInfo.ImageFile);
-                    await _product.Create(productInfo.MapToProductRequest());
+                    await _product.Create(productInfo.MapToProductRequest(), token);
                     return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
@@ -73,17 +73,14 @@ namespace ShredStorePresentation.Controllers
             return View();
         }
         // GET: ShredStoreController/Edit/5
-        public async Task<IActionResult> EditProduct(int id)
+        public async Task<IActionResult> EditProduct(int id, CancellationToken token)
         {
-            var selected = await _product.GetById(id);
+            var selected = await _product.GetById(id, token);
             SetProductDropdowns();
             return View(selected.MapToUpdateProductRequest());
         }
 
-        // POST: ShredStoreController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditProduct(UpdateProductViewRequest edited)
+        public async Task<IActionResult> EditProduct(UpdateProductViewRequest edited, CancellationToken token)
         {
             SetProductDropdowns();
             ModelState.Remove("ImageFile");
@@ -91,57 +88,34 @@ namespace ShredStorePresentation.Controllers
             {
                 try
                 {
-
                     if (edited.ImageFile is not null)
                     {
                         _imageService.DeleteImage(edited.ImageName);
                         await _imageService.UploadImage(edited.ImageFile);
                     }                     
                     
-                    await _product.Edit(edited.MapToUpdateProductRequest());
-                    return RedirectToAction(nameof(Index));
+                    await _product.Edit(edited.MapToUpdateProductRequest(), token);
+                    return RedirectToAction("Index", "Home");
                 }
                 catch (Exception ex)
                 {
                     //_utilityClass.GetLog().Error(ex, "Exception caught at EditProduct action in ShredStoreController.");
-                    return View();
                 }
             }
-
-            return RedirectToAction(nameof(EditProduct), edited.Id);
+            return RedirectToAction("Index", "Home");
         }
 
-
-        // GET: ShredStoreController/Delete/5
-        [HttpGet]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> DeleteProduct(int id, CancellationToken token)
         {
-            var selected = await _product.GetById(id);
-            return View(selected);
-        }
-
-        // POST: ShredStoreController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteProduct(int id)
-        {
-            
             try
             {
+                var selected = await _product.GetById(id, token);
+                
+                bool result = _imageService.DeleteImage(selected.ImageName);
+                
+                await _product.Delete(selected.Id, token);
 
-                var selected = await _product.GetById(id);
-                //string result = _utilityClass.DeleteImage(selected.ImageName);
-                //if (result == "Ok")
-                //{
-                //    await _product.Delete(selected.Id);
-                //    return RedirectToAction(nameof(Index));
-                //}
-                //else
-                //{
-                //    ViewBag.Message = "A error occurred while deleting your product.";
-                //    return View();
-                //}
-                return View();
+                return RedirectToAction("Index", "Home");
             }
             catch (Exception ex)
             {
@@ -178,9 +152,6 @@ namespace ShredStorePresentation.Controllers
             ViewBag.Categories = new SelectList(Categories());
             ViewBag.Types = new SelectList(Types());
         }
-
-
-
 
     }
 }

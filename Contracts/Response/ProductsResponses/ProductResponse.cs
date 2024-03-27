@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Contracts.Response.ProductsResponses
+﻿namespace Contracts.Response.ProductsResponses
 {
     public class ProductResponse
     {

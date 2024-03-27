@@ -27,6 +27,7 @@
             public const string GetAll = Base;
             public const string GetByCategory = $"{Base}/GetAll/{{category}}";
             public const string GetByUserId = $"{Base}/GetAll/{{userId:int}}";
+            public const string GetByCartId = $"{Base}/GetAll/Cart/{{cartId:int}}";
             public const string Update = $"{Base}/update";
             public const string Delete = $"{Base}/{{id:int}}";
         }
@@ -81,11 +82,13 @@
             public static string SetUrlParameters(int id, string endpoint)
             {
                 string url = endpoint;
-                url = url.Replace("{id}", $"{id}");
-                url = url.Replace("{id:int}", $"{id}");
-                url = url.Replace("{userId}", $"{id}");
-                url = url.Replace("{userId:int}", $"{id}");
-                url = url.Replace("{orderId}", $"{id}");
+                url = url
+                .Replace("{id}", $"{id}")
+                .Replace("{id:int}", $"{id}")
+                .Replace("{userId}", $"{id}")
+                .Replace("{userId:int}", $"{id}")
+                .Replace("{orderId}", $"{id}")
+                .Replace("{cartId:int}", $"{id}");
                 return url;
             }
             public static string SetUrlParameters(string parameter, string endpoint)
@@ -97,18 +100,19 @@
             public static string SetOrderItem_GetUrl(int itemId = 0, int orderId = 0, string endpoint = "")
             {
                 string url = endpoint;
-                url = url.Replace("{orderId}", $"{orderId}");
-                url = url.Replace("{itemId}", $"{itemId}");
+                url = url
+                .Replace("{orderId}", $"{orderId}")
+                .Replace("{itemId}", $"{itemId}");
                 return url;
             }
             public static string SetCartItem_GetUrl(int itemId = 0, int cartId = 0, string endpoint = "")
             {
                 string url = endpoint;
-                url = url.Replace("{cartId}", $"{cartId}");
-                url = url.Replace("{itemId}", $"{itemId}");
+                url = url
+                .Replace("{cartId}", $"{cartId}")
+                .Replace("{itemId}", $"{itemId}");
                 return url;
             }
-
         }
     }
 }

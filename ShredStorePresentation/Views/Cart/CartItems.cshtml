@@ -1,0 +1,84 @@
+﻿@using Contracts.Response.ProductsResponses
+@model IEnumerable<ProductCartItemResponse>
+
+@{
+    Layout = config.GetValue<string>("PageLayouts:SecondaryLayout");
+    ViewData["Title"] = "Shopping Cart";
+}
+
+<script>
+    function setQuantity(productId) {
+
+        var Id = "QuantityDropDown"
+        var concat = Id.concat("{",productId,"}");
+        console.log(concat);
+        var quantity = document.getElementById(concat).value;
+        $.ajax({
+            url: '@Url.Action("ChangeQuantity", "Cart")',
+            type: 'POST',
+            data: { quantity: quantity, productId: productId }
+        }).done(function () {
+            location.reload();
+        });
+    }
+
+</script>
+<div class="d-flex justify-content-between mt-5 mb-5" id="IndexMain">
+    <div class="YourProductsContainer">
+        <a class="text-light text-decoration-none h4 fw-bold">Products</a>
+        <div class="CartProducts">
+            @foreach (var item in Model)
+            {
+                <div class="card mb-3 bg-secondary bg-gradient" id="CartItemsCard">
+                    <div class="row g-0">
+                        <div class="col-md-4">
+                            <img src="~/Images/@item.ImageName" class="card-img-top" alt="...">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title">@item.Name</h5>
+                                <p class="card-text">Price: @item.Price.ToString("c2")</p>
+                                    <div class="d-flex justify-content-evenly mb-2">
+                                        <select onchange="setQuantity(@item.Id)" id="QuantityDropDown{@item.Id}" class="QuantityDropDown form-select dropdown-toggle">
+                                            @for (int i = 1; i <= 10; i++)
+                                            {
+                                                if (i == item.Quantity)
+                                                {
+                                                    <option selected value="@i">@i</option>
+                                                }
+                                                else
+                                                {
+                                                <option value="@i">@i</option>
+                                                }
+                                            }
+                                        </select>
+                                    <a id="BtnRemoveCartItem" asp-action="RemoveCartItem" asp-route-productId="@item.Id" class="btn btn-outline-light">Remove From Cart</a>
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="d-flex align-items-center border border-5 rounded-3 border-light justify-content-center mt-5 mb-5 ms-5 me-5 w-100" id="CartTotal">
+        <div class="w-75 text-center">
+            <h3 class="text-light mb-5 mt-2">Purchase Details</h3>
+            @foreach (var item in Model)
+            {
+                <div class="align-items-start">
+                    <p class="text-light">@item.Name</p>
+                    <p class="text-light">Price: @item.Price.ToString("c2")</p>
+                </div>
+
+            }
+            <div class="border-top border-white">
+                <p class="text-light fw-bold">Total: @ViewBag.TotalPrice.ToString("c2")</p>
+            </div>
+            <a asp-controller="Cart" asp-action="ConfirmPurchase" class="btn btn-outline-light mt-5 mb-5">Confirm Purchase</a>
+        </div>
+    </div>
+    
+
+</div>

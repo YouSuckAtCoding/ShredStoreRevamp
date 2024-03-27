@@ -41,6 +41,13 @@ namespace ShredStore.Controllers
             var products = await _productService.GetProductsByUser(userId, token);
             return Ok(products);
         }
+        [HttpGet(ApiEndpoints.ProductEndpoints.GetByCartId)]
+        [ProducesResponseType(typeof(ProductCartItemResponse), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetByCartId([FromRoute] int cartId, CancellationToken token)
+        {
+            var products = await _productService.GetCartProducts(cartId, token);
+            return Ok(products);
+        }
 
         [HttpGet(ApiEndpoints.ProductEndpoints.Get)]
         [ProducesResponseType(typeof(ProductResponse), StatusCodes.Status200OK)]

@@ -1,5 +1,6 @@
 ﻿using Application.Models;
 using Application.Repositories.ProductStorage;
+using Contracts.Response.ProductsResponses;
 using FluentValidation;
 using System;
 using System.Collections.Generic;
@@ -36,7 +37,7 @@ namespace Application.Services.ProductServices
         public async Task<Product?> GetProduct(int id, CancellationToken token)
         {
             var result = await _productRepository.GetProduct(id, token);
-            return result is not null ? result : null; 
+            return result is not null ? result : null;
         }
 
         public async Task<IEnumerable<Product>> GetProducts(CancellationToken token)
@@ -63,6 +64,14 @@ namespace Application.Services.ProductServices
             await _productRepository.UpdateProduct(product, token);
             var result = await _productRepository.GetProduct(product.Id, token);
             return result is not null ? result : null;
+        }
+
+        public async Task<IEnumerable<ProductCartItemResponse>> GetCartProducts(int cartId, CancellationToken token)
+        {
+            var result = await _productRepository.GetCartProducts(cartId, token);
+            if (result is null)
+                return null;
+            return result;
         }
     }
 }

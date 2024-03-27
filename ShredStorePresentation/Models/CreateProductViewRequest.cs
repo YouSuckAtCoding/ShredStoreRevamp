@@ -10,7 +10,7 @@ namespace ShredStorePresentation.Models
         [Required(ErrorMessage = "Please insert a name")]
         public string Name { get; set; }
         [Required]
-        [MaxLength(300, ErrorMessage = "Descriptionmus have between 30 and 300 characters.")]
+        [MaxLength(750, ErrorMessage = "Descriptionmus have between 30 and 300 characters.")]
         [MinLength(30, ErrorMessage = "Descriptionmus have between 30 and 300 characters.")]
         public string Description { get; set; }
         [Required]

@@ -21,9 +21,9 @@ namespace ShredStorePresentation.Services.ProductServices
             httpClient.BaseAddress = new Uri(config.GetValue<string>("ApiUri")!);
         }
 
-        public async Task<ProductResponse> Create(CreateProductRequest product)
+        public async Task<ProductResponse> Create(CreateProductRequest product, CancellationToken token)
         {
-            var httpResponseMessage = await httpClient.PostAsJsonAsync(ApiEndpoints.ProductEndpoints.Create, product);
+            var httpResponseMessage = await httpClient.PostAsJsonAsync(ApiEndpoints.ProductEndpoints.Create, product, token);
 
             var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
 
@@ -33,42 +33,48 @@ namespace ShredStorePresentation.Services.ProductServices
 
         }
 
-        public async Task Delete(int id)
+        public async Task Delete(int id, CancellationToken token)
         {
-            var httpResponseMessage = await httpClient.DeleteAsync(ApiEndpoints.UrlGenerator.SetUrlParameters(id, ApiEndpoints.ProductEndpoints.Delete));
+            var httpResponseMessage = await httpClient.DeleteAsync(ApiEndpoints.UrlGenerator.SetUrlParameters(id, ApiEndpoints.ProductEndpoints.Delete), token);
             httpResponseMessage.EnsureSuccessStatusCode();
 
         }
-        public async Task<ProductResponse> Edit(UpdateProductRequest product)
+        public async Task<ProductResponse> Edit(UpdateProductRequest product, CancellationToken token)
         {
-            var httpResponseMessage = await httpClient.PutAsJsonAsync(ApiEndpoints.ProductEndpoints.Update, product);
+            var httpResponseMessage = await httpClient.PutAsJsonAsync(ApiEndpoints.ProductEndpoints.Update, product, token);
 
             var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
 
             var edited = await JsonSerializer.DeserializeAsync<ProductResponse>(contentStream, jsonSerializerOptions);
             return edited;
         }
-        public async Task<IEnumerable<ProductResponse>> GetAll()
+        public async Task<IEnumerable<ProductResponse>> GetAll(CancellationToken token)
         {
-            var products = await httpClient.GetFromJsonAsync<IEnumerable<ProductResponse>>(ApiEndpoints.ProductEndpoints.GetAll, cancellationToken: default);
+            var products = await httpClient.GetFromJsonAsync<IEnumerable<ProductResponse>>(ApiEndpoints.ProductEndpoints.GetAll, token);
             return products;
 
         }
-        public async Task<IEnumerable<ProductResponse>> GetAllByCategory(string Category)
+        public async Task<IEnumerable<ProductResponse>> GetAllByCategory(string Category, CancellationToken token)
         {
-            var products = await httpClient.GetFromJsonAsync<IEnumerable<ProductResponse>>(ApiEndpoints.UrlGenerator.SetUrlParameters(Category, ApiEndpoints.ProductEndpoints.GetByCategory));
+            var products = await httpClient.GetFromJsonAsync<IEnumerable<ProductResponse>>(ApiEndpoints.UrlGenerator.SetUrlParameters(Category, ApiEndpoints.ProductEndpoints.GetByCategory), token);
             return products;
 
         }
-        public async Task<IEnumerable<ProductResponse>> GetAllByUserId(int UserId)
+        public async Task<IEnumerable<ProductResponse>> GetAllByUserId(int UserId, CancellationToken token)
         {
-            var products = await httpClient.GetFromJsonAsync<IEnumerable<ProductResponse>>(ApiEndpoints.UrlGenerator.SetUrlParameters(UserId, ApiEndpoints.ProductEndpoints.GetByUserId));
+            var products = await httpClient.GetFromJsonAsync<IEnumerable<ProductResponse>>(ApiEndpoints.UrlGenerator.SetUrlParameters(UserId, ApiEndpoints.ProductEndpoints.GetByUserId), token);
             return products;
 
         }
-        public async Task<ProductResponse> GetById(int id)
+        public async Task<IEnumerable<ProductCartItemResponse>> GetAllByCartId(int cartId, CancellationToken token)
         {
-            var Usuario = await httpClient.GetFromJsonAsync<ProductResponse>(ApiEndpoints.UrlGenerator.SetUrlParameters(id, ApiEndpoints.ProductEndpoints.Get));
+            var products = await httpClient.GetFromJsonAsync<IEnumerable<ProductCartItemResponse>>(ApiEndpoints.UrlGenerator.SetUrlParameters(cartId, ApiEndpoints.ProductEndpoints.GetByCartId), token);
+            return products;
+
+        }
+        public async Task<ProductResponse> GetById(int id, CancellationToken token)
+        {
+            var Usuario = await httpClient.GetFromJsonAsync<ProductResponse>(ApiEndpoints.UrlGenerator.SetUrlParameters(id, ApiEndpoints.ProductEndpoints.Get), token);
             return Usuario;
         }
     }

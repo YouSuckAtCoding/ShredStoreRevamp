@@ -1,4 +1,4 @@
-function myFunction() {
+function setCategory() {
 
     var e = document.getElementById('CategoryDropDown');
     var category = e.options[e.selectedIndex].text;
@@ -42,3 +42,4 @@ function removeOptions(selectElement) {
         selectElement.remove(i);
     }
 }
+

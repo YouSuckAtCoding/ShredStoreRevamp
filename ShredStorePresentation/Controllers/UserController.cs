@@ -93,11 +93,11 @@ namespace ShredStorePresentation.Controllers
             return View();
         }
         [HttpGet]
-        public async Task<IActionResult> UserDetails(int Id)
+        public async Task<IActionResult> UserDetails(int Id, CancellationToken token)
         {
 
             var selected = await _userHttpService.GetById(Id);
-            ViewBag.UserProducts = await _productHttpService.GetAllByUserId(Id);
+            ViewBag.UserProducts = await _productHttpService.GetAllByUserId(Id, token);
             return View(selected);
         }
         [HttpGet]
@@ -247,9 +247,9 @@ namespace ShredStorePresentation.Controllers
         }
         
         [HttpGet]
-        public async Task<IActionResult> AdminProducts()
+        public async Task<IActionResult> AdminProducts(CancellationToken token)
         {
-            IEnumerable<ProductResponse> users = await _productHttpService.GetAll();
+            IEnumerable<ProductResponse> users = await _productHttpService.GetAll(token);
             return View(users);
         }
 

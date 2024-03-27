@@ -27,6 +27,7 @@
             public const string GetAll = Base;
             public const string GetByCategory = $"{Base}/GetAll/{{category}}";
             public const string GetByUserId = $"{Base}/GetAll/{{userId:int}}";
+            public const string GetByCartId = $"{Base}/GetAll/Cart/{{cartId:int}}";
             public const string Update = $"{Base}/update";
             public const string Delete = $"{Base}/{{id:int}}";
         }

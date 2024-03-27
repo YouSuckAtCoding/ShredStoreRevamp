@@ -35,14 +35,14 @@
                 <a class="btn btn-outline-light mt-3 mb-3" asp-area="" asp-controller="User" asp-action="ChangePassword">Change Your Password</a>
                 <a class="btn btn-outline-light mt-3 mb-3" asp-area="" asp-controller="User" asp-action="DeleteAccount">Delete Account</a>
             }
-            
+
             @if (Accessor.HttpContext.Session.GetString("_Role") == null || Accessor.HttpContext.Session.GetString("_Role") != "Customer")
             {
                 <a class="btn btn-outline-light mt-3 mb-3" asp-area="" asp-controller="Product" asp-action="PublishProduct">Publish Product</a>
             }
         </div>
     </div>
-    <div class="text-center mt-5 mb-5" >
+    <div class="UserProductsContainer">
         <h1 class="text-light mb-5 mt-2">Your Products</h1>
         <div class="d-flex justify-content-evenly flex-wrap mb-5" id="YourProducts">
             @if (!products.Any())
@@ -51,18 +51,24 @@
             }
             else
             {
-                @foreach (var item in products)
-                {
-                    <div class="card me-2 bg-secondary bg-gradient" id="card-container">
-                        <img src="~/Images/@item.ImageName" class="card-img-top" alt="..." id="Card-Img">
-                        <div class="card-body">
-                            <h5 class="card-title text-light">@item.Name</h5>
-                            <p class="card-text text-light">Price: $@float.Parse(item.Price.ToString()) </p>
-                            <a asp-controller="Product" asp-action="Delete" asp-route-id=@item.Id class="btn btn-outline-light btn-sm">Delete Product</a>
-                            <a asp-controller="Product" asp-action="EditProduct" asp-route-id=@item.Id class="btn btn-outline-light btn-sm">Edit Product</a>
-                        </div>
-                    </div>
-                }
+                <div class="User-container">
+                    <ul id="UserProductList">
+                        @foreach (var item in products)
+                        {
+                            <li class="user-card-list-item">
+                                <div class="card me-2 bg-secondary bg-gradient" id="User-card-container">
+                                    <img src="~/Images/@item.ImageName" class="card-img-top" alt="..." id="User-Card-Img">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-light">@item.Name</h5>
+                                        <p class="card-text text-light">Price: @(item.Price.ToString("c2")) </p>
+                                        <a asp-controller="Product" asp-action="EditProduct" asp-route-Id=@item.Id class="btn btn-outline-light mb-3">Edit Product</a>
+                                        <a asp-controller="Product" asp-action="DeleteProduct" asp-route-Id=@item.Id class="btn btn-outline-light">Delete Product</a>
+                                    </div>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                </div>
 
             }
 

@@ -1,6 +1,6 @@
 ﻿CREATE PROCEDURE [dbo].[spCart_Insert]
 	@UserId int,
-	@CreatedDate date
+	@CreatedDate datetime
 AS
 Begin
 
