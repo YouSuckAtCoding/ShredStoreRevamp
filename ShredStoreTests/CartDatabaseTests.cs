@@ -53,16 +53,16 @@ namespace ShredStoreTests
         public async Task Should_Insert_Cart_If_Doesnt_Exist()
         {
 
-            User returnedUser = await SetUpCartID(_dbConnectionFactory);
+            int userId = await GenerateUserId(_dbConnectionFactory);
 
             ICartStorage CartStorage = new CartStorage(_dbConnectionFactory);
             Cart cart = Fake.FakeDataFactory.FakeCart();
-            cart.UserId = returnedUser.Id;
+            cart.UserId = userId;
 
             await CartStorage.InsertCart(cart);
+            var check = await CartStorage.GetCart(userId);
 
-            var check = await CartStorage.GetCart(returnedUser.Id);
-            check.UserId.Should().Be(returnedUser.Id);
+            check.UserId.Should().Be(userId);
 
             await Utility.CleanUpCarts(_dbConnectionFactory);
 
@@ -71,26 +71,26 @@ namespace ShredStoreTests
         public async Task Should_Delete_Cart_If_Exists()
         {
 
-            User returnedUser = await SetUpCartID(_dbConnectionFactory);
+            int userId = await GenerateUserId(_dbConnectionFactory);
 
             ICartStorage CartStorage = new CartStorage(_dbConnectionFactory);
             Cart cart = Fake.FakeDataFactory.FakeCart();
-            cart.UserId = returnedUser.Id;
+            cart.UserId = userId;
 
             await CartStorage.InsertCart(cart);
 
-            Cart res = await CartStorage.GetCart(returnedUser.Id);
+            Cart res = await CartStorage.GetCart(userId);
 
             await CartStorage.DeleteCart(cart.UserId);
 
-            res = await CartStorage.GetCart(returnedUser.Id);
+            res = await CartStorage.GetCart(userId);
             res.Should().BeSameAs(null);
 
             await Utility.CleanUpCarts(_dbConnectionFactory);
 
         }
 
-        private async Task<User> SetUpCartID(ISqlAccessConnectionFactory _dbConnectionFactory)
+        private async Task<int> GenerateUserId(ISqlAccessConnectionFactory _dbConnectionFactory)
         {
             User user = Fake.FakeDataFactory.FakeUser();
             IUserStorage UserStorage = new UserStorage(_dbConnectionFactory);
@@ -100,7 +100,7 @@ namespace ShredStoreTests
             var res = await UserStorage.GetUsers();
             User returnedUser = res.FirstOrDefault();
 
-            return returnedUser;
+            return returnedUser.Id;
 
         }
       

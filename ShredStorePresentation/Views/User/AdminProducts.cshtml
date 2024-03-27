@@ -1,0 +1,26 @@
+﻿@using Contracts.Response.ProductsResponses;
+@model IEnumerable<ProductResponse>
+
+@{
+    Layout = config.GetValue<string>("PageLayouts:SecondaryLayout");
+    ViewData["Title"] = "Admin";
+}
+
+<div class="text-center mt-5 mb-5" id="IndexMain">
+    <div class="d-flex container flex-wrap justify-content-evenly mb-5" id="UserContainer">
+        @foreach (var item in Model)
+        {
+            <div class="card me-2 bg-secondary bg-gradient mb-3 mt-2">
+                <div class="card-body">
+                    <h5 class="card-title text-light">@item.Name</h5>
+                    <p class="card-title text-light fw-bold">@item.Price</p>
+                    <p class="card-text text-light">@item.Brand</p>
+                    <a asp-controller="User" asp-action="Delete" asp-route-Id=@item.Id class="btn btn-outline-light">Remove Product</a>
+                    <a asp-controller="User" asp-action="Edit" asp-route-Id=@item.Id class="btn btn-outline-light">Edit Product</a>
+                </div>
+            </div>
+        }
+    </div>
+    <a class="dropdown-item text-light" asp-controller="User" asp-action="Admin">All Products</a>
+
+</div>

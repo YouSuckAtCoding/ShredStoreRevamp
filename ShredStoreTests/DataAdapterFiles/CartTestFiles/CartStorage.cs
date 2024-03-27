@@ -29,6 +29,6 @@ namespace ShredStoreTests.DataAdapterFiles.CartTestFiles
 
         }
 
-        public Task DeleteCart(int id) => _dataAccess.SaveData("dbo.spCart_Delete", new { UserId = id });
+        public Task DeleteCart(int id) => _dataAccess.SaveData("dbo.spCart_Delete", new { Id = id });
     }
 }

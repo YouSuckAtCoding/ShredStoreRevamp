@@ -65,6 +65,7 @@
     <Folder Include="dbo\StoredProcedures\Product" />
     <Folder Include="dbo\StoredProcedures\CartItem" />
     <Folder Include="dbo\StoredProcedures\OrderItem" />
+    <Folder Include="dbo\StoredProcedures\Payment" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\User.sql" />
@@ -86,7 +87,7 @@
     <Build Include="dbo\StoredProcedures\Order\spOrder_Delete.sql" />
     <Build Include="dbo\StoredProcedures\Product\spProduct_GetById.sql" />
     <Build Include="dbo\StoredProcedures\Product\spProduct_Delete.sql" />
-    <Build Include="dbo\StoredProcedures\Product\spProduto_Update.sql" />
+    <Build Include="dbo\StoredProcedures\Product\spProduct_Update.sql" />
     <Build Include="dbo\StoredProcedures\Cart\spCart_Delete.sql" />
     <Build Include="dbo\StoredProcedures\User\spUser_Login.sql" />
     <Build Include="dbo\Tables\CartItem.sql" />
@@ -107,6 +108,11 @@
     <Build Include="dbo\StoredProcedures\OrderItem\spOrderItem_GetById.sql" />
     <Build Include="dbo\StoredProcedures\OrderItem\spOrderItem_DeleteAll.sql" />
     <Build Include="dbo\StoredProcedures\Order\spOrder_GetAll.sql" />
+    <Build Include="dbo\StoredProcedures\Product\spProduct_GetByCategory.sql" />
+    <Build Include="dbo\StoredProcedures\Product\spProduct_GetByUserId.sql" />
+    <Build Include="dbo\StoredProcedures\Payment\spPayment_Insert.sql" />
+    <Build Include="dbo\StoredProcedures\Payment\spPayment_GetAll.sql" />
+    <Build Include="dbo\StoredProcedures\Product\spProduct_GetByCartId.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ShredStoreDatabase.publish.xml" />

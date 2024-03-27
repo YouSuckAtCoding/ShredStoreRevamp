@@ -27,7 +27,7 @@ namespace ShredStoreTests.DataAdapterFiles.OrderTestFiles
             var result = await _dataAccess.LoadData<Order, dynamic>("dbo.spOrder_GetById", new { Id = id });
             return result.FirstOrDefault();
         }
-        public Task UpdateOrder(Order Order) => _dataAccess.SaveData("dbo.spOrder_Update", new { Order.Id, Order.CreatedDate});
+        public Task UpdateOrder(Order Order) => _dataAccess.SaveData("dbo.spOrder_Update", new { Order.Id, Order.CreatedDate, Order.TotalAmount});
 
         public Task DeleteOrder(int id) => _dataAccess.SaveData("dbo.spOrder_Delete", new { Id = id });
     }

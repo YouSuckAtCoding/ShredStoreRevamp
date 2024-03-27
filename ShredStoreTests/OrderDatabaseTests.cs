@@ -1,13 +1,9 @@
 ﻿using Application.Models;
-using Application.Repositories;
 using Dapper;
 using FluentAssertions;
 using ShredStoreTests.DataAdapterFiles;
-using ShredStoreTests.DataAdapterFiles.CartItemTestFiles;
-using ShredStoreTests.DataAdapterFiles.CartTestFiles;
 using ShredStoreTests.DataAdapterFiles.OrderTestFiles;
-using ShredStoreTests.DataAdapterFiles.ProductTestFiles;
-using ShredStoreTests.DataAdapterFiles.UserTestFiles;
+using ShredStoreTests.DataAdapterFiles.PaymentTestFiles;
 using ShredStoreTests.Fake;
 
 namespace ShredStoreTests
@@ -43,13 +39,15 @@ namespace ShredStoreTests
         [Fact]
         public async Task Should_Insert_Order_If_Doenst_Exists()
         {
-            await SetUpMultipleCartItems();
             IOrderStorage orderStorage = new OrderStorage(_dbConnectionFactory);
             Order order = FakeDataFactory.FakeOrder();
-            order.PaymentId = 1;
-            await orderStorage.InsertOrder(order);
+            order.UserId = await Utility.GenerateUserId(_dbConnectionFactory);
+            int paymentId = await GeneratePaymentId();
+            order.PaymentId = paymentId;
 
+            await orderStorage.InsertOrder(order);
             var res = await orderStorage.GetOrders(order.UserId);
+
             res.First().UserId.Should().Be(order.UserId);
 
             await Utility.CleanUpOrders(_dbConnectionFactory);
@@ -57,20 +55,20 @@ namespace ShredStoreTests
             await Utility.CleanUpCarts(_dbConnectionFactory);
 
         }
+
         [Fact]
         public async Task TotalAmount_Should_Be_Equal_To_CartItem_Price_Multiplied_Product_Quantity()
         {
-            decimal expected = await SetUpCartItemPriceTests();
-
             IOrderStorage orderStorage = new OrderStorage(_dbConnectionFactory);
             Order order = FakeDataFactory.FakeOrder();
-            order.PaymentId = 1;
-            order.TotalAmount = expected;
-            await orderStorage.InsertOrder(order);
-            order.PaymentId = 1;
+            order.PaymentId = await GeneratePaymentId();
+            order.TotalAmount = 1000;
+            order.UserId = await Utility.GenerateUserId(_dbConnectionFactory);
 
+            await orderStorage.InsertOrder(order);
             var res = await orderStorage.GetOrders(order.UserId);
-            res.First().TotalAmount.Should().Be(expected);
+            
+            res.First().TotalAmount.Should().Be(1000);
 
             await Utility.CleanUpOrders(_dbConnectionFactory);
             await Utility.ClearCartItems(_dbConnectionFactory);
@@ -80,16 +78,14 @@ namespace ShredStoreTests
         [Fact]
         public async Task Should_Delete_Order()
         {
-            await SetUpMultipleCartItems();
             IOrderStorage orderStorage = new OrderStorage(_dbConnectionFactory);
             Order order = FakeDataFactory.FakeOrder();
-            order.PaymentId = 1;
+            order.PaymentId = await GeneratePaymentId();
+            order.UserId = await Utility.GenerateUserId(_dbConnectionFactory);
+
             await orderStorage.InsertOrder(order);
-            
             var res = await orderStorage.GetOrders(order.UserId);
-
             await orderStorage.DeleteOrder(res.First().Id);
-
             res = await orderStorage.GetOrders(order.UserId);
 
             res.Should().BeEmpty();
@@ -101,19 +97,18 @@ namespace ShredStoreTests
         [Fact]
         public async Task Should_Update_Order_Date()
         {
-            await SetUpMultipleCartItems();
+
             IOrderStorage orderStorage = new OrderStorage(_dbConnectionFactory);
             Order order = FakeDataFactory.FakeOrder();
-            order.PaymentId = 1;
-            await orderStorage.InsertOrder(order);
-            
-            var res = await orderStorage.GetOrders(order.UserId);
-
-            order.Id = res.First().Id;
+            order.PaymentId = await GeneratePaymentId();
+            order.UserId = await Utility.GenerateUserId(_dbConnectionFactory);
             DateTime newDate = new DateTime(2019, 05, 09, 09, 15, 00);
+
+            await orderStorage.InsertOrder(order);
+            var res = await orderStorage.GetOrders(order.UserId);
+            order.Id = res.First().Id;
             order.CreatedDate = newDate;
             await orderStorage.UpdateOrder(order);
-
             res = await orderStorage.GetOrders(order.UserId);
 
             res.First().CreatedDate.Should().Be(newDate);
@@ -122,97 +117,13 @@ namespace ShredStoreTests
             await Utility.ClearCartItems(_dbConnectionFactory);
             await Utility.CleanUpCarts(_dbConnectionFactory);
         }
-        private async Task<decimal> SetUpCartItemPriceTests()
+        private async Task<int> GeneratePaymentId()
         {
-
-            User user = FakeDataFactory.FakeUser();
-            Product product = FakeDataFactory.FakeProduct();
-            Cart cart = FakeDataFactory.FakeCart();
-
-
-            
-
-            await SetUpRecordsOnDatabase(user, product, cart);
-
-            ICartItemStorage cartItemStorage = new CartItemStorage(_dbConnectionFactory);
-
-            CartItem cartItem = new CartItem
-            {
-                ProductId = 1,
-                CartId = 1,
-                Quantity = 4
-            };
-            cartItem.Price = product.Price * cartItem.Quantity;
-            await cartItemStorage.InsertCartItem(cartItem);
-
-            return product.Price * cartItem.Quantity;
-
-        }
-
-        private async Task SetUpRecordsOnDatabase(User user, Product product, Cart cart)
-        {
-            IUserStorage userStorage = new UserStorage(_dbConnectionFactory);
-            await userStorage.InsertUser(user);
-
-            IProductStorage productStorage = new ProductStorage(_dbConnectionFactory);
-            await productStorage.InsertProduct(product);
-
-            ICartStorage cartStorage = new CartStorage(_dbConnectionFactory);
-            Cart carts = await cartStorage.GetCart(1);
-            int cartId = 0;
-            if (carts is null)
-            {
-                await cartStorage.InsertCart(cart);
-                cartId = 1;
-            }
-            else cartId = carts.UserId;
-        }
-
-        private async Task SetUpMultipleCartItems()
-        {
-            Cart cart = FakeDataFactory.FakeCart();
-            User user = FakeDataFactory.FakeUser();
-            IEnumerable<Product> products = FakeDataFactory.FakeProducts();
-
-            IUserStorage userStorage = new UserStorage(_dbConnectionFactory);
-            await userStorage.InsertUser(user);
-
-            var users = await userStorage.GetUsers();
-
-            ICartStorage cartStorage = new CartStorage(_dbConnectionFactory);
-            Cart carts = await cartStorage.GetCart(1);
-            int cartId = 0;
-            if (carts is null)
-            {
-                await cartStorage.InsertCart(cart);
-                cartId = 1;
-            }
-            else cartId = carts.UserId;
-
-            
-
-            IProductStorage productStorage = new ProductStorage(_dbConnectionFactory);
-
-            foreach (Product product in products)
-            {
-                await productStorage.InsertProduct(product);
-            }
-
-            IEnumerable<Product> returnedProducts = await productStorage.GetProducts();
-
-            ICartItemStorage cartItemStorage = new CartItemStorage(_dbConnectionFactory);
-
-            foreach (Product product in returnedProducts)
-            {
-                CartItem cartItem = new CartItem
-                {
-                    ProductId = product.Id,
-                    CartId = cartId,
-                    Quantity = 4
-                };
-                cartItem.Price = product.Price * cartItem.Quantity;
-                await cartItemStorage.InsertCartItem(cartItem);
-            }
+            IPaymentStorage paymentStorage = new PaymentStorage(_dbConnectionFactory);
+            await paymentStorage.InsertPayment(FakeDataFactory.FakePayment());
+            IEnumerable<Payment> payments = await paymentStorage.GetPayments();
+            int paymentId = payments.First().Id;
+            return paymentId;
         }
 
     }

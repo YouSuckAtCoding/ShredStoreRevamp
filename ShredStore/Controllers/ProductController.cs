@@ -2,7 +2,6 @@
 using Application.Services.ProductServices;
 using Contracts.Request.ProductRequests;
 using Contracts.Response.ProductsResponses;
-using Contracts.Response.UserResponses;
 using Microsoft.AspNetCore.Mvc;
 using ShredStore.Mapping;
 
@@ -25,6 +24,28 @@ namespace ShredStore.Controllers
         public async Task<IActionResult> GetAll(CancellationToken token)
         {
             var products = await _productService.GetProducts(token);
+            return Ok(products);
+        }
+
+        [HttpGet(ApiEndpoints.ProductEndpoints.GetByCategory)]
+        [ProducesResponseType(typeof(ProductsResponse), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetByCategory([FromRoute] string category, CancellationToken token)
+        {
+            var products = await _productService.GetProductsByCategory(category, token);
+            return Ok(products);
+        }
+        [HttpGet(ApiEndpoints.ProductEndpoints.GetByUserId)]
+        [ProducesResponseType(typeof(ProductsResponse), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetByUserId([FromRoute] int userId, CancellationToken token)
+        {
+            var products = await _productService.GetProductsByUser(userId, token);
+            return Ok(products);
+        }
+        [HttpGet(ApiEndpoints.ProductEndpoints.GetByCartId)]
+        [ProducesResponseType(typeof(ProductCartItemResponse), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetByCartId([FromRoute] int cartId, CancellationToken token)
+        {
+            var products = await _productService.GetCartProducts(cartId, token);
             return Ok(products);
         }
 
@@ -55,7 +76,7 @@ namespace ShredStore.Controllers
         [HttpPut(ApiEndpoints.ProductEndpoints.Update)]
         [ProducesResponseType(typeof(ProductResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateProductRequest request, CancellationToken token)
+        public async Task<IActionResult> Update([FromBody] UpdateProductRequest request, CancellationToken token)
         {
             Product product = request.MapToProduct();
 

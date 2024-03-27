@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Contracts.Request;
+using Contracts.Response.ProductsResponses;
+using Contracts.Response.UserResponses;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using ShredStorePresentation.Models;
-using ShredStorePresentation.Models.User.Request;
-using ShredStorePresentation.Models.User.Response;
+using ShredStorePresentation.Services.ProductServices;
 using ShredStorePresentation.Services.UserService;
 
 namespace ShredStorePresentation.Controllers
@@ -10,14 +11,15 @@ namespace ShredStorePresentation.Controllers
     public class UserController : Controller
     {
         private readonly IUserHttpService _userHttpService;
+        private readonly IProductHttpService _productHttpService;
         public const string SessionKeyName = "_Name";
         public const string SessionKeyId = "_Id";
         public const string SessionKeyRole = "_Role";
         public const string SessionKeyEmail = "_Email";
-        public UserController(IUserHttpService userHttpService)
+        public UserController(IUserHttpService userHttpService, IProductHttpService productHttpService)
         {
             _userHttpService = userHttpService;
-
+            _productHttpService = productHttpService;
         }
         [HttpGet]
         public IActionResult Login()
@@ -25,7 +27,7 @@ namespace ShredStorePresentation.Controllers
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult> Login(UserLoginViewRequest userLogin)
+        public async Task<IActionResult> Login(LoginUserRequest userLogin)
         {
             if (ModelState.IsValid)
             {
@@ -68,17 +70,12 @@ namespace ShredStorePresentation.Controllers
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult> CreateAccount(UserRegistrationViewRequest userData)
+        public async Task<IActionResult> CreateAccount(CreateUserRequest userData)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    if (userData.Id != 0)
-                    {
-                        ViewBag.Message = "Error while creating account";
-                        return View();
-                    }
                     await _userHttpService.Create(userData);
                     //await _emailSender.SendEmailAsync(userData.Email, 2);
                     return RedirectToAction(nameof(Login));
@@ -96,24 +93,11 @@ namespace ShredStorePresentation.Controllers
             return View();
         }
         [HttpGet]
-        public async Task<IActionResult> UserDetails(int Id)
+        public async Task<IActionResult> UserDetails(int Id, CancellationToken token)
         {
 
             var selected = await _userHttpService.GetById(Id);
-            ViewBag.UserProducts = new List<ProductViewResponse>();
-            switch (selected.Role)
-            {
-                case "Customer":
-                    selected.Role = "Customer";
-                    break;
-                case "Shop":
-                    selected.Role = "Shop";
-                    //var userProducts = await UserProducts();
-                    //ViewBag.UserProducts = userProducts;
-                    break;
-                default:
-                    break;
-            }
+            ViewBag.UserProducts = await _productHttpService.GetAllByUserId(Id, token);
             return View(selected);
         }
         [HttpGet]
@@ -124,7 +108,7 @@ namespace ShredStorePresentation.Controllers
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult> EditAccount(UserUpdateViewRequest userEdit)
+        public async Task<IActionResult> EditAccount(UpdateUserRequest userEdit)
         {
             if (ModelState.IsValid)
             {
@@ -154,7 +138,7 @@ namespace ShredStorePresentation.Controllers
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult> ChangePassword(UserLoginViewRequest userLogin)
+        public async Task<IActionResult> ChangePassword(LoginUserRequest userLogin)
         {
             userLogin.Email = HttpContext.Session.GetString("_Email");
             if (userLogin.Email != null && userLogin.Password != null)
@@ -167,7 +151,7 @@ namespace ShredStorePresentation.Controllers
                         int sessionId = HttpContext.Session.GetInt32("_Id").Value;
                         if (loggedUser.Id == sessionId)
                         {
-                            UserResetPasswordViewRequest request = new UserResetPasswordViewRequest
+                            ResetPasswordUserRequest request = new ResetPasswordUserRequest
                             {
                                 Password = userLogin.Password,
                                 Email = userLogin.Email
@@ -191,7 +175,7 @@ namespace ShredStorePresentation.Controllers
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult> NewPassword(UserResetPasswordViewRequest request)
+        public async Task<IActionResult> NewPassword(ResetPasswordUserRequest request)
         {
             try
             {
@@ -216,7 +200,7 @@ namespace ShredStorePresentation.Controllers
         [HttpGet]
         public async Task<IActionResult> DeleteAccount() => View();
         [HttpPost]
-        public async Task<IActionResult> DeleteAccount(UserLoginViewRequest userLogin)
+        public async Task<IActionResult> DeleteAccount(LoginUserRequest userLogin)
         {
             userLogin.Email = HttpContext.Session.GetString("_Email");
             try
@@ -255,6 +239,20 @@ namespace ShredStorePresentation.Controllers
             ViewBag.Message = "Please create an account to add to cart.";
             return View("Login");
         }
+        [HttpGet]
+        public async Task<IActionResult> Admin()
+        {
+            IEnumerable<UserResponse> users = await _userHttpService.GetAll();
+            return View(users);
+        }
+        
+        [HttpGet]
+        public async Task<IActionResult> AdminProducts(CancellationToken token)
+        {
+            IEnumerable<ProductResponse> users = await _productHttpService.GetAll(token);
+            return View(users);
+        }
+
         //[HttpGet]
         //public async Task<IActionResult> ForgotPassword()
         //{
@@ -303,7 +301,7 @@ namespace ShredStorePresentation.Controllers
             List<string> Role = ["Shop", "Customer"];
             return Role;
         }
-        private void SetSessionInfo(UserViewResponse user)
+        private void SetSessionInfo(UserResponse user)
         {
             HttpContext.Session.SetInt32(SessionKeyId, user.Id);
             HttpContext.Session.SetString(SessionKeyName, user.Name);

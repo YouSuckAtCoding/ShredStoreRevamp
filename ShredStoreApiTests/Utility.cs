@@ -70,7 +70,7 @@ namespace ShredStoreApiTests
                     CreatedDate = DateTime.Now,
                     UserId = id,
                     TotalAmount = 1000,
-                    PaymentId = 3
+                    PaymentId = 1
                 };
                 var jsonString = JsonSerializer.Serialize(request);
 

@@ -145,7 +145,9 @@ namespace ShredStoreApiTests
 
             IEnumerable<Product>? products = await ReturnAllProducts(client).ConfigureAwait(false);
 
-            var getResponse = await client.GetAsync(Utility.SetGet_Or_DeleteUrl(products!.First().Id, ApiEndpoints.ProductEndpoints.Get));
+            int id = products.Last().Id;
+
+            var getResponse = await client.GetAsync(Utility.SetGet_Or_DeleteUrl(id, ApiEndpoints.ProductEndpoints.Get));
 
             var getResult = await getResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
 
@@ -193,9 +195,11 @@ namespace ShredStoreApiTests
 
             IEnumerable<Product>? products = await ReturnAllProducts(client).ConfigureAwait(false);
 
-            await client.DeleteAsync(Utility.SetGet_Or_DeleteUrl(products.Last().Id, ApiEndpoints.ProductEndpoints.Delete));
+            int id = products.Last().Id;
 
-            string url = Utility.SetGet_Or_DeleteUrl(products.Last().Id, ApiEndpoints.ProductEndpoints.Delete);
+            await client.DeleteAsync(Utility.SetGet_Or_DeleteUrl(id, ApiEndpoints.ProductEndpoints.Delete));
+
+            string url = Utility.SetGet_Or_DeleteUrl(id, ApiEndpoints.ProductEndpoints.Delete);
 
             var getResponse = await client.GetAsync(url);
 

@@ -37,13 +37,6 @@ namespace ShredStoreApiTests
             users.Should().NotBeEmpty();
         }
 
-        private static async Task<IEnumerable<User>?> GetAllUsers(HttpClient client)
-        {
-            var response = await client.GetAsync(ApiEndpointsTest.UserEndpoints.GetAll);
-            var result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            var users = JsonSerializer.Deserialize<IEnumerable<User>>(result, jsonSerializerOptions);
-            return users;
-        }
 
         [Fact]
         public async Task Should_Insert_User()
@@ -76,6 +69,7 @@ namespace ShredStoreApiTests
         public async Task Should_Return_User_From_Login_Real_Endpoint()
         {
             using var client = CreateApi.CreateOfficialApi().CreateClient();
+
             HttpRequestMessage requestMessage = SetLogin(client);
 
             var response = client.SendAsync(requestMessage).ConfigureAwait(false);
@@ -147,7 +141,8 @@ namespace ShredStoreApiTests
                 Age = returned.Age,
                 Cpf = returned.Cpf,
                 Address = returned.Address,
-                Email = returned.Email
+                Email = returned.Email,
+                Role = returned.Role
             };          
 
             var jsonString = JsonSerializer.Serialize(request);
@@ -244,6 +239,14 @@ namespace ShredStoreApiTests
             loggeduser.Id.Should().BeGreaterThan(0);
 
         }
+
+        private static async Task<IEnumerable<User>?> GetAllUsers(HttpClient client)
+        {
+            var response = await client.GetAsync(ApiEndpointsTest.UserEndpoints.GetAll);
+            var result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var users = JsonSerializer.Deserialize<IEnumerable<User>>(result, jsonSerializerOptions);
+            return users;
+        }
         private static HttpRequestMessage SetResetPassword(HttpClient client, CreateUserRequest user)
         {
             ResetPasswordUserRequest request = new ResetPasswordUserRequest
@@ -267,7 +270,7 @@ namespace ShredStoreApiTests
         {
             LoginUserRequest request = new LoginUserRequest
             {
-                Email = "teste@gmail.com",
+                Email = "admin@teste.com",
                 Password = "123456789"
             };
 

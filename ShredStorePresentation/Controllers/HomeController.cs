@@ -1,7 +1,7 @@
+using Contracts.Response.ProductsResponses;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using ShredStorePresentation.Extensions;
-using ShredStorePresentation.Models;
 using ShredStorePresentation.Services.ProductServices;
 
 
@@ -21,12 +21,12 @@ namespace ShredStorePresentation.Controllers
         }
 
 
-        public async Task<IActionResult> Index(string Search = "")
+        public async Task<IActionResult> Index(CancellationToken token ,string Search = "")
         {
             string recordKey = "Products_";
             try
             {
-                var allProducts = await GetAllProducts(recordKey);
+                var allProducts = await GetAllProducts(recordKey, token);
                 if (Search == "" || Search is null)
                 {
                     return View(allProducts);
@@ -44,47 +44,77 @@ namespace ShredStorePresentation.Controllers
             }
             return View();
         }
-        private async Task<IEnumerable<ProductViewResponse>> GetAllProducts(string recordKey)
+        private async Task<IEnumerable<ProductResponse>> GetAllProducts(string recordKey, CancellationToken token)
         {
-            var products = await _cache.GetRecordAsync<IEnumerable<ProductViewResponse>>(recordKey);
+            var products = await _cache.GetRecordAsync<IEnumerable<ProductResponse>>(recordKey);
             if (products is null)
             {
-                var getProducts = await _productService.GetAll();
+                var getProducts = await _productService.GetAll(token);
                 SetOnCache(recordKey, getProducts);
                 return getProducts;
             }
             return products;
         }
-        private async Task<IEnumerable<ProductViewResponse>> GetCategoryProducts(string recordKey, string category)
+        private async Task<IEnumerable<ProductResponse>> GetCategoryProducts(string recordKey, string category, CancellationToken token)
         {
-            var products = await _cache.GetRecordAsync<IEnumerable<ProductViewResponse>>(recordKey);
+            var products = await _cache.GetRecordAsync<IEnumerable<ProductResponse>>(recordKey);
             if (products is null)
             {
-                var getProducts = await _productService.GetAllByCategory(category);
+                var getProducts = await _productService.GetAllByCategory(category, token);
                 SetOnCache(recordKey, getProducts);
                 return getProducts;
             }
             return products;
         }
-        private IEnumerable<ProductViewResponse> SearchResults(string search, IEnumerable<ProductViewResponse> products)
+
+        public async Task<IActionResult> Category(string Category, CancellationToken token)
+        {
+            string recordKey = $"{Category}_";
+            var products = await GetCategoryProducts(recordKey, Category, token);
+            try
+            {
+                ViewBag.Title = Category;
+                return View(products);
+            }
+            catch (Exception ex)
+            {
+                //_utilityClass.GetLog().Error(ex, "Exception caught at Category action in ShredStoreController.");
+            }
+            return View();
+
+        }
+        public async Task<IActionResult> EmptyCart(CancellationToken token)
+        {
+            ViewBag.NoProds = "True";
+            ViewBag.Message = "No products in cart!";
+            string recordKey = "Products_";
+            try
+            {
+                var products = await GetAllProducts(recordKey, token);
+                return View("Index", products);
+            }
+            catch (Exception ex)
+            {
+                //_utilityClass.GetLog().Error(ex, "Exception caught at EmptyCart action in ShredStoreController.");
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
+        private IEnumerable<ProductResponse> SearchResults(string search, IEnumerable<ProductResponse> products)
         {
             var searchResults = products.Where(p => p.Name.Contains(search) || p.Category.Contains(search) || p.Brand.Contains(search))
                          .OrderBy(p => p.Name);
             return searchResults;
         }
-        private async void SetOnCache(string recordKey, IEnumerable<ProductViewResponse> products)
+        private async void SetOnCache(string recordKey, IEnumerable<ProductResponse> products)
         {
             await _cache.SetRecordAsync(recordKey, products, TimeSpan.FromSeconds(35));
         }
-        //public IActionResult Privacy()
-        //{
-        //    return View();
-        //}
+        public IActionResult AboutUs()
+        {
+            return View();
+        }
 
-        //[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        //public IActionResult Error()
-        //{
-        //    return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        //}
+
     }
 }

@@ -28,6 +28,18 @@ namespace ShredStoreApiTests.TestDoubles
             return Task.FromResult(fake);
         }
 
+        public Task<IEnumerable<Product>> GetProductsByCategory(string category, CancellationToken token)
+        {
+            var fake = FakeDataFactory.FakeProducts();
+            return Task.FromResult(fake);
+        }
+
+        public Task<IEnumerable<Product>> GetProductsByUser(int id, CancellationToken token)
+        {
+            var fake = FakeDataFactory.FakeProducts();
+            return Task.FromResult(fake);
+        }
+
         public Task<Product> UpdateProduct(Product product, CancellationToken token)
         {
             var fake = FakeDataFactory.FakeProduct();

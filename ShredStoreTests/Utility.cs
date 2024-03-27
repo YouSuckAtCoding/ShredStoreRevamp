@@ -1,6 +1,8 @@
-﻿using Dapper;
+﻿using Application.Models;
+using Dapper;
 using Org.BouncyCastle.Asn1.Mozilla;
 using ShredStoreTests.DataAdapterFiles;
+using ShredStoreTests.DataAdapterFiles.UserTestFiles;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,6 +50,16 @@ namespace ShredStoreTests
             string str = @"Delete from dbo.[Order]";
             using var connection = await _dbConnectionFactory.CreateConnectionAsync(default);
             await connection.QueryAsync(str);
+        }
+
+        public static async Task<int> GenerateUserId(ISqlAccessConnectionFactory _dbConnectionFactory)
+        {
+            User user = Fake.FakeDataFactory.FakeUser();
+            IUserStorage userStorage = new UserStorage(_dbConnectionFactory);
+
+            await userStorage.InsertUser(user);
+            var userRes = await userStorage.Login(user.Email, user.Password);
+            return userRes!.Id;
         }
     }
 }

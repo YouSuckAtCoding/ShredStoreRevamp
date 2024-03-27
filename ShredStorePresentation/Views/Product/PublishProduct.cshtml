@@ -1,0 +1,59 @@
+﻿@using ShredStorePresentation.Models;
+
+@model CreateProductViewRequest
+
+@{
+    Layout = config.GetValue<string>("PageLayouts:SecondaryLayout");
+    ViewData["Title"] = "Publish Product";
+}
+
+
+<div class="d-flex justify-content-center flex-column text-center">
+    <h2 class="text-light text-center">Publish Your Product</h2>
+    <form asp-action="PublishProduct" enctype="multipart/form-data">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="UserId" value=@Accessor.HttpContext.Session.GetInt32("_Id") />
+        <input type="hidden" asp-for="ImageName" value="None" />
+        <div class="form-group ms-2 me-2 mb-3 mt-3 text-center">
+            <label asp-for="Name" class="control-label text-light"></label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+        <div class="form-group ms-2 me-2 mb-3 mt-3 text-center">
+            <label asp-for="Brand" class="control-label text-light"></label>
+            <input asp-for="Brand" class="form-control" />
+            <span asp-validation-for="Brand" class="text-danger"></span>
+        </div>
+        <div class="form-group ms-2 me-2 mb-3 mt-3 text-center">
+            <label asp-for="Price" class="control-label text-light"></label>
+            <input asp-for="Price" class="form-control" />
+            <span asp-validation-for="Price" class="text-danger"></span>
+        </div>
+        <div class="form-group ms-2 me-2 mb-3 mt-3 text-center">
+            <label asp-for="Description" class="control-label text-light"></label>
+            <textarea asp-for="Description" class="form-control" rows="6" wrap="soft">
+            </textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+        <div class="form-group ms-2 me-2 mb-3 mt-3 text-center">
+            <label asp-for="Category" class="control-label text-light" ></label>
+            <select onchange="setCategory()" asp-for="Category" id="CategoryDropDown" class="form-select dropdown-toggle" asp-items="ViewBag.Categories"></select>
+        </div>
+        <div class="form-group ms-2 me-2 mb-3 mt-3 text-center">
+            <label asp-for="Type" class="control-label text-light"></label>
+            <select asp-for="Type" class="form-select dropdown-toggle" id="TypesDropDown" asp-items="ViewBag.Types"></select>
+        </div>
+        
+        <div class="form-group ms-2 me-2 mb-3 mt-3 text-center">
+            <label asp-for="ImageFile" class="control-label text-light"></label>
+            <input type="file" asp-for="ImageFile" accept="image/*" />
+            <span asp-validation-for="ImageFile" class="text-danger"></span>
+        </div>
+        <div class="form-group mb-3 mt-3 text-center">
+            <input type="submit" value="Publish Your Product!" class="btn btn-outline-light" />
+        </div>
+    </form>
+</div>
+
+
+        

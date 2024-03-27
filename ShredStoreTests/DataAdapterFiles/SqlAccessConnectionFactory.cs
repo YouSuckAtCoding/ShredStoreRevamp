@@ -17,7 +17,7 @@ namespace ShredStoreTests.DataAdapterFiles
             _connectionString = connectionString;
         }
 
-        public async Task<IDbConnection> CreateConnectionAsync(CancellationToken token = default)
+        public async Task<SqlConnection> CreateConnectionAsync(CancellationToken token = default)
         {
             var connection = new SqlConnection(_connectionString);
             await connection.OpenAsync(token);

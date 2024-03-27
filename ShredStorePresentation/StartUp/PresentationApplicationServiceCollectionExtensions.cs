@@ -1,4 +1,7 @@
-﻿using ShredStorePresentation.Services.ProductServices;
+﻿using ShredStorePresentation.Services.CartItemServices;
+using ShredStorePresentation.Services.CartServices;
+using ShredStorePresentation.Services.Images;
+using ShredStorePresentation.Services.ProductServices;
 using ShredStorePresentation.Services.UserService;
 
 namespace ShredStorePresentation.StartUp
@@ -21,8 +24,9 @@ namespace ShredStorePresentation.StartUp
             });
             services.AddTransient<IUserHttpService, UserHttpService>();
             services.AddTransient<IProductHttpService, ProductHttpService>();
-            //services.AddTransient<ICartHttpService, CartHttpService>();
-            //services.AddTransient<ICartItemHttpService, CartItemHttpService>();
+            services.AddSingleton<IImageService, ImageService>();
+            services.AddTransient<ICartHttpService, CartHttpService>();
+            services.AddTransient<ICartItemHttpService, CartItemHttpService>();
             services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
             //services.AddSingleton<IProductFactory, ConcreteProductFactory>();
             //services.AddSingleton<IUserFactory, ConcreteUserFactory>();

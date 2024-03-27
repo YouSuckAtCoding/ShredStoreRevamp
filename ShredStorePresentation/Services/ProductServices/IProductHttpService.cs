@@ -1,15 +1,18 @@
-﻿using ShredStorePresentation.Models;
+﻿using Contracts.Request.ProductRequests;
+using Contracts.Response.ProductsResponses;
+using ShredStorePresentation.Models;
 
 namespace ShredStorePresentation.Services.ProductServices
 {
     public interface IProductHttpService
     {
-        Task<ProductViewResponse> Create(ProductViewResponse product);
-        Task Delete(int id);
-        Task<ProductViewResponse> Edit(ProductViewResponse product);
-        Task<IEnumerable<ProductViewResponse>> GetAll();
-        Task<IEnumerable<ProductViewResponse>> GetAllByCategory(string Category);
-        Task<IEnumerable<ProductViewResponse>> GetAllByUserId(int UserId);
-        Task<ProductViewResponse> GetById(int id);
+        Task<ProductResponse> Create(CreateProductRequest product, CancellationToken token);
+        Task Delete(int id, CancellationToken token);
+        Task<ProductResponse> Edit(UpdateProductRequest product, CancellationToken token);
+        Task<IEnumerable<ProductResponse>> GetAll(CancellationToken token);
+        Task<IEnumerable<ProductResponse>> GetAllByCategory(string Category, CancellationToken token);
+        Task<IEnumerable<ProductResponse>> GetAllByUserId(int UserId, CancellationToken token);
+        Task<IEnumerable<ProductCartItemResponse>> GetAllByCartId(int cartId, CancellationToken token);
+        Task<ProductResponse> GetById(int id, CancellationToken token);
     }
 }

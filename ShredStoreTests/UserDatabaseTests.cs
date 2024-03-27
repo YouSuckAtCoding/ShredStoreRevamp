@@ -43,7 +43,9 @@ namespace ShredStoreTests
         {
             User user = Fake.FakeDataFactory.FakeUser();
             IUserStorage storage = new UserStorage(_dbConnectionFactory);
+
             await storage.InsertUser(user);
+
             var res = await storage.GetUsers();
             res.Should().HaveCountGreaterThan(0);
             await Utility.CleanUpUsers(_dbConnectionFactory);
@@ -79,7 +81,9 @@ namespace ShredStoreTests
         {
             User user = Fake.FakeDataFactory.FakeUser();
             IUserStorage storage = new UserStorage(_dbConnectionFactory);
-            var res = await storage.Login(user.Name, user.Password);
+
+            var res = await storage.Login(user.Email, user.Password);
+
             res.Should().Be(null);
             await Utility.CleanUpUsers(_dbConnectionFactory);
         }
@@ -88,8 +92,10 @@ namespace ShredStoreTests
         {
             User user = Fake.FakeDataFactory.FakeUser();
             IUserStorage storage = new UserStorage(_dbConnectionFactory);
+
             await storage.InsertUser(user);
-            var res = await storage.Login(user.Name, user.Password);
+            var res = await storage.Login(user.Email, user.Password);
+
             res.Cpf.Should().BeEquivalentTo(user.Cpf);
             await Utility.CleanUpUsers(_dbConnectionFactory);
         }
