@@ -4,15 +4,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Models
+namespace Contracts.Request.PaymentRequests
 {
-
-    public class Payment
+    public enum PaymentType
     {
+        Credito = 1,
+        Debito = 2,
+        Pix = 3
+    }
+    public class CreatePaymentRequest
+    {
+
+
         public int Id { get; set; }
         public decimal Amount { get; set; }
         public DateTime Date { get; set; }
-        public int PaymentType { get; set; }
+        public PaymentType PaymentType { get; set; }
         public bool Payed { get; set; }
+
     }
 }

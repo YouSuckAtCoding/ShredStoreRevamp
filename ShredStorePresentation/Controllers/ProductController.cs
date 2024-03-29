@@ -73,13 +73,14 @@ namespace ShredStorePresentation.Controllers
             return View();
         }
         // GET: ShredStoreController/Edit/5
+        [HttpGet]
         public async Task<IActionResult> EditProduct(int id, CancellationToken token)
         {
             var selected = await _product.GetById(id, token);
             SetProductDropdowns();
             return View(selected.MapToUpdateProductRequest());
         }
-
+        [HttpPost]
         public async Task<IActionResult> EditProduct(UpdateProductViewRequest edited, CancellationToken token)
         {
             SetProductDropdowns();
@@ -91,8 +92,8 @@ namespace ShredStorePresentation.Controllers
                     if (edited.ImageFile is not null)
                     {
                         _imageService.DeleteImage(edited.ImageName);
-                        await _imageService.UploadImage(edited.ImageFile);
-                    }                     
+                        edited.ImageName = await _imageService.UploadImage(edited.ImageFile);
+                    }                      
                     
                     await _product.Edit(edited.MapToUpdateProductRequest(), token);
                     return RedirectToAction("Index", "Home");

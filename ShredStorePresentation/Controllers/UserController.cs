@@ -41,7 +41,7 @@ namespace ShredStorePresentation.Controllers
                     }
                     else
                     {
-                        ViewBag.Message = "User does not exists!";
+                        ViewBag.Message = "Wrong Password / User does not exists";
                         return View();
                     }
                 }
@@ -116,7 +116,7 @@ namespace ShredStorePresentation.Controllers
                 {
                     if (userEdit.Id <= 0)
                     {
-                        ViewBag.Message = "User doens't exitst. Please send this to admin.";
+                        ViewBag.Message = "User doesn't exitst. Please send this to admin.";
                         return View();
                     }
                     await _userHttpService.EditUser(userEdit);

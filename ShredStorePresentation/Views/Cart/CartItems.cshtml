@@ -71,12 +71,11 @@
                     <p class="text-light">@item.Name</p>
                     <p class="text-light">Price: @item.Price.ToString("c2")</p>
                 </div>
-
             }
             <div class="border-top border-white">
                 <p class="text-light fw-bold">Total: @ViewBag.TotalPrice.ToString("c2")</p>
             </div>
-            <a asp-controller="Cart" asp-action="ConfirmPurchase" class="btn btn-outline-light mt-5 mb-5">Confirm Purchase</a>
+            <a asp-controller="Order" asp-action="Payment" class="btn btn-outline-light mt-5 mb-5">Confirm Purchase</a>
         </div>
     </div>
     

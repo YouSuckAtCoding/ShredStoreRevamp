@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Models
+namespace Contracts.Response.PaymentResponses
 {
-
-    public class Payment
+    public class PaymentResponse
     {
         public int Id { get; set; }
         public decimal Amount { get; set; }
