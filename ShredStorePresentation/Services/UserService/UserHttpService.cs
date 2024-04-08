@@ -50,14 +50,14 @@ namespace ShredStorePresentation.Services.UserService
         {
             var httpResponseMessage = await httpClient.PostAsJsonAsync(ApiEndpoints.UserEndpoints.Create, user);
 
-            return httpResponseMessage.StatusCode == System.Net.HttpStatusCode.Created ? true : false;
+            return httpResponseMessage.StatusCode == HttpStatusCode.Created ? true : false;
 
         }
 
 
         public async Task<UserResponse> EditUser(UpdateUserRequest user)
         {
-            var httpResponseMessage = await httpClient.PutAsJsonAsync(ApiEndpoints.UrlGenerator.SetUrlParameters(user.Id, ApiEndpoints.UserEndpoints.Update), user);
+            var httpResponseMessage = await httpClient.PutAsJsonAsync(ApiEndpoints.UserEndpoints.Update, user);
 
             var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
 
@@ -77,9 +77,9 @@ namespace ShredStorePresentation.Services.UserService
             return result;
         }
 
-        public async Task<bool> Delete(int sessionId)
+        public async Task<bool> Delete(int userId)
         {
-            var httpResponseMessage = await httpClient.DeleteAsync(ApiEndpoints.UrlGenerator.SetUrlParameters(sessionId, ApiEndpoints.UserEndpoints.Delete));
+            var httpResponseMessage = await httpClient.DeleteAsync(ApiEndpoints.UrlGenerator.SetUrlParameters(userId, ApiEndpoints.UserEndpoints.Delete));
             return httpResponseMessage.StatusCode == System.Net.HttpStatusCode.OK ? true : false;
         }
 

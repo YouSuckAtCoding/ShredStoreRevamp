@@ -3,6 +3,7 @@ using Application.Services.UserServices;
 using Contracts.Request;
 using Contracts.Response.UserResponses;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using ShredStore.Mapping;
 
 namespace ShredStore.Controllers
@@ -73,7 +74,7 @@ namespace ShredStore.Controllers
 
         [HttpPut(ApiEndpoints.UserEndpoints.Update)]
         [ProducesResponseType(typeof(UserResponse), StatusCodes.Status200OK)]
-        public async Task<IActionResult> Update([FromBody] UpdateUserRequest request, CancellationToken token)
+        public async Task<IActionResult> Update([FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)] UpdateUserRequest request, CancellationToken token)
         {
             User user = request.MapToUser();
 

@@ -10,16 +10,13 @@
     <div class="row d-flex justify-content-center">
         <form asp-action="EditAccount">
             <input type="hidden" asp-for="Id" value=@Accessor.HttpContext.Session.GetInt32("_Id") />
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group ms-2 me-2 mb-3 mt-3">
                 <label asp-for="Name" class="control-label text-light"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
+                <input asp-for="Name" class="form-control" />                
             </div>
             <div class="form-group ms-2 me-2 mb-3 mt-3">
-                <label asp-for="Email" class="control-label text-light"></label>
-                <input asp-for="Email" class="form-control" />
-                <span asp-validation-for="Email" class="text-danger"></span>
+                <label asp-for="Address" class="control-label text-light"></label>
+                <input asp-for="Address" class="form-control" />
             </div>
             <div class="form-group ms-2 me-2 mb-3 mt-3">
                 <label asp-for="Role" class="control-label text-light"></label>

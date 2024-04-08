@@ -31,7 +31,7 @@
             }
             else
             {
-                <a class="btn btn-outline-light mt-3 mb-3" asp-area="" asp-controller="User" asp-action="EditAccount">Edit User Detalis</a>
+                <a class="btn btn-outline-light mt-3 mb-3" asp-area="" asp-controller="User" asp-action="EditAccount" asp-route-id="@Model.Id">Edit User Detalis</a>
                 <a class="btn btn-outline-light mt-3 mb-3" asp-area="" asp-controller="User" asp-action="ChangePassword">Change Your Password</a>
                 <a class="btn btn-outline-light mt-3 mb-3" asp-area="" asp-controller="User" asp-action="DeleteAccount">Delete Account</a>
             }

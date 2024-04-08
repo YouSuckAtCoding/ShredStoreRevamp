@@ -138,10 +138,7 @@ namespace ShredStoreApiTests
             {
                 Id = returned.Id,
                 Name = returned.Name,
-                Age = returned.Age,
-                Cpf = returned.Cpf,
                 Address = returned.Address,
-                Email = returned.Email,
                 Role = returned.Role
             };          
 

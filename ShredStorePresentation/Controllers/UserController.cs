@@ -3,6 +3,7 @@ using Contracts.Response.ProductsResponses;
 using Contracts.Response.UserResponses;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using ShredStorePresentation.Extensions;
 using ShredStorePresentation.Services.ProductServices;
 using ShredStorePresentation.Services.UserService;
 
@@ -101,37 +102,39 @@ namespace ShredStorePresentation.Controllers
             return View(selected);
         }
         [HttpGet]
-        public IActionResult EditAccount()
+        public async Task<IActionResult> EditAccount(int id)
         {
             var list = GetRoles();
             ViewBag.Roles = new SelectList(list);
-            return View();
+            var user = await _userHttpService.GetById(id);
+            return View(user.MapToUpdateUserRequest());
         }
         [HttpPost]
         public async Task<IActionResult> EditAccount(UpdateUserRequest userEdit)
         {
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    if (userEdit.Id <= 0)
-                    {
-                        ViewBag.Message = "User doesn't exitst. Please send this to admin.";
-                        return View();
-                    }
-                    await _userHttpService.EditUser(userEdit);
-                    return RedirectToAction("SetSessionInfo", "ShredStore", userEdit);
-                }
-                catch (Exception ex)
-                {
-                    ViewBag.Message = "An error has occurred.";
-                    //_utilityClass.GetLog().Error(ex, "Exception caught at EditAccount action in UserOperationsController.");
-                    return View();
+            var list = GetRoles();
+            ViewBag.Roles = new SelectList(list);
 
+            try
+            {
+                if (userEdit.Id <= 0)
+                {
+                    ViewBag.Message = "User doesn't exitst. Please send this to admin.";
+                    return View();
                 }
+                await _userHttpService.EditUser(userEdit);
+                SetSessionInfo(await _userHttpService.GetById(userEdit.Id));
+                return RedirectToAction("Index", "Home");
             }
-            return View();
+            catch (Exception ex)
+            {
+                ViewBag.Message = "An error has occurred.";
+                //_utilityClass.GetLog().Error(ex, "Exception caught at EditAccount action in UserOperationsController.");
+                return View();
+
+            }
         }
+
         [HttpGet]
         public async Task<IActionResult> ChangePassword()
         {
@@ -141,7 +144,7 @@ namespace ShredStorePresentation.Controllers
         public async Task<IActionResult> ChangePassword(LoginUserRequest userLogin)
         {
             userLogin.Email = HttpContext.Session.GetString("_Email");
-            if (userLogin.Email != null && userLogin.Password != null)
+            if (userLogin.Email is not null && userLogin.Password is not null)
             {
                 try
                 {
@@ -198,14 +201,15 @@ namespace ShredStorePresentation.Controllers
             }
         }
         [HttpGet]
-        public async Task<IActionResult> DeleteAccount() => View();
+        public IActionResult DeleteAccount() => View();
         [HttpPost]
         public async Task<IActionResult> DeleteAccount(LoginUserRequest userLogin)
         {
-            userLogin.Email = HttpContext.Session.GetString("_Email");
+            
             try
             {
-                if (userLogin.Email != null && userLogin.Password != null)
+                userLogin.Email = HttpContext.Session.GetString("_Email");
+                if (userLogin.Email is not null && userLogin.Password is not null)
                 {
                     var loggedUser = await _userHttpService.Login(userLogin);
                     if (loggedUser != null)
@@ -245,7 +249,7 @@ namespace ShredStorePresentation.Controllers
             IEnumerable<UserResponse> users = await _userHttpService.GetAll();
             return View(users);
         }
-        
+
         [HttpGet]
         public async Task<IActionResult> AdminProducts(CancellationToken token)
         {
@@ -308,6 +312,6 @@ namespace ShredStorePresentation.Controllers
             HttpContext.Session.SetString(SessionKeyEmail, user.Email);
             HttpContext.Session.SetString(SessionKeyRole, user.Role);
         }
-        
+
     }
 }

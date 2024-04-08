@@ -1,5 +1,7 @@
-﻿using Contracts.Request.ProductRequests;
+﻿using Contracts.Request;
+using Contracts.Request.ProductRequests;
 using Contracts.Response.ProductsResponses;
+using Contracts.Response.UserResponses;
 using ShredStorePresentation.Models;
 
 namespace ShredStorePresentation.Extensions
@@ -49,6 +51,17 @@ namespace ShredStorePresentation.Extensions
                 Category = request.Category,
                 Brand = request.Brand,
                 ImageName = request.ImageName
+            };
+        }
+
+        public static UpdateUserRequest MapToUpdateUserRequest(this UserResponse request)
+        {
+            return new UpdateUserRequest
+            {
+                Id = request.Id,
+                Name = request.Name,
+                Address = request.Address,
+                Role = request.Role
             };
         }
 

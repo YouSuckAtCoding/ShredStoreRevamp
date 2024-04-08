@@ -59,7 +59,7 @@ namespace ShredStorePresentation.Controllers
                 {
                     productInfo.ImageName = await _imageService.UploadImage(productInfo.ImageFile);
                     await _product.Create(productInfo.MapToProductRequest(), token);
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction("Index", "Home");
                 }
                 catch (Exception ex)
                 {

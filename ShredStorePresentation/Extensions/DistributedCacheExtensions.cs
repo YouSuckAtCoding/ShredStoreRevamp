@@ -12,7 +12,7 @@ namespace ShredStorePresentation.Extensions
            TimeSpan? unusedExpiredTime = null)
         {
             var options = new DistributedCacheEntryOptions();
-            options.AbsoluteExpirationRelativeToNow = absoluteExpireTime ?? TimeSpan.FromMinutes(1);
+            options.AbsoluteExpirationRelativeToNow = absoluteExpireTime ?? TimeSpan.FromSeconds(15);
             options.SlidingExpiration = unusedExpiredTime;
 
             var jsonData = JsonSerializer.Serialize(data);
