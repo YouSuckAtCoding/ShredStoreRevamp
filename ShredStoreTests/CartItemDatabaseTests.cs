@@ -43,12 +43,14 @@ namespace ShredStoreTests
 
         [Fact]
         public async Task Should_Throw_SqlExecption_If_Product_Doenst_Exists()
-        {            
+        {
+            int productId = int.MaxValue;
+            int quantity = 5;
             CartItem cartItem = new CartItem
             {
-                ProductId = 50,
+                ProductId = productId,
                 CartId = await GenerateCartId(),
-                Quantity = 5
+                Quantity = quantity
 
             };
 
@@ -61,11 +63,15 @@ namespace ShredStoreTests
         public async Task Should_Throw_SqlExecption_If_Cart_Doenst_Exists()
         {
 
+            int cartId = 2;
+            int productId = 1;
+            int quantity = 1;
+
             CartItem cartItem = new CartItem
             {
-                ProductId = 1,
-                CartId = 2,
-                Quantity = 1
+                ProductId = productId,
+                CartId = cartId,
+                Quantity = quantity
             };
 
             ICartItemStorage cartItemStorage = new CartItemStorage(_dbConnectionFactory);
@@ -78,17 +84,19 @@ namespace ShredStoreTests
         {
 
             int productId = await GenerateProductId();
+            int quantity = 1;
             CartItem cartItem = new CartItem
             {
                 ProductId = productId,
                 CartId = await GenerateCartId(),
-                Quantity = 1
+                Quantity = quantity
             };
             ICartItemStorage cartItemStorage = new CartItemStorage(_dbConnectionFactory);
+
             await cartItemStorage.InsertCartItem(cartItem);
             var res = await cartItemStorage.GetCartItems(cartItem.CartId);
 
-            res.Should().HaveCount(1);
+            res.Should().HaveCount(quantity);
             await Utility.ClearCartItems(_dbConnectionFactory);
         }
 
@@ -98,19 +106,21 @@ namespace ShredStoreTests
             IEnumerable<Product> products = await InsertMultipleProducts();
             ICartItemStorage cartItemStorage = new CartItemStorage(_dbConnectionFactory);
             int cartId = await GenerateCartId();
+            int quantity = 1;
+
             foreach (Product product in products)
             {
                 CartItem cartItem = new CartItem
                 {
                     ProductId = product.Id,
                     CartId = cartId,
-                    Quantity = 1
+                    Quantity = quantity
 
                 };
                 await cartItemStorage.InsertCartItem(cartItem);
             }
-
             var res = await cartItemStorage.GetCartItems(cartId);
+
             res.Should().HaveCountGreaterThanOrEqualTo(10);
 
             await Utility.ClearCartItems(_dbConnectionFactory);
@@ -122,11 +132,13 @@ namespace ShredStoreTests
         public async Task Should_Delete_CartItem()
         {
             int productId = await GenerateProductId();
+            int quantity = 1;
+            int expected = 0;
             CartItem cartItem = new CartItem
             {
                 ProductId = productId,
                 CartId = await GenerateCartId(),
-                Quantity = 1
+                Quantity = quantity
             };
 
             ICartItemStorage cartItemStorage = new CartItemStorage(_dbConnectionFactory);
@@ -134,7 +146,7 @@ namespace ShredStoreTests
             await cartItemStorage.DeleteCartItem(productId, cartItem.CartId);
             var res = await cartItemStorage.GetCartItems(cartItem.CartId);
 
-            res.Should().HaveCount(0);
+            res.Should().HaveCount(expected);
             await Utility.ClearCartItems(_dbConnectionFactory);
         }
 
@@ -142,10 +154,11 @@ namespace ShredStoreTests
         [Fact]
         public async Task Should_Be_Empty_After_Delete_All()
         {
+            int cardId = 1;
             ICartItemStorage cartItemStorage = new CartItemStorage(_dbConnectionFactory);
-            await cartItemStorage.DeleteAllCartItem(1);
+            await cartItemStorage.DeleteAllCartItem(cardId);
 
-            IEnumerable<CartItem> CartItems = await cartItemStorage.GetCartItems(1);
+            IEnumerable<CartItem> CartItems = await cartItemStorage.GetCartItems(cardId);
             CartItems.Should().BeEmpty();
         }
 
@@ -154,21 +167,23 @@ namespace ShredStoreTests
         {
 
             int productId = await GenerateProductId();
+            int quantity = 5;
+            int expected = 1;
             CartItem cartItem = new CartItem
             {
                 ProductId = productId,
                 CartId = await GenerateCartId(),
-                Quantity = 5
+                Quantity = quantity
 
             };
 
             ICartItemStorage cartItemStorage = new CartItemStorage(_dbConnectionFactory);
             await cartItemStorage.InsertCartItem(cartItem);
-            await cartItemStorage.UpdateCartItem(productId, 1, cartItem.CartId);
+            await cartItemStorage.UpdateCartItem(productId, expected, cartItem.CartId);
             IEnumerable<CartItem> items = await cartItemStorage.GetCartItems(cartItem.CartId);
 
             var res = items.First();
-            res.Quantity.Should().Be(1);
+            res.Quantity.Should().Be(expected);
 
             await Utility.ClearCartItems(_dbConnectionFactory);
         }
@@ -180,20 +195,23 @@ namespace ShredStoreTests
             IEnumerable<Product> products = await InsertMultipleProducts();
             ICartItemStorage cartItemStorage = new CartItemStorage(_dbConnectionFactory);
             int cartId = await GenerateCartId();
+            int quantity = 1;
+            int expected = 0;
+
             foreach (Product product in products)
             {
                 CartItem cartItem = new CartItem
                 {
                     ProductId = product.Id,
                     CartId = cartId,
-                    Quantity = 1
+                    Quantity = quantity
 
                 };
                 await cartItemStorage.InsertCartItem(cartItem);
             }
 
             var result = await storage.GetCartProducts(cartId, default);
-            result.Count().Should().BeGreaterThan(0);
+            result.Count().Should().BeGreaterThan(expected);
 
 
         }

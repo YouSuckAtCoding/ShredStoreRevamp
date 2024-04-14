@@ -18,28 +18,32 @@ namespace ShredStoreTests.Fake
 {
     public class FakeDataFactory
     {
+        private const string language = "pt_BR";
+        private const string fakeRole = "Customer";
+        private const int fakeUserId = 1;
+
         public static User FakeUser()
         {
-            var userFaker = new Faker<User>("pt_BR")
+            var userFaker = new Faker<User>(language)
             .RuleFor(x => x.Name, f => f.Name.FullName(Bogus.DataSets.Name.Gender.Male))
             .RuleFor(x => x.Email, f => f.Internet.Email(f.Person.FirstName).ToLower())
             .RuleFor(x => x.Cpf, f => f.Person.Cpf(false))
             .RuleFor(x => x.Address, f => f.Address.StreetAddress())
             .RuleFor(x => x.Age, f => f.Random.Number(16,110))
-            .RuleFor(x => x.Role, "Customer")
+            .RuleFor(x => x.Role, fakeRole)
             .RuleFor(x => x.Password, f => f.Random.AlphaNumeric(15));
 
             return userFaker;
         }
         public static CreateUserRequest FakeCreateUserRequest()
         {
-            var userFaker = new Faker<CreateUserRequest>("pt_BR")
+            var userFaker = new Faker<CreateUserRequest>(language)
             .RuleFor(x => x.Name, f => f.Name.FullName(Bogus.DataSets.Name.Gender.Male))
             .RuleFor(x => x.Email, f => f.Internet.Email(f.Person.FirstName).ToLower())
             .RuleFor(x => x.Cpf, f => f.Person.Cpf(false))
             .RuleFor(x => x.Address, f => f.Address.StreetAddress())
             .RuleFor(x => x.Age, f => f.Random.Number(16, 110))
-            .RuleFor(x => x.Role, "Customer")
+            .RuleFor(x => x.Role, fakeRole)
             .RuleFor(x => x.Password, f => f.Random.AlphaNumeric(15));
 
             return userFaker;
@@ -47,7 +51,7 @@ namespace ShredStoreTests.Fake
 
         public static ResetPasswordUserRequest FakeResetPasswordUserRequest()
         {
-            var userFaker = new Faker<ResetPasswordUserRequest>("pt_Br")
+            var userFaker = new Faker<ResetPasswordUserRequest>(language)
                 .RuleFor(x => x.Email, "teste@gmail.com")
                 .RuleFor(x => x.Password, f => f.Random.AlphaNumeric(15));
             return userFaker;            
@@ -55,13 +59,13 @@ namespace ShredStoreTests.Fake
 
         public static IEnumerable<User> FakeUsers()
         {
-            var userFaker = new Faker<User>("pt_BR")
+            var userFaker = new Faker<User>(language)
             .RuleFor(x => x.Name, f => f.Name.FullName(Bogus.DataSets.Name.Gender.Male))
             .RuleFor(x => x.Email, f => f.Internet.Email(f.Person.FirstName).ToLower())
             .RuleFor(x => x.Cpf, f => f.Person.Cpf(false))
             .RuleFor(x => x.Address, f => f.Address.StreetAddress())
             .RuleFor(x => x.Age, f => f.Random.Number(25))
-            .RuleFor(x => x.Role, "Customer")
+            .RuleFor(x => x.Role, fakeRole)
             .RuleFor(x => x.Password, f => f.Random.AlphaNumeric(15));
 
             return userFaker.Generate(10);
@@ -69,7 +73,7 @@ namespace ShredStoreTests.Fake
 
         public static Product FakeProduct()
         {
-            var ProductFaker = new Faker<Product>("pt_BR")
+            var ProductFaker = new Faker<Product>(language)
             .RuleFor(x => x.Name, f => f.Name.FirstName())
             .RuleFor(x => x.Price, f => f.Random.Number(100, 2000))
             .RuleFor(x => x.Type, f => f.Random.Word())
@@ -84,7 +88,7 @@ namespace ShredStoreTests.Fake
         {
             IFormFile file = GenerateFakeFile(".png", "test;test");
 
-            var productFaker = new Faker<CreateProductRequest>("pt_BR")
+            var productFaker = new Faker<CreateProductRequest>(language)
             .RuleFor(x => x.Name, f => f.Name.FirstName())
             .RuleFor(x => x.Price, f => f.Random.Number(100, 2000))
             .RuleFor(x => x.Type, f => f.Random.Word())
@@ -102,7 +106,7 @@ namespace ShredStoreTests.Fake
         {
             
 
-            var ProductFaker = new Faker<Product>("pt_BR")
+            var ProductFaker = new Faker<Product>(language)
             .RuleFor(x => x.Name, f => f.Name.FirstName())
             .RuleFor(x => x.Price, f => f.Random.Number(100, 2000))
             .RuleFor(x => x.Type, f => f.Random.Word())
@@ -118,7 +122,7 @@ namespace ShredStoreTests.Fake
             Cart Cart = new Cart
             {
                 CreatedDate = DateTime.Now,
-                UserId = 1,
+                UserId = fakeUserId,
             };
 
             return Cart;
@@ -127,9 +131,9 @@ namespace ShredStoreTests.Fake
 
         public static Order FakeOrder()
         {
-            var orderFaker = new Faker<Order>("pt_BR")
+            var orderFaker = new Faker<Order>(language)
             .RuleFor(x => x.CreatedDate, DateTime.Now)
-            .RuleFor(x => x.UserId, 1)
+            .RuleFor(x => x.UserId, fakeUserId)
             .RuleFor(x => x.TotalAmount, 1000)
             .RuleFor(x => x.PaymentId, 1);
 
@@ -138,9 +142,9 @@ namespace ShredStoreTests.Fake
 
         public static IEnumerable<Order> FakeOrders()
         {
-            var orderFaker = new Faker<Order>("pt_BR")
+            var orderFaker = new Faker<Order>(language)
             .RuleFor(x => x.CreatedDate, DateTime.Now)
-            .RuleFor(x => x.UserId, 1)
+            .RuleFor(x => x.UserId, fakeUserId)
             .RuleFor(x => x.TotalAmount, 1000)
             .RuleFor(x => x.PaymentId, 1);
 
@@ -149,9 +153,9 @@ namespace ShredStoreTests.Fake
         
         public static CreateOrderRequest FakeCreateOrderRequest()
         {
-            var orderFaker = new Faker<CreateOrderRequest>("pt_BR")
+            var orderFaker = new Faker<CreateOrderRequest>(language)
             .RuleFor(x => x.CreatedDate, DateTime.Now)
-            .RuleFor(x => x.UserId, 1)
+            .RuleFor(x => x.UserId, fakeUserId)
             .RuleFor(x => x.TotalAmount, 1000)
             .RuleFor(x => x.PaymentId, 1);
 
@@ -160,15 +164,15 @@ namespace ShredStoreTests.Fake
 
         public static CreateCartRequest FakeCreateCartRequest()
         {
-            var CartRequestFaker = new Faker<CreateCartRequest>("pt_BR")
-                .RuleFor(x => x.UserId, 1)
+            var CartRequestFaker = new Faker<CreateCartRequest>(language)
+                .RuleFor(x => x.UserId, fakeUserId)
                 .RuleFor(x => x.CreatedDate, DateTime.UtcNow);
             return CartRequestFaker;
         }
 
         public static IEnumerable<OrderItem> FakeOrderItems()
         {
-            var fakeItem = new Faker<OrderItem>("pt_BR")
+            var fakeItem = new Faker<OrderItem>(language)
                 .RuleFor(x => x.OrderId, 1)
                 .RuleFor(x => x.ProductId, 1)
                 .RuleFor(x => x.Id, 1)
@@ -179,7 +183,7 @@ namespace ShredStoreTests.Fake
 
         public static Payment FakePayment()
         {
-            var fakePayment = new Faker<Payment>("pt_BR")
+            var fakePayment = new Faker<Payment>(language)
                 .RuleFor(x => x.Amount, 2000)
                 .RuleFor(x => x.Date, DateTime.Now)
                 .RuleFor(x => x.PaymentType, 1)
@@ -192,14 +196,17 @@ namespace ShredStoreTests.Fake
         public static IFormFile GenerateFakeFile(string contentType, string content)
         {
             byte[] bytes = Encoding.UTF8.GetBytes(content);
+            string fileName = "dummy.csv";
+            string name = "Data";
+
             try
             {
                 var file = new FormFile(
                 baseStream: new MemoryStream(bytes),
                 baseStreamOffset: 0,
                 length: bytes.Length,
-                name: "Data",
-                fileName: "dummy.csv"
+                name: name,
+                fileName: fileName
             )
                 {
                     Headers = new HeaderDictionary(),
@@ -211,7 +218,6 @@ namespace ShredStoreTests.Fake
             }
             catch (Exception ex)
             {
-
                 throw ex;
             }
             

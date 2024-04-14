@@ -68,7 +68,7 @@ namespace ShredStoreTests
             await orderStorage.InsertOrder(order);
             var res = await orderStorage.GetOrders(order.UserId);
             
-            res.First().TotalAmount.Should().Be(1000);
+            res.First().TotalAmount.Should().Be(order.TotalAmount);
 
             await Utility.CleanUpOrders(_dbConnectionFactory);
             await Utility.ClearCartItems(_dbConnectionFactory);

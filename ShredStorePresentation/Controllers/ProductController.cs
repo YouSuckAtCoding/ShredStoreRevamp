@@ -15,18 +15,21 @@ namespace ShredStorePresentation.Controllers
         private readonly IDistributedCache _cache;
         private readonly IImageService _imageService;
         private readonly CacheRecordKeys _cacheKeys;
+        private readonly ILogger<ProductController> _logger;
 
         public ProductController(IProductHttpService _product,
                                  IDistributedCache _cache,
                                  IImageService imageService,
-                                 IConfiguration config,
-                                 CacheRecordKeys cacheKeys)
+                                 CacheRecordKeys cacheKeys,
+                                 ILogger<ProductController> logger)
         {
             this._product = _product;
             this._cache = _cache;
             _imageService = imageService;
             _cacheKeys = cacheKeys;
+            _logger = logger;
         }
+
         public async Task<IActionResult> ProductDetails(int Id, CancellationToken token)
         {
             try
@@ -36,10 +39,9 @@ namespace ShredStorePresentation.Controllers
             }
             catch (Exception ex)
             {
-                //_utilityClass.GetLog().Error(ex, "Exception caught at ProductDetails action in ShredStoreController.");
+                _logger.LogError(ex, LogMessages.LogErrorMessage(), [ControllerExtensions.ControllerName<ProductController>(), ex.Message, DateTime.Now.ToString()]);
                 return RedirectToAction(nameof(Index), ControllerExtensions.ControllerName<HomeController>());
             }
-
         }
     
         // GET: ShredStoreController/Create
@@ -48,8 +50,6 @@ namespace ShredStorePresentation.Controllers
             SetProductDropdowns();
             return View();
         }
-
-
 
         // POST: ShredStoreController/Create
         [HttpPost]
@@ -65,14 +65,16 @@ namespace ShredStorePresentation.Controllers
                     productInfo.ImageName = await _imageService.UploadImage(productInfo.ImageFile);
                     await _product.Create(productInfo.MapToProductRequest(), token);
 
+                    _logger.LogInformation(LogMessages.LogLoginMessage(), [productInfo.Name, DateTime.Now.ToString()]);
+
                     await ResetProductCache();
 
                     return RedirectToAction(ControllerExtensions.IndexActionName(), ControllerExtensions.ControllerName<HomeController>());
                 }
                 catch (Exception ex)
                 {
-                    //_utilityClass.GetLog().Error(ex, "Exception caught at PublishProduct action in ShredStoreController.");
-                    
+
+                    _logger.LogError(ex, LogMessages.LogErrorMessage(), [ControllerExtensions.ControllerName<ProductController>(), ex.Message, DateTime.Now.ToString()]);
                     return View();
                 }
 
@@ -85,7 +87,9 @@ namespace ShredStorePresentation.Controllers
         public async Task<IActionResult> EditProduct(int id, CancellationToken token)
         {
             var selected = await _product.GetById(id, token);
+
             SetProductDropdowns();
+
             return View(selected.MapToUpdateProductRequest());
         }
         [HttpPost]
@@ -93,6 +97,7 @@ namespace ShredStorePresentation.Controllers
         {
             SetProductDropdowns();
             ModelState.Remove("ImageFile");
+
             if (ModelState.IsValid)
             {
                 try
@@ -104,19 +109,19 @@ namespace ShredStorePresentation.Controllers
 
                     await _product.Edit(edited.MapToUpdateProductRequest(), token);
 
+                    _logger.LogInformation(LogMessages.LogProductEditedMessage(), [edited.Name, edited.Id, DateTime.Now.ToString()]);
+
                     await ResetProductCache();
 
                     return RedirectToAction(ControllerExtensions.IndexActionName(), ControllerExtensions.ControllerName<HomeController>());
                 }
                 catch (Exception ex)
                 {
-                    //_utilityClass.GetLog().Error(ex, "Exception caught at EditProduct action in ShredStoreController.");
+                    _logger.LogError(ex, LogMessages.LogErrorMessage(), [ControllerExtensions.ControllerName<ProductController>(), ex.Message, DateTime.Now.ToString()]);
                 }
             }
             return RedirectToAction(ControllerExtensions.IndexActionName(), ControllerExtensions.ControllerName<HomeController>());
         }
-
-      
 
         public async Task<IActionResult> DeleteProduct(int id, CancellationToken token)
         {
@@ -132,7 +137,7 @@ namespace ShredStorePresentation.Controllers
             }
             catch (Exception ex)
             {
-                //_utilityClass.GetLog().Error(ex, "Exception caught at DeleteProduct action in ShredStoreController.");
+                _logger.LogError(ex, LogMessages.LogErrorMessage(), [ControllerExtensions.ControllerName<ProductController>(), ex.Message, DateTime.Now.ToString()]);
                 return View();
             }
         }

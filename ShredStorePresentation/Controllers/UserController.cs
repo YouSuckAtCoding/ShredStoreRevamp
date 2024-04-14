@@ -14,9 +14,9 @@ namespace ShredStorePresentation.Controllers
     {
         private readonly IUserHttpService _userHttpService;
         private readonly IProductHttpService _productHttpService;
-        private readonly ILogger<HomeController> _logger;
+        private readonly ILogger<UserController> _logger;
         private readonly string ErrorMessage = "An error has occurred.";
-        public UserController(IUserHttpService userHttpService, IProductHttpService productHttpService, ILogger<HomeController> logger)
+        public UserController(IUserHttpService userHttpService, IProductHttpService productHttpService, ILogger<UserController> logger)
         {
             _userHttpService = userHttpService;
             _productHttpService = productHttpService;
@@ -256,7 +256,7 @@ namespace ShredStorePresentation.Controllers
         }
         private void SetSessionInfo()
         {
-            _logger.LogInformation(LogMessages.LogLoginMessage(), [HttpContext.Session.GetString(SessionKeys.GetSessionKeyName()),
+            _logger.LogInformation(LogMessages.LogLogoutMessage(), [HttpContext.Session.GetString(SessionKeys.GetSessionKeyName()),
                 HttpContext.Session.GetInt32(SessionKeys.GetSessionKeyId()) ,DateTime.Now.ToString()]);
 
             HttpContext.Session.SetString(SessionKeys.GetSessionKeyName(), "");

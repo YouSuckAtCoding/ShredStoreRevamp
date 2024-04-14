@@ -27,6 +27,7 @@ namespace ShredStorePresentation.Controllers
         public async Task<IActionResult> InsertToCart(int productId, int quantity, CancellationToken token)
         {
 
+
             if (HttpContext.Session.GetInt32("_Id") is null)
                 return RedirectToAction("Login", "User");
 
@@ -55,7 +56,7 @@ namespace ShredStorePresentation.Controllers
 
             await _cartItem.InsertCartItems(cartItemRequest, token);
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction(ControllerExtensions.IndexActionName(), ControllerExtensions.ControllerName<HomeController>());
 
         }
         [HttpPost]

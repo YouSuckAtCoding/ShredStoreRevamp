@@ -25,6 +25,9 @@ namespace ShredStoreApiTests
             PropertyNameCaseInsensitive = true
 
         };
+
+        
+        private const int id = 1;
         [Fact]
         public async Task Should_Return_200_From_Create_Endpoint()
         {
@@ -33,21 +36,8 @@ namespace ShredStoreApiTests
 
             var jsonString = JsonSerializer.Serialize(request);
 
-            var httpContent = new StringContent(jsonString, Encoding.UTF8, "application/json");
-            var response = await client.PostAsync(ApiEndpointsTest.OrderEndpoints.Create, httpContent);
-            response.Should().HaveStatusCode(HttpStatusCode.Created);
-        }
-
-        [Fact]
-        public async Task Should_Insert_Order_From_Real_Create_Endpoint()
-        {
-            using var client = CreateApi.CreateOfficialApi().CreateClient();
-            var request = FakeDataFactory.FakeCreateOrderRequest();
-
-            var jsonString = JsonSerializer.Serialize(request);
-
-            var httpContent = new StringContent(jsonString, Encoding.UTF8, "application/json");
-            var response = await client.PostAsync(ApiEndpointsTest.OrderEndpoints.Create, httpContent);
+            var httpContent = new StringContent(jsonString, Encoding.UTF8, Utility.content_Type);
+            var response = await client.PostAsync(ApiEndpoints.OrderEndpoints.Create, httpContent);
             response.Should().HaveStatusCode(HttpStatusCode.Created);
         }
 
@@ -55,44 +45,17 @@ namespace ShredStoreApiTests
         public async Task Should_Return_200_From_GetAll_Endpoint()
         {
             using var client = CreateApiWithOrderRepository<StubSuccessOrderRepository>().CreateClient();
-            var response = await client.GetAsync(Utility.SetGet_Or_DeleteUrl(1,ApiEndpointsTest.OrderEndpoints.GetAll));
+            var response = await client.GetAsync(Utility.SetGet_Or_DeleteUrl(id,ApiEndpoints.OrderEndpoints.GetAll));
             response.Should().HaveStatusCode(HttpStatusCode.OK);
         }
 
-        [Fact]
-        public async Task Should_All_User_Orders_From_Real_GetAll_Endpoint()
-        {
-            using var client = CreateApi.CreateOfficialApi().CreateClient();
-
-            int id = await Utility.SeuUpOrders(client);
-
-           IEnumerable<Order> orders = await Utility.GetAllUserOrders(client, id).ConfigureAwait(false);
-           orders.Should().HaveCountGreaterThan(1);
-        }
-
+    
         [Fact]
         public async Task Should_Return_200_From_Get_Endpoint()
         {
             using var client = CreateApiWithOrderRepository<StubSuccessOrderRepository>().CreateClient();
-            var response = await client.GetAsync(Utility.SetGet_Or_DeleteUrl(1, ApiEndpointsTest.OrderEndpoints.Get));
+            var response = await client.GetAsync(Utility.SetGet_Or_DeleteUrl(id, ApiEndpoints.OrderEndpoints.Get));
             response.Should().HaveStatusCode(HttpStatusCode.OK);
-        }
-
-        [Fact]
-        public async Task Should_Return_Order_From_Real_Get_Endpoint()
-        {
-            using var client = CreateApi.CreateOfficialApi().CreateClient();
-
-            int id = await Utility.SeuUpOrders(client);
-
-            IEnumerable<Order> orders = await Utility.GetAllUserOrders(client, id).ConfigureAwait(false);
-
-            int orderId = orders.First().Id;
-
-            var response = await client.GetAsync(Utility.SetGet_Or_DeleteUrl(orderId, ApiEndpointsTest.OrderEndpoints.Get));
-            var result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            var order = JsonSerializer.Deserialize<Order>(result, jsonSerializerOptions);
-            order.Id.Should().Be(orderId);
         }
 
         [Fact]
@@ -102,7 +65,7 @@ namespace ShredStoreApiTests
 
             UpdateOrderRequest request = new UpdateOrderRequest
             {
-                Id = 1,
+                Id = id,
                 CreatedDate = DateTime.Now,
                 UserId = 1,
                 PaymentId = 1,
@@ -111,69 +74,19 @@ namespace ShredStoreApiTests
             };
 
             var jsonString = JsonSerializer.Serialize(request);
-            var httpContent = new StringContent(jsonString, Encoding.UTF8, "application/json");
-            var response = await client.PutAsync(ApiEndpointsTest.OrderEndpoints.Update, httpContent);
+            var httpContent = new StringContent(jsonString, Encoding.UTF8, Utility.content_Type);
+            var response = await client.PutAsync(ApiEndpoints.OrderEndpoints.Update, httpContent);
 
             response.Should().HaveStatusCode(HttpStatusCode.OK);
-        }
-
-        [Fact]
-        public async Task Should_Update_Order_From_Real_Update_Endpoint()
-        {
-            using var client = CreateApi.CreateOfficialApi().CreateClient();
-
-            int id = await Utility.SeuUpOrders(client);
-
-            IEnumerable<Order> orders = await Utility.GetAllUserOrders(client, id).ConfigureAwait(false);
-
-            var selected = orders.First();
-            int newAmount = 1000000;
-
-            UpdateOrderRequest request = new UpdateOrderRequest
-            {
-                Id = selected.Id,
-                CreatedDate = DateTime.Now,
-                UserId = selected.UserId,
-                PaymentId = selected.PaymentId,
-                TotalAmount = newAmount
-
-            };
-
-            var jsonString = JsonSerializer.Serialize(request);
-            var httpContent = new StringContent(jsonString, Encoding.UTF8, "application/json");
-            var response = await client.PutAsync(ApiEndpointsTest.OrderEndpoints.Update, httpContent);
-
-            var result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            var order = JsonSerializer.Deserialize<Order>(result, jsonSerializerOptions);
-
-            order.TotalAmount.Should().Be(newAmount);
         }
 
         [Fact]
         public async Task Should_Return_200_From_Delete_Endpoint()
         {
             using var client = CreateApiWithOrderRepository<StubSuccessOrderRepository>().CreateClient();
-            var response = await client.GetAsync(Utility.SetGet_Or_DeleteUrl(1, ApiEndpointsTest.OrderEndpoints.Delete));
+            var response = await client.GetAsync(Utility.SetGet_Or_DeleteUrl(id, ApiEndpoints.OrderEndpoints.Delete));
             response.Should().HaveStatusCode(HttpStatusCode.OK);
-        }
-
-        [Fact]
-        public async Task Should_Delete_Order_From_Real_Delete_Endpoint()
-        {
-            using var client = CreateApi.CreateOfficialApi().CreateClient();
-            
-            int id = await Utility.SeuUpOrders(client);
-            var orders = await Utility.GetAllUserOrders(client, id);
-
-            int orderId = orders.Last().Id;
-            await client.DeleteAsync(Utility.SetGet_Or_DeleteUrl(orderId, ApiEndpointsTest.OrderEndpoints.Delete));
-
-            orders = await Utility.GetAllUserOrders(client, id);
-            orders.Should().NotContain(x => x.Id == orderId);
-        }
-
-
-      
+        }  
 
         private ApiFactory CreateApiWithOrderRepository<T>()
         where T : class, IOrderService

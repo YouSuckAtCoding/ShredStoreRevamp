@@ -33,8 +33,10 @@ namespace ShredStoreTests
         {
             using var connection = await _dbConnectionFactory.CreateConnectionAsync(default);
             string spName = Sp;
+
             dynamic res = await connection.QueryAsync(Utility.CreateQueryForStoredProcedureCheck(spName));
             string name = res[0].name;
+
             name.Should().Be(spName);
         }
 
@@ -43,19 +45,24 @@ namespace ShredStoreTests
         {
             User user = Fake.FakeDataFactory.FakeUser();
             IUserStorage storage = new UserStorage(_dbConnectionFactory);
+            int expected = 0;
 
             await storage.InsertUser(user);
 
             var res = await storage.GetUsers();
-            res.Should().HaveCountGreaterThan(0);
+            res.Should().HaveCountGreaterThan(expected);
             await Utility.CleanUpUsers(_dbConnectionFactory);
         }
         [Fact]
         public async Task Should_Be_Default_If_User_Does_Not_Exists()
         {
             IUserStorage storage = new UserStorage(_dbConnectionFactory);
-            var res = await storage.GetUser(50);
+            int userId = int.MaxValue;
+
+            var res = await storage.GetUser(userId);
+
             res.Should().BeSameAs(default);
+
             await Utility.CleanUpUsers(_dbConnectionFactory);
 
         }
@@ -68,7 +75,9 @@ namespace ShredStoreTests
             
             await storage.InsertUser(user);
             var res = await storage.GetUsers();
+
             User returned = res.Where(x => x.Cpf == user.Cpf).FirstOrDefault();
+
             await storage.DeleteUser(returned.Id);
 
             res = await storage.GetUsers();
@@ -85,6 +94,7 @@ namespace ShredStoreTests
             var res = await storage.Login(user.Email, user.Password);
 
             res.Should().Be(null);
+
             await Utility.CleanUpUsers(_dbConnectionFactory);
         }
         [Fact]
@@ -97,6 +107,7 @@ namespace ShredStoreTests
             var res = await storage.Login(user.Email, user.Password);
 
             res.Cpf.Should().BeEquivalentTo(user.Cpf);
+
             await Utility.CleanUpUsers(_dbConnectionFactory);
         }
         [Fact]
@@ -110,13 +121,15 @@ namespace ShredStoreTests
             User user2 = Fake.FakeDataFactory.FakeUser();
             var res = await storage.GetUsers();
 
-            user2.Id = res.ElementAt(0).Id;
+            
+            user2.Id = res.First().Id;
 
             await storage.UpdateUser(user2);
 
             res = await storage.GetUsers();
 
             res.Should().Contain(x => x.Cpf == user2.Cpf);
+
             await Utility.CleanUpUsers(_dbConnectionFactory);
         }
 
