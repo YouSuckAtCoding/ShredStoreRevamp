@@ -1,4 +1,6 @@
-﻿using ShredStorePresentation.Services.CartItemServices;
+﻿using Serilog;
+using ShredStorePresentation.Extensions.Cache;
+using ShredStorePresentation.Services.CartItemServices;
 using ShredStorePresentation.Services.CartServices;
 using ShredStorePresentation.Services.Images;
 using ShredStorePresentation.Services.ProductServices;
@@ -28,6 +30,7 @@ namespace ShredStorePresentation.StartUp
             services.AddTransient<ICartHttpService, CartHttpService>();
             services.AddTransient<ICartItemHttpService, CartItemHttpService>();
             services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<CacheRecordKeys>();
             //services.AddSingleton<IProductFactory, ConcreteProductFactory>();
             //services.AddSingleton<IUserFactory, ConcreteUserFactory>();
             //services.AddSingleton<ICartFactory, ConcreteCartFactory>();
@@ -42,8 +45,11 @@ namespace ShredStorePresentation.StartUp
                 options.InstanceName = "ShredStore_";
             });
 
+            var logger = new LoggerConfiguration()
+                .WriteTo.Console().WriteTo.File("log.txt", rollingInterval: RollingInterval.Day)
+                .CreateLogger();
 
-
+            builder.Host.UseSerilog(logger);
 
             return services;
 

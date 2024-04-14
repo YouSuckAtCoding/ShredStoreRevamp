@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Caching.Distributed;
 using ShredStorePresentation.Extensions;
+using ShredStorePresentation.Extensions.Cache;
 using ShredStorePresentation.Models;
 using ShredStorePresentation.Services.Images;
 using ShredStorePresentation.Services.ProductServices;
@@ -13,15 +14,18 @@ namespace ShredStorePresentation.Controllers
         private readonly IProductHttpService _product;
         private readonly IDistributedCache _cache;
         private readonly IImageService _imageService;
-        
-        
+        private readonly CacheRecordKeys _cacheKeys;
+
         public ProductController(IProductHttpService _product,
                                  IDistributedCache _cache,
-                                 IImageService imageService)
+                                 IImageService imageService,
+                                 IConfiguration config,
+                                 CacheRecordKeys cacheKeys)
         {
             this._product = _product;
             this._cache = _cache;
             _imageService = imageService;
+            _cacheKeys = cacheKeys;
         }
         public async Task<IActionResult> ProductDetails(int Id, CancellationToken token)
         {
@@ -33,7 +37,7 @@ namespace ShredStorePresentation.Controllers
             catch (Exception ex)
             {
                 //_utilityClass.GetLog().Error(ex, "Exception caught at ProductDetails action in ShredStoreController.");
-                return RedirectToAction(nameof(Index), "Home");
+                return RedirectToAction(nameof(Index), ControllerExtensions.ControllerName<HomeController>());
             }
 
         }
@@ -57,9 +61,13 @@ namespace ShredStorePresentation.Controllers
             {
                 try
                 {
+                    
                     productInfo.ImageName = await _imageService.UploadImage(productInfo.ImageFile);
                     await _product.Create(productInfo.MapToProductRequest(), token);
-                    return RedirectToAction("Index", "Home");
+
+                    await ResetProductCache();
+
+                    return RedirectToAction(ControllerExtensions.IndexActionName(), ControllerExtensions.ControllerName<HomeController>());
                 }
                 catch (Exception ex)
                 {
@@ -91,20 +99,24 @@ namespace ShredStorePresentation.Controllers
                 {
                     if (edited.ImageFile is not null)
                     {
-                        _imageService.DeleteImage(edited.ImageName);
-                        edited.ImageName = await _imageService.UploadImage(edited.ImageFile);
-                    }                      
-                    
+                        await ResetProductImage(edited);
+                    }
+
                     await _product.Edit(edited.MapToUpdateProductRequest(), token);
-                    return RedirectToAction("Index", "Home");
+
+                    await ResetProductCache();
+
+                    return RedirectToAction(ControllerExtensions.IndexActionName(), ControllerExtensions.ControllerName<HomeController>());
                 }
                 catch (Exception ex)
                 {
                     //_utilityClass.GetLog().Error(ex, "Exception caught at EditProduct action in ShredStoreController.");
                 }
             }
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction(ControllerExtensions.IndexActionName(), ControllerExtensions.ControllerName<HomeController>());
         }
+
+      
 
         public async Task<IActionResult> DeleteProduct(int id, CancellationToken token)
         {
@@ -116,7 +128,7 @@ namespace ShredStorePresentation.Controllers
                 
                 await _product.Delete(selected.Id, token);
 
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction(ControllerExtensions.IndexActionName(), ControllerExtensions.ControllerName<HomeController>());
             }
             catch (Exception ex)
             {
@@ -152,6 +164,18 @@ namespace ShredStorePresentation.Controllers
         {
             ViewBag.Categories = new SelectList(Categories());
             ViewBag.Types = new SelectList(Types());
+        }
+
+        private async Task ResetProductCache()
+        {
+            string recordKey = _cacheKeys.GetProductCacheKey();
+            await _cache.DeleteRecordsAsync(recordKey);
+        }
+
+        private async Task ResetProductImage(UpdateProductViewRequest edited)
+        {
+            _imageService.DeleteImage(edited.ImageName);
+            edited.ImageName = await _imageService.UploadImage(edited.ImageFile);
         }
 
     }

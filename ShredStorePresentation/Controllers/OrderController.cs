@@ -3,6 +3,7 @@ using Contracts.Request.PaymentRequests;
 using Contracts.Response.ProductsResponses;
 using Contracts.Response.UserResponses;
 using Microsoft.AspNetCore.Mvc;
+using ShredStorePresentation.Extensions.Cache;
 using ShredStorePresentation.Models;
 using ShredStorePresentation.Services.CartItemServices;
 using ShredStorePresentation.Services.CartServices;
@@ -27,7 +28,7 @@ namespace ShredStorePresentation.Controllers
         }
         public async Task<IActionResult> Payment(CancellationToken token)
         {
-            int userId = HttpContext.Session.GetInt32("_Id")!.Value;
+            int userId = HttpContext.Session.GetInt32(SessionKeys.GetSessionKeyId())!.Value;
 
             IEnumerable<ProductCartItemResponse> result = await _product.GetAllByCartId(userId, token);
 

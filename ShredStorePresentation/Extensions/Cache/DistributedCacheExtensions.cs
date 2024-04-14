@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
 using System.Text.Json;
 
-namespace ShredStorePresentation.Extensions
+namespace ShredStorePresentation.Extensions.Cache
 {
     public static class DistributedCacheExtensions
     {
@@ -28,11 +28,29 @@ namespace ShredStorePresentation.Extensions
 
                 if (jsonData is null)
                 {
-                    return default(T);
+                    return default;
                 }
 
                 return JsonSerializer.Deserialize<T>(jsonData);
 
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+        }
+
+        public static async Task DeleteRecordsAsync(this IDistributedCache cache, string recordId)
+        {
+            try
+            {
+                var jsonData = await cache.GetStringAsync(recordId);
+
+                if (jsonData is not null)
+                {
+                    await cache.DeleteRecordsAsync(recordId);
+                }
             }
             catch (Exception ex)
             {

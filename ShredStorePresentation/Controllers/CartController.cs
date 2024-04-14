@@ -2,7 +2,8 @@
 using Contracts.Request.CartRequests;
 using Contracts.Response.ProductsResponses;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+using ShredStorePresentation.Extensions;
+using ShredStorePresentation.Extensions.Cache;
 using ShredStorePresentation.Services.CartItemServices;
 using ShredStorePresentation.Services.CartServices;
 using ShredStorePresentation.Services.ProductServices;
@@ -63,7 +64,7 @@ namespace ShredStorePresentation.Controllers
 
             int qtd = Convert.ToInt32(quantity);
             int Id = Convert.ToInt32(productId);
-            int userId = HttpContext.Session.GetInt32("_Id")!.Value;
+            int userId = HttpContext.Session.GetInt32(SessionKeys.GetSessionKeyId())!.Value;
 
             UpdateCartItemRequest request = new UpdateCartItemRequest
             {
@@ -77,20 +78,20 @@ namespace ShredStorePresentation.Controllers
         }
         public async Task<IActionResult> CartItems(CancellationToken token)
         {
-            int userId = HttpContext.Session.GetInt32("_Id")!.Value;
+            int userId = HttpContext.Session.GetInt32(SessionKeys.GetSessionKeyId())!.Value;
 
             IEnumerable<ProductCartItemResponse> result = await _product.GetAllByCartId(userId, token);
 
             if (!result.Any())
-                return RedirectToAction("EmptyCart", "Home");
+                return RedirectToAction(ControllerExtensions.EmptyCartActionName(), ControllerExtensions.ControllerName<HomeController>());
 
             ViewBag.TotalPrice = GetTotalPrice(result);
 
-            return View("CartItems", result);
+            return View(nameof(CartItems), result);
         }
         public async Task<IActionResult> RemoveCartItem(int productId)
         {
-            int userId = HttpContext.Session.GetInt32("_Id")!.Value;
+            int userId = HttpContext.Session.GetInt32(SessionKeys.GetSessionKeyId())!.Value;
             await _cartItem.RemoveItem(productId, userId);
             return await CartItems(default);
         }

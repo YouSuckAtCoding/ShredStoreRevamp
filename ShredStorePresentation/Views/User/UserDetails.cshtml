@@ -59,10 +59,10 @@
                                 <div class="card me-2 bg-secondary bg-gradient" id="User-card-container">
                                     <img src="~/Images/@item.ImageName" class="card-img-top" alt="..." id="User-Card-Img">
                                     <div class="card-body">
-                                        <h5 class="card-title text-light">@item.Name</h5>
+                                        <p class="card-title text-light" id="User-card-container-title">@item.Name</p>
                                         <p class="card-text text-light">Price: @(item.Price.ToString("c2")) </p>
-                                        <a asp-controller="Product" asp-action="EditProduct" asp-route-Id=@item.Id class="btn btn-outline-light mb-3">Edit Product</a>
-                                        <a asp-controller="Product" asp-action="DeleteProduct" asp-route-Id=@item.Id class="btn btn-outline-light">Delete Product</a>
+                                        <a asp-controller="Product" asp-action="EditProduct" asp-route-Id=@item.Id class="btn btn-sm btn-outline-light">Edit Product</a>
+                                        <a asp-controller="Product" asp-action="DeleteProduct" asp-route-Id=@item.Id class="btn btn-sm btn-outline-light">Delete Product</a>
                                     </div>
                                 </div>
                             </li>
