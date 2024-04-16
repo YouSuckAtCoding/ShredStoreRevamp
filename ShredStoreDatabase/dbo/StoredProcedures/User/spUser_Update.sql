@@ -7,9 +7,9 @@ AS
 Begin
 
 	Update dbo.[User]
-	Set [Name] = @Name, 
-	[Address] = @Address,
-	Role = @Role
+	Set [Name] = ISNULL(@Name, [Name]), 
+	[Address] = ISNULL(@Address, [Address]),
+	[Role] = ISNULL(@Role, [Role])
 	Where Id = @Id
 
 End

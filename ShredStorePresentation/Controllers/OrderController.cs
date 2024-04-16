@@ -30,9 +30,9 @@ namespace ShredStorePresentation.Controllers
         {
             int userId = HttpContext.Session.GetInt32(SessionKeys.GetSessionKeyId())!.Value;
 
-            IEnumerable<ProductCartItemResponse> result = await _product.GetAllByCartId(userId, token);
+            IEnumerable<ProductCartItemResponse> result = await _product.GetAllByCartId(userId, "");
 
-            UserResponse user = await _userHttpService.GetById(userId);
+            UserResponse user = await _userHttpService.GetById(userId, "");
 
             CreateOrderViewRequest request = new CreateOrderViewRequest
             {

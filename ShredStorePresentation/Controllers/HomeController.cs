@@ -31,7 +31,7 @@ namespace ShredStorePresentation.Controllers
             {
                 var res = ControllerExtensions.ControllerActionName<HomeController>();
 
-                var allProducts = await GetAllProducts(_cachekeys.GetProductCacheKey(), token);
+                var allProducts = await GetAllProducts(_cachekeys.GetProductCacheKey());
                 if (Search == "" || Search is null)
                 {
                     
@@ -58,7 +58,7 @@ namespace ShredStorePresentation.Controllers
         public async Task<IActionResult> Category(string Category, CancellationToken token)
         {
             string recordKey = $"{Category}_";
-            var products = await GetCategoryProducts(recordKey, Category, token);
+            var products = await GetCategoryProducts(recordKey, Category);
             try
             {
                 ViewBag.Title = Category;
@@ -78,7 +78,7 @@ namespace ShredStorePresentation.Controllers
             ViewBag.Message = "No products in cart!";
             try
             {
-                var products = await GetAllProducts(_cachekeys.GetProductCacheKey(), token);
+                var products = await GetAllProducts(_cachekeys.GetProductCacheKey());
                 return View(nameof(Index), products);
             }
             catch (Exception ex)
@@ -99,23 +99,23 @@ namespace ShredStorePresentation.Controllers
             await _cache.SetRecordAsync(recordKey, products, TimeSpan.FromSeconds(35));
         }
      
-        private async Task<IEnumerable<ProductResponse>> GetAllProducts(string recordKey, CancellationToken token)
+        private async Task<IEnumerable<ProductResponse>> GetAllProducts(string recordKey)
         {
             var products = await _cache.GetRecordAsync<IEnumerable<ProductResponse>>(recordKey);
             if (products is null)
             {
-                var getProducts = await _productService.GetAll(token);
+                var getProducts = await _productService.GetAll();
                 SetOnCache(recordKey, getProducts);
                 return getProducts;
             }
             return products;
         }
-        private async Task<IEnumerable<ProductResponse>> GetCategoryProducts(string recordKey, string category, CancellationToken token)
+        private async Task<IEnumerable<ProductResponse>> GetCategoryProducts(string recordKey, string category)
         {
             var products = await _cache.GetRecordAsync<IEnumerable<ProductResponse>>(recordKey);
             if (products is null)
             {
-                var getProducts = await _productService.GetAllByCategory(category, token);
+                var getProducts = await _productService.GetAllByCategory(category);
                 SetOnCache(recordKey, getProducts);
                 return getProducts;
             }

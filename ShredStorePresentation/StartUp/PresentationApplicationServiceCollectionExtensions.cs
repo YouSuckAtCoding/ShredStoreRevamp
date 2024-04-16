@@ -3,6 +3,8 @@ using ShredStorePresentation.Extensions.Cache;
 using ShredStorePresentation.Services.CartItemServices;
 using ShredStorePresentation.Services.CartServices;
 using ShredStorePresentation.Services.Images;
+using ShredStorePresentation.Services.JtwService;
+using ShredStorePresentation.Services.JtwServices;
 using ShredStorePresentation.Services.ProductServices;
 using ShredStorePresentation.Services.UserService;
 
@@ -30,14 +32,9 @@ namespace ShredStorePresentation.StartUp
             services.AddTransient<ICartHttpService, CartHttpService>();
             services.AddTransient<ICartItemHttpService, CartItemHttpService>();
             services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddTransient<IJwtHttpService, JwtHttpService>();
+            services.AddTransient<IJwtService, JwtService>();
             services.AddSingleton<CacheRecordKeys>();
-            //services.AddSingleton<IProductFactory, ConcreteProductFactory>();
-            //services.AddSingleton<IUserFactory, ConcreteUserFactory>();
-            //services.AddSingleton<ICartFactory, ConcreteCartFactory>();
-            //services.AddSingleton<ICartItemFactory, ConcreteCartItemFactory>();
-            //services.AddSingleton<EmailSender>();
-            //services.AddSingleton<MiscellaneousUtilityClass>();
-
 
             services.AddStackExchangeRedisCache(options =>
             {
@@ -46,7 +43,7 @@ namespace ShredStorePresentation.StartUp
             });
 
             var logger = new LoggerConfiguration()
-                .WriteTo.Console().WriteTo.File("log.txt", rollingInterval: RollingInterval.Day)
+                .WriteTo.Console().WriteTo.File("logs/log.txt", rollingInterval: RollingInterval.Day)
                 .CreateLogger();
 
             builder.Host.UseSerilog(logger);

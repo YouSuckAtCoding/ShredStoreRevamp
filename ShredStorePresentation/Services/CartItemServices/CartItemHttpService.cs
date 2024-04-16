@@ -1,7 +1,5 @@
 ﻿using Contracts.Request.CartItemRequests;
 using Contracts.Response.CartItemResponses;
-using Contracts.Response.ProductsResponses;
-using Newtonsoft.Json.Linq;
 using System.Text.Json;
 
 namespace ShredStorePresentation.Services.CartItemServices
@@ -23,19 +21,19 @@ namespace ShredStorePresentation.Services.CartItemServices
             httpClient.BaseAddress = new Uri(config.GetValue<string>("ApiUri")!);
         }
 
-        public async Task<bool> InsertCartItems(CreateCartItemRequest request, CancellationToken token)
+        public async Task<bool> InsertCartItems(CreateCartItemRequest request, string token)
         {
-            var httpResponseMessage = await httpClient.PostAsJsonAsync(ApiEndpoints.CartItemEndpoints.Create, request, token);
+            var httpResponseMessage = await httpClient.PostAsJsonAsync(ApiEndpoints.CartItemEndpoints.Create, request);
             if (httpResponseMessage.StatusCode != System.Net.HttpStatusCode.OK)
                 return false;
 
             return true;
         }
 
-        public async Task<IEnumerable<CartItemResponse>> GetCartItems(int cartId, CancellationToken token)
+        public async Task<IEnumerable<CartItemResponse>> GetCartItems(int cartId, string token)
         {
             var httpResponseMessage = await httpClient.GetAsync(ApiEndpoints.UrlGenerator.
-                SetUrlParameters(cartId, ApiEndpoints.CartItemEndpoints.GetAll), token);
+                SetUrlParameters(cartId, ApiEndpoints.CartItemEndpoints.GetAll));
 
             var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
 
@@ -47,16 +45,16 @@ namespace ShredStorePresentation.Services.CartItemServices
             return products;
         }
 
-        public async Task<bool> UpdateCartItem(UpdateCartItemRequest request, CancellationToken token)
+        public async Task<bool> UpdateCartItem(UpdateCartItemRequest request, string token)
         {
-            var httpResponseMessage = await httpClient.PutAsJsonAsync(ApiEndpoints.CartItemEndpoints.Update, request, token);
+            var httpResponseMessage = await httpClient.PutAsJsonAsync(ApiEndpoints.CartItemEndpoints.Update, request);
 
             if (httpResponseMessage.StatusCode == System.Net.HttpStatusCode.OK)
                 return true;
             return false;
         }
 
-        public async Task RemoveItem(int productId, int userId)
+        public async Task RemoveItem(int productId, int userId, string token)
         {
             await httpClient.DeleteAsync(ApiEndpoints.UrlGenerator.SetCartItem_GetUrl(productId, userId, ApiEndpoints.CartItemEndpoints.Delete));
 

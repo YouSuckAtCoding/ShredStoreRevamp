@@ -31,6 +31,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShredStorePresentation", "S
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{E85AC719-18AC-44B4-BBE2-559A13356BF5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Identity.Api", "..\Identity.Api\Identity.Api.csproj", "{3355D569-3E99-4029-88D2-3F43F597BF8F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,6 +77,10 @@ Global
 		{E85AC719-18AC-44B4-BBE2-559A13356BF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E85AC719-18AC-44B4-BBE2-559A13356BF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E85AC719-18AC-44B4-BBE2-559A13356BF5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3355D569-3E99-4029-88D2-3F43F597BF8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3355D569-3E99-4029-88D2-3F43F597BF8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3355D569-3E99-4029-88D2-3F43F597BF8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3355D569-3E99-4029-88D2-3F43F597BF8F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -88,6 +94,7 @@ Global
 		{AAF35ABC-A0F0-4473-AC87-B336654E3893} = {7646897C-B98A-4ECE-A94D-0F18809FECC1}
 		{027BC7C2-2904-44DB-B202-11424AFF5F23} = {DD26EC7F-0494-4F18-B646-9C705EB2F540}
 		{5180C91B-71BF-469B-B847-1D28BA1775BD} = {C4FED58A-792D-4480-9AA8-6A7755B30D9F}
+		{3355D569-3E99-4029-88D2-3F43F597BF8F} = {BC52DE00-3E1F-4818-82E3-DC23D107D04F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C353204C-4F55-414F-A66F-6C3C559ED27F}

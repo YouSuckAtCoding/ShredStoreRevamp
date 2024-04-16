@@ -13,11 +13,6 @@ using Application.Services.UserServices;
 using DatabaseAccess;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application
 {
@@ -25,6 +20,8 @@ namespace Application
     {
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
+
+
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IProductRepository, ProductRepository>();
@@ -38,7 +35,11 @@ namespace Application
             services.AddTransient<IOrderItemRepository, OrderItemRepository>();
             services.AddTransient<IOrderItemService, OrderItemService>();
             services.AddTransient<ISqlDataAccess, SqlDataAccess>();
+            
             services.AddValidatorsFromAssemblyContaining<IApplicationMarker>(ServiceLifetime.Singleton);
+
+          
+
             return services;
         }
     }

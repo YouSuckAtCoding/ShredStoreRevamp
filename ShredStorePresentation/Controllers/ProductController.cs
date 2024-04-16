@@ -30,11 +30,11 @@ namespace ShredStorePresentation.Controllers
             _logger = logger;
         }
 
-        public async Task<IActionResult> ProductDetails(int Id, CancellationToken token)
+        public async Task<IActionResult> ProductDetails(int Id)
         {
             try
             {
-                var selected = await _product.GetById(Id, token);
+                var selected = await _product.GetById(Id);
                 return View(selected);
             }
             catch (Exception ex)
@@ -43,7 +43,7 @@ namespace ShredStorePresentation.Controllers
                 return RedirectToAction(nameof(Index), ControllerExtensions.ControllerName<HomeController>());
             }
         }
-    
+
         // GET: ShredStoreController/Create
         public IActionResult PublishProduct()
         {
@@ -54,46 +54,48 @@ namespace ShredStorePresentation.Controllers
         // POST: ShredStoreController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> PublishProduct(CreateProductViewRequest productInfo, CancellationToken token)
+        public async Task<IActionResult> PublishProduct(CreateProductViewRequest productInfo)
         {
-            SetProductDropdowns();            
+            SetProductDropdowns();
             if (ModelState.IsValid)
             {
-                try
+                string? token = Request.Cookies["token"];
+                if (token is not null)
                 {
-                    
-                    productInfo.ImageName = await _imageService.UploadImage(productInfo.ImageFile);
-                    await _product.Create(productInfo.MapToProductRequest(), token);
+                    try
+                    {
+                        productInfo.ImageName = await _imageService.UploadImage(productInfo.ImageFile);
+                        await _product.Create(productInfo.MapToProductRequest(), token);
 
-                    _logger.LogInformation(LogMessages.LogLoginMessage(), [productInfo.Name, DateTime.Now.ToString()]);
+                        _logger.LogInformation(LogMessages.LogLoginMessage(), [productInfo.Name, DateTime.Now.ToString()]);
 
-                    await ResetProductCache();
+                        await ResetProductCache();
 
-                    return RedirectToAction(ControllerExtensions.IndexActionName(), ControllerExtensions.ControllerName<HomeController>());
+                        return RedirectToAction(ControllerExtensions.IndexActionName(), ControllerExtensions.ControllerName<HomeController>());
+                    }
+                    catch (Exception ex)
+                    {
+
+                        _logger.LogError(ex, LogMessages.LogErrorMessage(), [ControllerExtensions.ControllerName<ProductController>(), ex.Message, DateTime.Now.ToString()]);
+                        return View();
+                    }
                 }
-                catch (Exception ex)
-                {
-
-                    _logger.LogError(ex, LogMessages.LogErrorMessage(), [ControllerExtensions.ControllerName<ProductController>(), ex.Message, DateTime.Now.ToString()]);
-                    return View();
-                }
-
             }
-            
+
             return View();
         }
         // GET: ShredStoreController/Edit/5
         [HttpGet]
-        public async Task<IActionResult> EditProduct(int id, CancellationToken token)
+        public async Task<IActionResult> EditProduct(int id)
         {
-            var selected = await _product.GetById(id, token);
+            var selected = await _product.GetById(id);
 
             SetProductDropdowns();
 
             return View(selected.MapToUpdateProductRequest());
         }
         [HttpPost]
-        public async Task<IActionResult> EditProduct(UpdateProductViewRequest edited, CancellationToken token)
+        public async Task<IActionResult> EditProduct(UpdateProductViewRequest edited)
         {
             SetProductDropdowns();
             ModelState.Remove("ImageFile");
@@ -102,18 +104,23 @@ namespace ShredStorePresentation.Controllers
             {
                 try
                 {
-                    if (edited.ImageFile is not null)
+                    string? token = Request.Cookies["token"];
+                    if (token is not null)
                     {
-                        await ResetProductImage(edited);
+                        if (edited.ImageFile is not null)
+                            await ResetProductImage(edited);
+
+
+                        await _product.Edit(edited.MapToUpdateProductRequest(), token);
+
+                        _logger.LogInformation(LogMessages.LogProductEditedMessage(), [edited.Name, edited.Id, DateTime.Now.ToString()]);
+
+                        await ResetProductCache();
+
+                        return RedirectToAction(ControllerExtensions.IndexActionName(), ControllerExtensions.ControllerName<HomeController>());
                     }
 
-                    await _product.Edit(edited.MapToUpdateProductRequest(), token);
-
-                    _logger.LogInformation(LogMessages.LogProductEditedMessage(), [edited.Name, edited.Id, DateTime.Now.ToString()]);
-
-                    await ResetProductCache();
-
-                    return RedirectToAction(ControllerExtensions.IndexActionName(), ControllerExtensions.ControllerName<HomeController>());
+                    throw new UnauthorizedAccessException();
                 }
                 catch (Exception ex)
                 {
@@ -123,17 +130,22 @@ namespace ShredStorePresentation.Controllers
             return RedirectToAction(ControllerExtensions.IndexActionName(), ControllerExtensions.ControllerName<HomeController>());
         }
 
-        public async Task<IActionResult> DeleteProduct(int id, CancellationToken token)
+        public async Task<IActionResult> DeleteProduct(int id)
         {
             try
             {
-                var selected = await _product.GetById(id, token);
-                
-                bool result = _imageService.DeleteImage(selected.ImageName);
-                
-                await _product.Delete(selected.Id, token);
+                string? token = Request.Cookies["token"];
+                if (token is not null)
+                {
+                    var selected = await _product.GetById(id);
 
-                return RedirectToAction(ControllerExtensions.IndexActionName(), ControllerExtensions.ControllerName<HomeController>());
+                    bool result = _imageService.DeleteImage(selected.ImageName);
+
+                    await _product.Delete(selected.Id, token);
+
+                    return RedirectToAction(ControllerExtensions.IndexActionName(), ControllerExtensions.ControllerName<HomeController>());
+                }
+                throw new UnauthorizedAccessException();
             }
             catch (Exception ex)
             {
@@ -141,47 +153,48 @@ namespace ShredStorePresentation.Controllers
                 return View();
             }
         }
-        public async Task<IActionResult> AboutUs() => View();
-        private List<string> Categories()
-        {
-            List<string> categories =
-            [
-                "Eletric Guitar",
+
+    public async Task<IActionResult> AboutUs() => View();
+    private List<string> Categories()
+    {
+        List<string> categories =
+        [
+            "Eletric Guitar",
                 "Pedals",
                 "Amplifier",
                 "Accessories",
                 "Acoustic Guitar",
             ];
-            return categories;
-        }
-        private List<string> Types()
-        {
-            List<string> categories =
-            [
-                "6 Strings",
+        return categories;
+    }
+    private List<string> Types()
+    {
+        List<string> categories =
+        [
+            "6 Strings",
                 "7 Strings",
                 "8 Strings",
                 "12 Strings"
-            ];
-            return categories;
-        }
-        private void SetProductDropdowns()
-        {
-            ViewBag.Categories = new SelectList(Categories());
-            ViewBag.Types = new SelectList(Types());
-        }
-
-        private async Task ResetProductCache()
-        {
-            string recordKey = _cacheKeys.GetProductCacheKey();
-            await _cache.DeleteRecordsAsync(recordKey);
-        }
-
-        private async Task ResetProductImage(UpdateProductViewRequest edited)
-        {
-            _imageService.DeleteImage(edited.ImageName);
-            edited.ImageName = await _imageService.UploadImage(edited.ImageFile);
-        }
-
+        ];
+        return categories;
     }
+    private void SetProductDropdowns()
+    {
+        ViewBag.Categories = new SelectList(Categories());
+        ViewBag.Types = new SelectList(Types());
+    }
+
+    private async Task ResetProductCache()
+    {
+        string recordKey = _cacheKeys.GetProductCacheKey();
+        await _cache.DeleteRecordsAsync(recordKey);
+    }
+
+    private async Task ResetProductImage(UpdateProductViewRequest edited)
+    {
+        _imageService.DeleteImage(edited.ImageName);
+        edited.ImageName = await _imageService.UploadImage(edited.ImageFile);
+    }
+
+}
 }

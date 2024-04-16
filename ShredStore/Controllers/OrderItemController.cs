@@ -2,6 +2,7 @@
 using Application.Services.OrderItemServices;
 using Contracts.Request.OrderItemRequests;
 using Contracts.Response.OrdertemResponses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ShredStore.Mapping;
@@ -10,6 +11,7 @@ namespace ShredStore.Controllers
 {
     
     [ApiController]
+    [Authorize(AuthConstants.CustomerPolicyName)]
     public class OrderItemController : ControllerBase
     {
         private readonly IOrderItemService _orderItemService;

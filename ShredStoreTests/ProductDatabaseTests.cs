@@ -3,7 +3,6 @@ using Dapper;
 using FluentAssertions;
 using ShredStoreTests.DataAdapterFiles;
 using ShredStoreTests.DataAdapterFiles.ProductTestFiles;
-using ShredStoreTests.DataAdapterFiles.UserTestFiles;
 
 namespace ShredStoreTests
 {

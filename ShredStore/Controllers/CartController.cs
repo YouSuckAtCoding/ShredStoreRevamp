@@ -3,6 +3,7 @@ using Application.Services.CartServices;
 using Contracts.Request.CartRequests;
 using Contracts.Response.CartResponses;
 using Contracts.Response.ProductsResponses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ShredStore.Mapping;
@@ -11,6 +12,7 @@ namespace ShredStore.Controllers
 {
 
     [ApiController]
+    [Authorize(AuthConstants.CustomerPolicyName)]
     public class CartController : ControllerBase
     {
         private readonly ICartService _cartService;
@@ -23,6 +25,7 @@ namespace ShredStore.Controllers
         [HttpPost(ApiEndpoints.CartEndpoints.Create)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> Create([FromBody] CreateCartRequest request, CancellationToken token)
         {
             Cart cart = request.MapToCart();
@@ -33,6 +36,7 @@ namespace ShredStore.Controllers
         [HttpGet(ApiEndpoints.CartEndpoints.Get)]
         [ProducesResponseType(typeof(CartResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> Get([FromRoute] int id, CancellationToken token)
         {
             Cart? cart = await _cartService.GetCart(id, token);
@@ -47,6 +51,7 @@ namespace ShredStore.Controllers
         [HttpDelete(ApiEndpoints.CartEndpoints.Delete)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> Delete([FromRoute] int id, CancellationToken token)
         {
             Cart? cart = await _cartService.GetCart(id, token);

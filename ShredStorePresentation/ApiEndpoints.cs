@@ -77,6 +77,11 @@
             public const string DeleteAll = $"{Base}/{{orderId}}";
         }
 
+        public static class TokenEndpoints
+        {
+            public const string GenerateToken = "token";
+        }
+
         public static class UrlGenerator
         {
             public static string SetUrlParameters(int id, string endpoint)

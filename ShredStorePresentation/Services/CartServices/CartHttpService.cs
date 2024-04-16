@@ -22,9 +22,9 @@ namespace ShredStorePresentation.Services.CartServices
             httpClient.BaseAddress = new Uri(config.GetValue<string>("ApiUri")!);
         }
 
-        public async Task<CreateCartRequest> Create(CreateCartRequest cart, CancellationToken token)
+        public async Task<CreateCartRequest> Create(CreateCartRequest cart, string token)
         {
-            var httpResponseMessage = await httpClient.PostAsJsonAsync(ApiEndpoints.CartEndpoints.Create, cart, token);
+            var httpResponseMessage = await httpClient.PostAsJsonAsync(ApiEndpoints.CartEndpoints.Create, cart);
 
             var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
 
@@ -34,9 +34,9 @@ namespace ShredStorePresentation.Services.CartServices
 
         }
 
-        public async Task<CartResponse> GetById(int id, CancellationToken token)
+        public async Task<CartResponse> GetById(int id, string token)
         {   
-            var response = await httpClient.GetAsync(ApiEndpoints.UrlGenerator.SetUrlParameters(id, ApiEndpoints.CartEndpoints.Get), token);
+            var response = await httpClient.GetAsync(ApiEndpoints.UrlGenerator.SetUrlParameters(id, ApiEndpoints.CartEndpoints.Get));
 
             if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                 return new CartResponse();

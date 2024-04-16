@@ -1,11 +1,4 @@
-﻿using static System.Net.Mime.MediaTypeNames;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
-using System.IO;
-using Aspose.Imaging;
-
-namespace ShredStorePresentation.Services.Images
+﻿namespace ShredStorePresentation.Services.Images
 {
     public class ImageService : IImageService
     {
