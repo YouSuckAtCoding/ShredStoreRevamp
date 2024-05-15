@@ -1,61 +1,37 @@
 using Application;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
+using AspNetCoreRateLimit;
 using Movies.Api.Mapping;
 using Serilog;
-using ShredStore;
-using System.Text;
+using ShredStore.Jwt;
 
 var builder = WebApplication.CreateBuilder(args);
 
+string CorsPolicy = "AllowAngularApp";
+string logFilePath = "logs/apilog-.txt";
+string allowedHosts = "Cors:AllowedHosts";
+
 var config = builder.Configuration;
+var hosts = config.GetSection(allowedHosts).Get<string[]>()!;
 
-builder.Services.AddAuthentication(x =>
-{
-    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-
-}).AddJwtBearer(x =>
-{
-    x.TokenValidationParameters = new TokenValidationParameters
-    {
-        IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(config["Jwt:Key"]!)),
-        ValidateIssuerSigningKey = true,
-        ValidateLifetime = true,
-        ValidIssuer = config["Jwt:Issuer"],
-        ValidAudience = config["Jwt:Audience"],
-        ValidateIssuer = true,
-        ValidateAudience = true
-    };
-});
-
-
-builder.Services.AddAuthorization(x =>
-{
-    x.AddPolicy(AuthConstants.AdminUserPolicyName, p => p.RequireClaim(AuthConstants.AdminUserClaimName, "true"));
-
-    x.AddPolicy(AuthConstants.CustomerPolicyName, p => p.RequireAssertion(c =>
-    c.User.HasClaim(m => m is { Type: AuthConstants.AdminUserClaimName, Value: "true" }) ||
-    c.User.HasClaim(m => m is { Type: AuthConstants.CustomerClaimName, Value: "true" }) ||
-    c.User.HasClaim(m => m is { Type: AuthConstants.ShopClaimName, Value: "true" })));
-
-    x.AddPolicy(AuthConstants.ShopPolicyName, p => p.RequireAssertion(c =>
-    c.User.HasClaim(m => m is { Type: AuthConstants.AdminUserClaimName, Value: "true" }) ||
-    c.User.HasClaim(m => m is { Type: AuthConstants.ShopClaimName, Value: "true" })));
-});
-
+builder.Services.AddJwtAuthorization(config);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddApplication();
 
+builder.Services.AddCors(o => o.AddPolicy(CorsPolicy,
+                      policy =>
+                      {
+                          policy.WithOrigins(hosts)
+                                 .AllowAnyMethod()
+                                 .AllowAnyHeader();
+                      }));
+
 
 var logger = new LoggerConfiguration()
                 .WriteTo.Console()
-                .WriteTo.File("logs/apilog-.txt", rollingInterval: RollingInterval.Day)
+                .WriteTo.File(logFilePath, rollingInterval: RollingInterval.Day)
                 .CreateLogger();
 
 builder.Host.UseSerilog(logger);
@@ -69,11 +45,16 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseIpRateLimiting();
+
 app.UseSerilogRequestLogging();
 
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
+
+app.UseCors(CorsPolicy);
+
 app.UseAuthorization();
 
 app.UseMiddleware<ValidationMappingMiddleware>();

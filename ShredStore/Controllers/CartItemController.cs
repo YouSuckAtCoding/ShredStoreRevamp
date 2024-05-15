@@ -4,6 +4,7 @@ using Contracts.Request.CartItemRequests;
 using Contracts.Response.CartItemResponses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ShredStore.Jwt;
 using ShredStore.Mapping;
 
 namespace ShredStore.Controllers

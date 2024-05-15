@@ -1,6 +1,4 @@
-﻿using Contracts.Request.OrderRequests;
-using Contracts.Request.PaymentRequests;
-using Contracts.Response.ProductsResponses;
+﻿using Contracts.Response.ProductsResponses;
 using Contracts.Response.UserResponses;
 using Microsoft.AspNetCore.Mvc;
 using ShredStorePresentation.Extensions.Cache;
@@ -26,7 +24,7 @@ namespace ShredStorePresentation.Controllers
             _product = product;
             _userHttpService = userHttpService;
         }
-        public async Task<IActionResult> Payment(CancellationToken token)
+        public async Task<IActionResult> Payment()
         {
             int userId = HttpContext.Session.GetInt32(SessionKeys.GetSessionKeyId())!.Value;
 

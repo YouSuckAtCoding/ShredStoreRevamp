@@ -24,4 +24,3 @@ services:
     image: redis:latest
     ports:
       - "1402:6379"
-     

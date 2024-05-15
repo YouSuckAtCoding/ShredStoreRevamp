@@ -23,7 +23,7 @@ namespace ShredStorePresentation.Services.ProductServices
         public ProductHttpService(IConfiguration config)
         {
             httpClient = new HttpClient();
-            httpClient.BaseAddress = new Uri(config.GetValue<string>("ApiUri")!);
+            httpClient.BaseAddress = new Uri(config.GetValue<string>(Constants.ConfigApiUri)!);
         }
 
         public async Task<ProductResponse> Create(CreateProductRequest product, string token)
@@ -174,7 +174,7 @@ namespace ShredStorePresentation.Services.ProductServices
         public async Task<ProductResponse> GetById(int id)
         {
 
-            Uri uri = new Uri(httpClient.BaseAddress + ApiEndpoints.UrlGenerator.SetUrlParameters(id, ApiEndpoints.ProductEndpoints.GetByCartId));
+            Uri uri = new Uri(httpClient.BaseAddress + ApiEndpoints.UrlGenerator.SetUrlParameters(id, ApiEndpoints.ProductEndpoints.Get));
 
             HttpCreateRequestMessageRequest request = new HttpCreateRequestMessageRequest();
             request = request.GenerateCreateMessageRequest(uri, HttpMethod.Get);

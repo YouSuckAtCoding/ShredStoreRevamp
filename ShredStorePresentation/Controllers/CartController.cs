@@ -29,7 +29,7 @@ namespace ShredStorePresentation.Controllers
         {
             try
             {
-                string? token = Request.Cookies["token"];
+                string? token = Request.Cookies[Constants.TokenName];
                 if (token is not null)
                 {
 
@@ -90,26 +90,46 @@ namespace ShredStorePresentation.Controllers
             };
 
             await _cartItem.UpdateCartItem(request, "");
-            return await CartItems(default);
+            return await CartItems();
         }
-        public async Task<IActionResult> CartItems(CancellationToken token)
+        
+        public async Task<IActionResult> CartItems()
         {
-            int userId = HttpContext.Session.GetInt32(SessionKeys.GetSessionKeyId())!.Value;
 
-            IEnumerable<ProductCartItemResponse> result = await _product.GetAllByCartId(userId, "");
+            try
+            {
+                string? token = Request.Cookies[Constants.TokenName];
+                if (token is not null)
+                {
+                    int userId = HttpContext.Session.GetInt32(SessionKeys.GetSessionKeyId())!.Value;
 
-            if (!result.Any())
-                return RedirectToAction(ControllerExtensions.EmptyCartActionName(), ControllerExtensions.ControllerName<HomeController>());
+                    IEnumerable<ProductCartItemResponse> result = await _product.GetAllByCartId(userId, "");
 
-            ViewBag.TotalPrice = GetTotalPrice(result);
+                    if (!result.Any())
+                        return RedirectToAction(ControllerExtensions.EmptyCartActionName(), ControllerExtensions.ControllerName<HomeController>());
 
-            return View(nameof(CartItems), result);
+                    ViewBag.TotalPrice = GetTotalPrice(result);
+
+                    return View(nameof(CartItems), result);
+                }
+                throw new UnauthorizedAccessException();
+            }
+            catch (Exception ex)
+            {
+
+                _logger.LogError(ex, LogMessages.LogErrorMessage(), [ControllerExtensions.ControllerName<HomeController>(), ex.Message, DateTime.Now.ToString()]);
+                return View();
+            }
         }
         public async Task<IActionResult> RemoveCartItem(int productId)
         {
-            int userId = HttpContext.Session.GetInt32(SessionKeys.GetSessionKeyId())!.Value;
-            await _cartItem.RemoveItem(productId, userId, "");
-            return await CartItems(default);
+            string? token = Request.Cookies[Constants.TokenName];
+            if (token is not null)
+            {
+                int userId = HttpContext.Session.GetInt32(SessionKeys.GetSessionKeyId())!.Value;
+                await _cartItem.RemoveItem(productId, userId, token);
+            }
+            return await CartItems();
         }
         private decimal GetTotalPrice(IEnumerable<ProductCartItemResponse> result)
         {

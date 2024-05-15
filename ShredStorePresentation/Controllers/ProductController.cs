@@ -59,7 +59,7 @@ namespace ShredStorePresentation.Controllers
             SetProductDropdowns();
             if (ModelState.IsValid)
             {
-                string? token = Request.Cookies["token"];
+                string? token = Request.Cookies[Constants.TokenName];
                 if (token is not null)
                 {
                     try
@@ -98,13 +98,13 @@ namespace ShredStorePresentation.Controllers
         public async Task<IActionResult> EditProduct(UpdateProductViewRequest edited)
         {
             SetProductDropdowns();
-            ModelState.Remove("ImageFile");
+            ModelState.Remove(Constants.ImageFile);
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    string? token = Request.Cookies["token"];
+                    string? token = Request.Cookies[Constants.TokenName];
                     if (token is not null)
                     {
                         if (edited.ImageFile is not null)
@@ -134,7 +134,7 @@ namespace ShredStorePresentation.Controllers
         {
             try
             {
-                string? token = Request.Cookies["token"];
+                string? token = Request.Cookies[Constants.TokenName];
                 if (token is not null)
                 {
                     var selected = await _product.GetById(id);

@@ -7,11 +7,12 @@ using Contracts.Response.UserResponses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using ShredStore.Jwt;
 using ShredStore.Mapping;
 
 namespace ShredStore.Controllers
 {
-    
+
     [ApiController]
     [Authorize(AuthConstants.CustomerPolicyName)]
     public class OrderController : ControllerBase

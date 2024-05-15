@@ -5,11 +5,11 @@ using ShredStorePresentation.Services.JtwService;
 
 namespace ShredStorePresentation.Services.JtwServices
 {
-    public class JwtService : IJwtService
+    public class JwtGenerationService : IJwtGenerationService
     {
         private readonly IJwtHttpService _jwtHttpService;
 
-        public JwtService(IJwtHttpService jwtHttpService)
+        public JwtGenerationService(IJwtHttpService jwtHttpService)
         {
             _jwtHttpService = jwtHttpService;
         }

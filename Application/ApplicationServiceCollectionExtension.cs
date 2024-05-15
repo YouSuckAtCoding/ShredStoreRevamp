@@ -6,13 +6,16 @@ using Application.Repositories.ProductStorage;
 using Application.Repositories.UserStorage;
 using Application.Services.CartItemServices;
 using Application.Services.CartServices;
+using Application.Services.JwtServices;
 using Application.Services.OrderItemServices;
 using Application.Services.OrderServices;
 using Application.Services.ProductServices;
 using Application.Services.UserServices;
+using AspNetCoreRateLimit;
 using DatabaseAccess;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
+using System.Net;
 
 namespace Application
 {
@@ -20,6 +23,31 @@ namespace Application
     {
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
+
+            services.AddMemoryCache();
+            services.Configure<IpRateLimitOptions>(options =>
+            {
+                options.EnableEndpointRateLimiting = true;
+                options.StackBlockedRequests = false;
+                options.HttpStatusCode = (int)HttpStatusCode.TooManyRequests;
+                options.RealIpHeader = "X-Real-IP";
+                options.ClientIdHeader = "X-ClientId";
+                options.GeneralRules = new List<RateLimitRule>
+                {
+                    new RateLimitRule
+                    {
+                        Endpoint ="*",
+                        Period = "20s",
+                        Limit = 3
+                    }
+                };
+            });
+
+            services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
+            services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
+            services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+            services.AddSingleton<IProcessingStrategy, AsyncKeyLockProcessingStrategy>();
+            services.AddInMemoryRateLimiting();
 
 
             services.AddTransient<IUserRepository, UserRepository>();
@@ -35,12 +63,13 @@ namespace Application
             services.AddTransient<IOrderItemRepository, OrderItemRepository>();
             services.AddTransient<IOrderItemService, OrderItemService>();
             services.AddTransient<ISqlDataAccess, SqlDataAccess>();
-            
+            services.AddSingleton<IJwtService, JwtService>();
+
             services.AddValidatorsFromAssemblyContaining<IApplicationMarker>(ServiceLifetime.Singleton);
 
-          
-
+            
             return services;
         }
     }
 }
+

@@ -22,7 +22,7 @@ namespace ShredStorePresentation.Services.UserService
         public UserHttpService(IConfiguration config)
         {
             httpClient = new HttpClient();
-            httpClient.BaseAddress = new Uri(config.GetValue<string>("ApiUri")!);   
+            httpClient.BaseAddress = new Uri(config.GetValue<string>(Constants.ConfigApiUri)!);   
         }
         public async Task<bool> Create(CreateUserRequest user)
         {

@@ -1,4 +1,4 @@
-﻿namespace ShredStore
+﻿namespace ShredStore.Jwt
 {
     public static class AuthConstants
     {

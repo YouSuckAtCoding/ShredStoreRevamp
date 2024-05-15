@@ -6,6 +6,7 @@ using Contracts.Response.ProductsResponses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using ShredStore.Jwt;
 using ShredStore.Mapping;
 
 namespace ShredStore.Controllers

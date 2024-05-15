@@ -18,10 +18,10 @@ namespace ShredStorePresentation.Controllers
         private readonly IUserHttpService _userHttpService;
         private readonly IProductHttpService _productHttpService;
         private readonly ILogger<UserController> _logger;
-        private readonly IJwtService _jwtService;
+        private readonly IJwtGenerationService _jwtService;
         private const int cookieExpireTime = 15;
         private readonly string ErrorMessage = "An error has occurred.";
-        public UserController(IUserHttpService userHttpService, IProductHttpService productHttpService, ILogger<UserController> logger, IJwtService jwtService)
+        public UserController(IUserHttpService userHttpService, IProductHttpService productHttpService, ILogger<UserController> logger, IJwtGenerationService jwtService)
         {
             _userHttpService = userHttpService;
             _productHttpService = productHttpService;
@@ -99,7 +99,7 @@ namespace ShredStorePresentation.Controllers
         public async Task<IActionResult> UserDetails(int Id)
         {
 
-            string? token = Request.Cookies["token"];
+            string? token = Request.Cookies[Constants.TokenName];
             if (token is not null)
             {
                 var selected = await _userHttpService.GetById(Id, token);
@@ -120,7 +120,7 @@ namespace ShredStorePresentation.Controllers
             var list = GetRoles();
             ViewBag.Roles = new SelectList(list);
 
-            string? token = Request.Cookies["token"];
+            string? token = Request.Cookies[Constants.TokenName];
 
             if (token is not null)
             {
@@ -137,7 +137,7 @@ namespace ShredStorePresentation.Controllers
 
             try
             {
-                string? token = Request.Cookies["token"];
+                string? token = Request.Cookies[Constants.TokenName];
 
                 if (token is not null)
                 {
@@ -169,7 +169,7 @@ namespace ShredStorePresentation.Controllers
         [HttpPost]
         public async Task<IActionResult> ChangePassword(ResetPasswordUserRequest request)
         {
-            string? token = Request.Cookies["token"];
+            string? token = Request.Cookies[Constants.TokenName];
             try
             {
                 if (token is not null)
@@ -219,7 +219,7 @@ namespace ShredStorePresentation.Controllers
 
             try
             {
-                string? token = Request.Cookies["token"];
+                string? token = Request.Cookies[Constants.TokenName];
 
                 if (token is not null)
                 {
@@ -261,7 +261,7 @@ namespace ShredStorePresentation.Controllers
         [HttpGet]
         public async Task<IActionResult> Admin()
         {
-            string? token = Request.Cookies["token"];
+            string? token = Request.Cookies[Constants.TokenName];
 
             if (token is not null)
             {
@@ -275,7 +275,7 @@ namespace ShredStorePresentation.Controllers
         [HttpGet]
         public async Task<IActionResult> AdminProducts()
         {
-            string? token = Request.Cookies["token"];
+            string? token = Request.Cookies[Constants.TokenName];
 
             if (token is not null)
             {

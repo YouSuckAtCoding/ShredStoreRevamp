@@ -12,6 +12,9 @@ namespace ShredStorePresentation.StartUp
 {
     public static class PresentationApplicationServiceCollectionExtensions
     {
+        private const string RedisCnn = "Redis";
+        private const string RedisInstanceName = "ShredStore_";
+        private const string LogFilePath = "logs/log.txt";
         public static IServiceCollection RegisterServices(this IServiceCollection services, WebApplicationBuilder builder)
         {
             ConfigurationManager configuration = builder.Configuration;
@@ -33,17 +36,17 @@ namespace ShredStorePresentation.StartUp
             services.AddTransient<ICartItemHttpService, CartItemHttpService>();
             services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
             services.AddTransient<IJwtHttpService, JwtHttpService>();
-            services.AddTransient<IJwtService, JwtService>();
+            services.AddTransient<IJwtGenerationService, JwtGenerationService>();
             services.AddSingleton<CacheRecordKeys>();
 
             services.AddStackExchangeRedisCache(options =>
             {
-                options.Configuration = configuration.GetConnectionString("Redis");
-                options.InstanceName = "ShredStore_";
+                options.Configuration = configuration.GetConnectionString(RedisCnn);
+                options.InstanceName = RedisInstanceName;
             });
 
             var logger = new LoggerConfiguration()
-                .WriteTo.Console().WriteTo.File("logs/log.txt", rollingInterval: RollingInterval.Day)
+                .WriteTo.Console().WriteTo.File(LogFilePath, rollingInterval: RollingInterval.Day)
                 .CreateLogger();
 
             builder.Host.UseSerilog(logger);

@@ -18,7 +18,7 @@ namespace ShredStorePresentation.Services.CartItemServices
         public CartItemHttpService(IConfiguration config)
         {
             httpClient = new HttpClient();
-            httpClient.BaseAddress = new Uri(config.GetValue<string>("ApiUri")!);
+            httpClient.BaseAddress = new Uri(config.GetValue<string>(Constants.ConfigApiUri)!);
         }
 
         public async Task<bool> InsertCartItems(CreateCartItemRequest request, string token)
