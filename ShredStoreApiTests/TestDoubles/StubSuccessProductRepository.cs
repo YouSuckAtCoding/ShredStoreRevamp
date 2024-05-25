@@ -1,5 +1,6 @@
 ﻿using Application.Models;
 using Application.Services.ProductServices;
+using Contracts.Response.ProductsResponses;
 using ShredStoreTests.Fake;
 
 namespace ShredStoreApiTests.TestDoubles
@@ -14,6 +15,11 @@ namespace ShredStoreApiTests.TestDoubles
         public Task<bool> DeleteProduct(int id, CancellationToken token)
         {
             return Task.FromResult(true);
+        }
+
+        public Task<IEnumerable<ProductCartItemResponse>> GetCartProducts(int cartId, CancellationToken token)
+        {
+            return Task.FromResult(Enumerable.Empty<ProductCartItemResponse>());
         }
 
         public Task<Product?> GetProduct(int id, CancellationToken token)

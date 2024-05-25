@@ -1,6 +1,6 @@
 ﻿namespace ShredStore
 {
-    public static class ApiEndpointsTest
+    public static class ApiEndpoints
     {
         private const string ApiBase = "api";
 

@@ -2,7 +2,8 @@
 using Contracts.Request.CartRequests;
 using Contracts.Response.ProductsResponses;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+using ShredStorePresentation.Extensions;
+using ShredStorePresentation.Extensions.Cache;
 using ShredStorePresentation.Services.CartItemServices;
 using ShredStorePresentation.Services.CartServices;
 using ShredStorePresentation.Services.ProductServices;
@@ -14,6 +15,7 @@ namespace ShredStorePresentation.Controllers
         private readonly ICartHttpService _cart;
         private readonly ICartItemHttpService _cartItem;
         private readonly IProductHttpService _product;
+        private readonly ILogger<CartController> _logger;
 
 
         public CartController(ICartHttpService cart, ICartItemHttpService cartItem, IProductHttpService product)
@@ -23,47 +25,62 @@ namespace ShredStorePresentation.Controllers
             _product = product;
         }
 
-        public async Task<IActionResult> InsertToCart(int productId, int quantity, CancellationToken token)
+        public async Task<IActionResult> InsertToCart(int productId, int quantity)
         {
-
-            if (HttpContext.Session.GetInt32("_Id") is null)
-                return RedirectToAction("Login", "User");
-
-            int userId = HttpContext.Session.GetInt32("_Id")!.Value;
-
-            var cart = await _cart.GetById(userId, token);
-
-            if (cart is null || cart.UserId == 0)
+            try
             {
-                CreateCartRequest request = new CreateCartRequest
+                string? token = Request.Cookies[Constants.TokenName];
+                if (token is not null)
                 {
-                    CreatedDate = DateTime.Now,
-                    UserId = userId
-                };
-                await _cart.Create(request, token);
-                cart = await _cart.GetById(userId, token);
+
+                    if (HttpContext.Session.GetInt32("_Id") is null)
+                        return RedirectToAction("Login", "User");
+
+                    int userId = HttpContext.Session.GetInt32("_Id")!.Value;
+
+                    var cart = await _cart.GetById(userId, token);
+
+                    if (cart is null || cart.UserId == 0)
+                    {
+                        CreateCartRequest request = new CreateCartRequest
+                        {
+                            CreatedDate = DateTime.Now,
+                            UserId = userId
+                        };
+                        await _cart.Create(request, token);
+                        cart = await _cart.GetById(userId, token);
+                    }
+
+                    CreateCartItemRequest cartItemRequest = new CreateCartItemRequest
+                    {
+                        CartId = cart.UserId,
+                        ProductId = productId,
+                        Quantity = quantity
+
+                    };
+
+                    await _cartItem.InsertCartItems(cartItemRequest, token);
+
+                    return RedirectToAction(ControllerExtensions.IndexActionName(), ControllerExtensions.ControllerName<HomeController>());
+
+                }
+                throw new UnauthorizedAccessException();
             }
-
-            CreateCartItemRequest cartItemRequest = new CreateCartItemRequest
+            catch (Exception ex)
             {
-                CartId = cart.UserId,
-                ProductId = productId,
-                Quantity = quantity
-
-            };
-
-            await _cartItem.InsertCartItems(cartItemRequest, token);
-
-            return RedirectToAction("Index", "Home");
+                _logger.LogError(ex, LogMessages.LogErrorMessage(), [ControllerExtensions.ControllerName<ProductController>(), ex.Message, DateTime.Now.ToString()]);
+                return RedirectToAction(ControllerExtensions.IndexActionName(), ControllerExtensions.ControllerName<HomeController>());
+            }
+            
 
         }
         [HttpPost]
-        public async Task<IActionResult> ChangeQuantity(string quantity, string productId, CancellationToken token)
+        public async Task<IActionResult> ChangeQuantity(string quantity, string productId)
         {
 
             int qtd = Convert.ToInt32(quantity);
             int Id = Convert.ToInt32(productId);
-            int userId = HttpContext.Session.GetInt32("_Id")!.Value;
+            int userId = HttpContext.Session.GetInt32(SessionKeys.GetSessionKeyId())!.Value;
 
             UpdateCartItemRequest request = new UpdateCartItemRequest
             {
@@ -72,27 +89,47 @@ namespace ShredStorePresentation.Controllers
                 ProductId = Id
             };
 
-            await _cartItem.UpdateCartItem(request, token);
-            return await CartItems(default);
+            await _cartItem.UpdateCartItem(request, "");
+            return await CartItems();
         }
-        public async Task<IActionResult> CartItems(CancellationToken token)
+        
+        public async Task<IActionResult> CartItems()
         {
-            int userId = HttpContext.Session.GetInt32("_Id")!.Value;
 
-            IEnumerable<ProductCartItemResponse> result = await _product.GetAllByCartId(userId, token);
+            try
+            {
+                string? token = Request.Cookies[Constants.TokenName];
+                if (token is not null)
+                {
+                    int userId = HttpContext.Session.GetInt32(SessionKeys.GetSessionKeyId())!.Value;
 
-            if (!result.Any())
-                return RedirectToAction("EmptyCart", "Home");
+                    IEnumerable<ProductCartItemResponse> result = await _product.GetAllByCartId(userId, "");
 
-            ViewBag.TotalPrice = GetTotalPrice(result);
+                    if (!result.Any())
+                        return RedirectToAction(ControllerExtensions.EmptyCartActionName(), ControllerExtensions.ControllerName<HomeController>());
 
-            return View("CartItems", result);
+                    ViewBag.TotalPrice = GetTotalPrice(result);
+
+                    return View(nameof(CartItems), result);
+                }
+                throw new UnauthorizedAccessException();
+            }
+            catch (Exception ex)
+            {
+
+                _logger.LogError(ex, LogMessages.LogErrorMessage(), [ControllerExtensions.ControllerName<HomeController>(), ex.Message, DateTime.Now.ToString()]);
+                return View();
+            }
         }
         public async Task<IActionResult> RemoveCartItem(int productId)
         {
-            int userId = HttpContext.Session.GetInt32("_Id")!.Value;
-            await _cartItem.RemoveItem(productId, userId);
-            return await CartItems(default);
+            string? token = Request.Cookies[Constants.TokenName];
+            if (token is not null)
+            {
+                int userId = HttpContext.Session.GetInt32(SessionKeys.GetSessionKeyId())!.Value;
+                await _cartItem.RemoveItem(productId, userId, token);
+            }
+            return await CartItems();
         }
         private decimal GetTotalPrice(IEnumerable<ProductCartItemResponse> result)
         {

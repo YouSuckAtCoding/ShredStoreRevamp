@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Application.Models
 {
+
     public class Payment
     {
         public int Id { get; set; }

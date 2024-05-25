@@ -46,7 +46,10 @@ namespace ShredStoreTests
         public async Task Should_Be_Null_If_Cart_Not_Exists()
         {
             ICartStorage CartStorage = new CartStorage(_dbConnectionFactory);
-            var check = await CartStorage.GetCart(2);
+            int cartd = 2;
+
+            var check = await CartStorage.GetCart(cartd);
+
             check.Should().BeSameAs(null);
         }
         [Fact]

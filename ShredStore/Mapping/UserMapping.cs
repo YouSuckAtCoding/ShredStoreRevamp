@@ -26,10 +26,7 @@ namespace ShredStore.Mapping
             {
                 Id = request.Id,
                 Name = request.Name,
-                Cpf = request.Cpf,
                 Address = request.Address,
-                Age = request.Age,
-                Email = request.Email,
                 Role = request.Role
 
             };

@@ -2,6 +2,7 @@ using Contracts.Response.ProductsResponses;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using ShredStorePresentation.Extensions;
+using ShredStorePresentation.Extensions.Cache;
 using ShredStorePresentation.Services.ProductServices;
 
 
@@ -12,23 +13,28 @@ namespace ShredStorePresentation.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly IDistributedCache _cache;
         private readonly IProductHttpService _productService;
-
-        public HomeController(ILogger<HomeController> logger, IDistributedCache cache, IProductHttpService product)
+        private readonly CacheRecordKeys _cachekeys;
+        
+        public HomeController(ILogger<HomeController> logger, IDistributedCache cache, IProductHttpService product, CacheRecordKeys cachekeys)
         {
             _logger = logger;
             _cache = cache;
             _productService = product;
+            _cachekeys = cachekeys;
         }
 
 
         public async Task<IActionResult> Index(CancellationToken token ,string Search = "")
         {
-            string recordKey = "Products_";
+            
             try
             {
-                var allProducts = await GetAllProducts(recordKey, token);
+                var res = ControllerExtensions.ControllerActionName<HomeController>();
+
+                var allProducts = await GetAllProducts(_cachekeys.GetProductCacheKey());
                 if (Search == "" || Search is null)
                 {
+                    
                     return View(allProducts);
                 }
                 else
@@ -40,45 +46,28 @@ namespace ShredStorePresentation.Controllers
             }
             catch (Exception ex)
             {
-                //_utilityClass.GetLog().Error(ex, "Exception caught at Index action in ShredStoreController.");
+                _logger.LogError(ex, LogMessages.LogErrorMessage(), [ControllerExtensions.ControllerName<HomeController>(), ex.Message, DateTime.Now.ToString()]);
             }
             return View();
         }
-        private async Task<IEnumerable<ProductResponse>> GetAllProducts(string recordKey, CancellationToken token)
-        {
-            var products = await _cache.GetRecordAsync<IEnumerable<ProductResponse>>(recordKey);
-            if (products is null)
-            {
-                var getProducts = await _productService.GetAll(token);
-                SetOnCache(recordKey, getProducts);
-                return getProducts;
-            }
-            return products;
-        }
-        private async Task<IEnumerable<ProductResponse>> GetCategoryProducts(string recordKey, string category, CancellationToken token)
-        {
-            var products = await _cache.GetRecordAsync<IEnumerable<ProductResponse>>(recordKey);
-            if (products is null)
-            {
-                var getProducts = await _productService.GetAllByCategory(category, token);
-                SetOnCache(recordKey, getProducts);
-                return getProducts;
-            }
-            return products;
-        }
 
+        public IActionResult AboutUs()
+        {
+            return View();
+        }
         public async Task<IActionResult> Category(string Category, CancellationToken token)
         {
             string recordKey = $"{Category}_";
-            var products = await GetCategoryProducts(recordKey, Category, token);
+            var products = await GetCategoryProducts(recordKey, Category);
             try
             {
                 ViewBag.Title = Category;
+                
                 return View(products);
             }
             catch (Exception ex)
             {
-                //_utilityClass.GetLog().Error(ex, "Exception caught at Category action in ShredStoreController.");
+               _logger.LogError(ex, LogMessages.LogErrorMessage(), [ControllerExtensions.ControllerName<HomeController>(), ex.Message, DateTime.Now.ToString()]);
             }
             return View();
 
@@ -87,15 +76,14 @@ namespace ShredStorePresentation.Controllers
         {
             ViewBag.NoProds = "True";
             ViewBag.Message = "No products in cart!";
-            string recordKey = "Products_";
             try
             {
-                var products = await GetAllProducts(recordKey, token);
-                return View("Index", products);
+                var products = await GetAllProducts(_cachekeys.GetProductCacheKey());
+                return View(nameof(Index), products);
             }
             catch (Exception ex)
             {
-                //_utilityClass.GetLog().Error(ex, "Exception caught at EmptyCart action in ShredStoreController.");
+               _logger.LogError(ex, LogMessages.LogErrorMessage(), [ControllerExtensions.ControllerName<HomeController>(), ex.Message, DateTime.Now.ToString()]);
             }
             return RedirectToAction(nameof(Index));
         }
@@ -110,9 +98,28 @@ namespace ShredStorePresentation.Controllers
         {
             await _cache.SetRecordAsync(recordKey, products, TimeSpan.FromSeconds(35));
         }
-        public IActionResult AboutUs()
+     
+        private async Task<IEnumerable<ProductResponse>> GetAllProducts(string recordKey)
         {
-            return View();
+            var products = await _cache.GetRecordAsync<IEnumerable<ProductResponse>>(recordKey);
+            if (products is null)
+            {
+                var getProducts = await _productService.GetAll();
+                SetOnCache(recordKey, getProducts);
+                return getProducts;
+            }
+            return products;
+        }
+        private async Task<IEnumerable<ProductResponse>> GetCategoryProducts(string recordKey, string category)
+        {
+            var products = await _cache.GetRecordAsync<IEnumerable<ProductResponse>>(recordKey);
+            if (products is null)
+            {
+                var getProducts = await _productService.GetAllByCategory(category);
+                SetOnCache(recordKey, getProducts);
+                return getProducts;
+            }
+            return products;
         }
 
 

@@ -3,7 +3,6 @@ using Dapper;
 using FluentAssertions;
 using ShredStoreTests.DataAdapterFiles;
 using ShredStoreTests.DataAdapterFiles.ProductTestFiles;
-using ShredStoreTests.DataAdapterFiles.UserTestFiles;
 
 namespace ShredStoreTests
 {
@@ -46,16 +45,16 @@ namespace ShredStoreTests
             IProductStorage storage = new ProductStorage(_dbConnectionFactory);
             int userId = await Utility.GenerateUserId(_dbConnectionFactory);
             prod.UserId = userId;
+            int expected = 0;
 
             await storage.InsertProduct(prod);
 
             var res = await storage.GetProducts();
-            res.Should().HaveCountGreaterThan(0);
+            res.Should().HaveCountGreaterThan(expected);
 
             await Utility.CleanUpProducts(_dbConnectionFactory);
 
         }
-
      
         [Fact]
         public async Task Should_Be_Empty_If_No_Product_Exists()
@@ -71,8 +70,9 @@ namespace ShredStoreTests
         public async Task Should_Be_Default_If_Product_Doesnt_Exists()
         {
             IProductStorage storage = new ProductStorage(_dbConnectionFactory);
+            int productId = 2;
 
-            var res = await storage.GetProduct(2);
+            var res = await storage.GetProduct(productId);
             res.Should().BeSameAs(default);
 
             await Utility.CleanUpProducts(_dbConnectionFactory);
@@ -89,7 +89,7 @@ namespace ShredStoreTests
             Product newProd = Fake.FakeDataFactory.FakeProduct();
 
             var res = await storage.GetProducts();
-            newProd.Id = res.ElementAt(0).Id;
+            newProd.Id = res.First().Id;
 
             await storage.UpdateProduct(newProd);
 
@@ -106,8 +106,8 @@ namespace ShredStoreTests
             IProductStorage storage = new ProductStorage(_dbConnectionFactory);
             int userId = await Utility.GenerateUserId(_dbConnectionFactory);
             prod.UserId = userId;
-            await storage.InsertProduct(prod);
 
+            await storage.InsertProduct(prod);
             var res = await storage.GetProducts();
             Product returned = res.Where(x => x.Description == prod.Description).FirstOrDefault();
             await storage.DeleteProduct(returned.Id);

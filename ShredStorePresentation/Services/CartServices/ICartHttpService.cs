@@ -5,7 +5,7 @@ namespace ShredStorePresentation.Services.CartServices
 {
     public interface ICartHttpService
     {
-        Task<CreateCartRequest> Create(CreateCartRequest cart, CancellationToken token);
-        Task<CartResponse> GetById(int id, CancellationToken token);
+        Task<CreateCartRequest> Create(CreateCartRequest cart,string token);
+        Task<CartResponse> GetById(int id,string token);
     }
 }

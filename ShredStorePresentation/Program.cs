@@ -1,3 +1,4 @@
+using Serilog;
 using ShredStorePresentation;
 using ShredStorePresentation.StartUp;
 
@@ -25,6 +26,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseSerilogRequestLogging();
 
 app.UseAuthorization();
 app.UseSession();

@@ -4,14 +4,17 @@ using Contracts.Request;
 using Contracts.Request.OrderRequests;
 using Contracts.Response.OrderResponses;
 using Contracts.Response.UserResponses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using ShredStore.Jwt;
 using ShredStore.Mapping;
 
 namespace ShredStore.Controllers
 {
-    
+
     [ApiController]
+    [Authorize(AuthConstants.CustomerPolicyName)]
     public class OrderController : ControllerBase
     {
         private readonly IOrderService _orderService;
@@ -23,14 +26,17 @@ namespace ShredStore.Controllers
 
         [HttpGet(ApiEndpoints.OrderEndpoints.GetAll)]
         [ProducesResponseType(typeof(OrdersResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> GetAll([FromRoute] int userId, CancellationToken token)
         {
             var result = await _orderService.GetOrders(userId, token);
             return Ok(result);
         }
 
+        [Authorize(AuthConstants.AdminUserPolicyName)]
         [HttpGet(ApiEndpoints.OrderEndpoints.GetAllOrders)]
         [ProducesResponseType(typeof(OrdersResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> GetAll(CancellationToken token)
         {
             var result = await _orderService.GetAllOrders(token);
@@ -41,6 +47,7 @@ namespace ShredStore.Controllers
         [HttpPost(ApiEndpoints.OrderEndpoints.Create)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> CreateOrder([FromBody] CreateOrderRequest request, CancellationToken token)
         {
             Order Order = request.MapToOrder();
@@ -55,6 +62,7 @@ namespace ShredStore.Controllers
         [HttpGet(ApiEndpoints.OrderEndpoints.Get)]
         [ProducesResponseType(typeof(OrderResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> Get([FromRoute] int orderId, CancellationToken token)
         {
             Order? order = await _orderService.GetOrder(orderId, token);
@@ -69,6 +77,7 @@ namespace ShredStore.Controllers
 
         [HttpPut(ApiEndpoints.OrderEndpoints.Update)]
         [ProducesResponseType(typeof(OrderResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> Update(UpdateOrderRequest request, CancellationToken token)
         {
             Order order = request.MapToOrder();
@@ -80,6 +89,7 @@ namespace ShredStore.Controllers
 
         [HttpDelete(ApiEndpoints.OrderEndpoints.Delete)]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> Delete([FromRoute] int orderId, CancellationToken token)
         {
 

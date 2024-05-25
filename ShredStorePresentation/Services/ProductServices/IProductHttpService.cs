@@ -6,13 +6,13 @@ namespace ShredStorePresentation.Services.ProductServices
 {
     public interface IProductHttpService
     {
-        Task<ProductResponse> Create(CreateProductRequest product, CancellationToken token);
-        Task Delete(int id, CancellationToken token);
-        Task<ProductResponse> Edit(UpdateProductRequest product, CancellationToken token);
-        Task<IEnumerable<ProductResponse>> GetAll(CancellationToken token);
-        Task<IEnumerable<ProductResponse>> GetAllByCategory(string Category, CancellationToken token);
-        Task<IEnumerable<ProductResponse>> GetAllByUserId(int UserId, CancellationToken token);
-        Task<IEnumerable<ProductCartItemResponse>> GetAllByCartId(int cartId, CancellationToken token);
-        Task<ProductResponse> GetById(int id, CancellationToken token);
+        Task<ProductResponse> Create(CreateProductRequest product, string token);
+        Task Delete(int id, string token);
+        Task<ProductResponse> Edit(UpdateProductRequest product, string token);
+        Task<IEnumerable<ProductResponse>> GetAll();
+        Task<IEnumerable<ProductResponse>> GetAllByCategory(string Category);
+        Task<IEnumerable<ProductResponse>> GetAllByUserId(int UserId, string token);
+        Task<IEnumerable<ProductCartItemResponse>> GetAllByCartId(int cartId, string token);
+        Task<ProductResponse> GetById(int id);
     }
 }

@@ -1,10 +1,15 @@
 ﻿using Contracts.Request;
+using Contracts.Response.JwtResponses;
 using Contracts.Response.ProductsResponses;
 using Contracts.Response.UserResponses;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using ShredStorePresentation.Extensions;
+using ShredStorePresentation.Extensions.Cache;
+using ShredStorePresentation.Services.JtwServices;
 using ShredStorePresentation.Services.ProductServices;
 using ShredStorePresentation.Services.UserService;
+
 
 namespace ShredStorePresentation.Controllers
 {
@@ -12,20 +17,19 @@ namespace ShredStorePresentation.Controllers
     {
         private readonly IUserHttpService _userHttpService;
         private readonly IProductHttpService _productHttpService;
-        public const string SessionKeyName = "_Name";
-        public const string SessionKeyId = "_Id";
-        public const string SessionKeyRole = "_Role";
-        public const string SessionKeyEmail = "_Email";
-        public UserController(IUserHttpService userHttpService, IProductHttpService productHttpService)
+        private readonly ILogger<UserController> _logger;
+        private readonly IJwtGenerationService _jwtService;
+        private const int cookieExpireTime = 15;
+        private readonly string ErrorMessage = "An error has occurred.";
+        public UserController(IUserHttpService userHttpService, IProductHttpService productHttpService, ILogger<UserController> logger, IJwtGenerationService jwtService)
         {
             _userHttpService = userHttpService;
             _productHttpService = productHttpService;
+            _logger = logger;
+            _jwtService = jwtService;
         }
         [HttpGet]
-        public IActionResult Login()
-        {
-            return View();
-        }
+        public IActionResult Login() => View();
         [HttpPost]
         public async Task<IActionResult> Login(LoginUserRequest userLogin)
         {
@@ -36,19 +40,23 @@ namespace ShredStorePresentation.Controllers
                     var loggedUser = await _userHttpService.Login(userLogin);
                     if (loggedUser != null && loggedUser.Id != 0)
                     {
-                        SetSessionInfo(loggedUser);
-                        return RedirectToAction("Index", "Home");
+                        JwtGenerateResponse token = await _jwtService.GenerateToken(loggedUser);
+
+                        SetSessionInfo(loggedUser, token);
+
+                        _logger.LogInformation(LogMessages.LogLoginMessage(), [loggedUser.Name, DateTime.Now.ToString(), loggedUser.Id]);
+                        return RedirectToAction(ControllerExtensions.IndexActionName(), ControllerExtensions.ControllerName<HomeController>());
                     }
-                    else
-                    {
-                        ViewBag.Message = "User does not exists!";
-                        return View();
-                    }
+
+                    ViewBag.Message = "Wrong Password / User does not exists";
+                    _logger.LogInformation(LogMessages.LogFailedLoginMessage(), [DateTime.Now.ToString()]);
+                    return View();
+
                 }
                 catch (Exception ex)
                 {
-                    ViewBag.Message = "An error has occurred.";
-                    //_utilityClass.GetLog().Error(ex, "Exception caught at Login action in UserOperationsController.");
+                    ViewBag.Message = ErrorMessage;
+                    _logger.LogError(ex, LogMessages.LogErrorMessage(), [ControllerExtensions.ControllerName<HomeController>(), ex.Message, DateTime.Now.ToString()]);
                     return View();
                 }
             }
@@ -57,10 +65,8 @@ namespace ShredStorePresentation.Controllers
         [HttpGet]
         public ActionResult Logout()
         {
-            HttpContext.Session.SetString(SessionKeyName, "");
-            HttpContext.Session.SetInt32(SessionKeyId, 0);
-            HttpContext.Session.SetString(SessionKeyRole, "");
-            return RedirectToAction(nameof(Index), "Home");
+            SetSessionInfo();
+            return RedirectToAction(nameof(Index), ControllerExtensions.ControllerName<HomeController>());
         }
         [HttpGet]
         public IActionResult CreateAccount()
@@ -77,15 +83,12 @@ namespace ShredStorePresentation.Controllers
                 try
                 {
                     await _userHttpService.Create(userData);
-                    //await _emailSender.SendEmailAsync(userData.Email, 2);
                     return RedirectToAction(nameof(Login));
-
-
                 }
                 catch (Exception ex)
                 {
                     ViewBag.Message = "An error occurred while registering.";
-                    //_utilityClass.GetLog().Error(ex, "Exception caught at CreateAccount action in UserOperationsController.");
+                    _logger.LogError(ex, LogMessages.LogErrorMessage(), [ControllerExtensions.ControllerName<HomeController>(), ex.Message, DateTime.Now.ToString()]);
                     return View();
 
                 }
@@ -93,221 +96,220 @@ namespace ShredStorePresentation.Controllers
             return View();
         }
         [HttpGet]
-        public async Task<IActionResult> UserDetails(int Id, CancellationToken token)
+        public async Task<IActionResult> UserDetails(int Id)
         {
 
-            var selected = await _userHttpService.GetById(Id);
-            ViewBag.UserProducts = await _productHttpService.GetAllByUserId(Id, token);
-            return View(selected);
+            string? token = Request.Cookies[Constants.TokenName];
+            if (token is not null)
+            {
+                var selected = await _userHttpService.GetById(Id, token);
+
+                ViewBag.UserProducts = Enumerable.Empty<ProductResponse>();
+
+                if (selected.Role != Role.Customer)
+                    ViewBag.UserProducts = await _productHttpService.GetAllByUserId(Id, token);
+
+                return View(selected);
+            }
+            return RedirectToAction(ControllerExtensions.IndexActionName(), ControllerExtensions.ControllerName<HomeController>());
+
         }
         [HttpGet]
-        public IActionResult EditAccount()
+        public async Task<IActionResult> EditAccount(int id)
         {
             var list = GetRoles();
             ViewBag.Roles = new SelectList(list);
-            return View();
+
+            string? token = Request.Cookies[Constants.TokenName];
+
+            if (token is not null)
+            {
+                var user = await _userHttpService.GetById(id, token);
+                return View(user.MapToUpdateUserRequest());
+            }
+            return RedirectToAction(ControllerExtensions.IndexActionName(), ControllerExtensions.ControllerName<HomeController>());
         }
         [HttpPost]
         public async Task<IActionResult> EditAccount(UpdateUserRequest userEdit)
         {
-            if (ModelState.IsValid)
+            var list = GetRoles();
+            ViewBag.Roles = new SelectList(list);
+
+            try
             {
-                try
+                string? token = Request.Cookies[Constants.TokenName];
+
+                if (token is not null)
                 {
                     if (userEdit.Id <= 0)
                     {
-                        ViewBag.Message = "User doens't exitst. Please send this to admin.";
+                        ViewBag.Message = "User doesn't exitst. Please send this to admin.";
                         return View();
                     }
-                    await _userHttpService.EditUser(userEdit);
-                    return RedirectToAction("SetSessionInfo", "ShredStore", userEdit);
-                }
-                catch (Exception ex)
-                {
-                    ViewBag.Message = "An error has occurred.";
-                    //_utilityClass.GetLog().Error(ex, "Exception caught at EditAccount action in UserOperationsController.");
-                    return View();
+                    UserResponse userResponse = await _userHttpService.EditUser(userEdit, token);
 
+                    JwtGenerateResponse newToken = await _jwtService.GenerateToken(userResponse);
+
+                    SetSessionInfo(userResponse, newToken);
+
+                    return RedirectToAction(ControllerExtensions.IndexActionName(), ControllerExtensions.ControllerName<HomeController>());
                 }
-            }
-            return View();
-        }
-        [HttpGet]
-        public async Task<IActionResult> ChangePassword()
-        {
-            return View();
-        }
-        [HttpPost]
-        public async Task<IActionResult> ChangePassword(LoginUserRequest userLogin)
-        {
-            userLogin.Email = HttpContext.Session.GetString("_Email");
-            if (userLogin.Email != null && userLogin.Password != null)
-            {
-                try
-                {
-                    var loggedUser = await _userHttpService.Login(userLogin);
-                    if (loggedUser != null)
-                    {
-                        int sessionId = HttpContext.Session.GetInt32("_Id").Value;
-                        if (loggedUser.Id == sessionId)
-                        {
-                            ResetPasswordUserRequest request = new ResetPasswordUserRequest
-                            {
-                                Password = userLogin.Password,
-                                Email = userLogin.Email
-                            };
-                            return View("NewPassword", request);
-                        }
-                    }
-                    else
-                    {
-                        return View();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    ViewBag.Message = "An error has occurred.";
-                    //_utilityClass.GetLog().Error(ex, "Exception caught at ChangePassword action in UserOperationsController.");
-                    return View();
-                    throw;
-                }
-            }
-            return View();
-        }
-        [HttpPost]
-        public async Task<IActionResult> NewPassword(ResetPasswordUserRequest request)
-        {
-            try
-            {
-                bool ok = await _userHttpService.ResetUserPassword(request);
-                if (ok)
-                {
-                    return RedirectToAction("Index", "Home");
-                }
-                else
-                {
-                    ViewBag.Message = "Invalid Email.";
-                    return View();
-                }
+                throw new UnauthorizedAccessException();
             }
             catch (Exception ex)
             {
-                ViewBag.Message = "An error has occurred.";
-                //_utilityClass.GetLog().Error(ex, "Exception caught at NewPassword action in UserOperationsController.");
+                ViewBag.Message = ErrorMessage;
+                _logger.LogError(ex, LogMessages.LogErrorMessage(), [ControllerExtensions.ControllerName<HomeController>(), ex.Message, DateTime.Now.ToString()]);
                 return View();
+
             }
         }
         [HttpGet]
-        public async Task<IActionResult> DeleteAccount() => View();
+        public IActionResult ChangePassword() => View();
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword(ResetPasswordUserRequest request)
+        {
+            string? token = Request.Cookies[Constants.TokenName];
+            try
+            {
+                if (token is not null)
+                {
+                    request.Email = HttpContext.Session.GetString(SessionKeys.GetSessionKeyEmail());
+                    if (request.Email is not null && request.Password is not null)
+                    {
+                        LoginUserRequest loginRequest = new LoginUserRequest
+                        {
+                            Email = request.Email,
+                            Password = request.Password
+                        };
+                        var loggedUser = await _userHttpService.Login(loginRequest);
+
+                        if (loggedUser != null)
+                        {
+                            int sessionId = HttpContext.Session.GetInt32(SessionKeys.GetSessionKeyId()).Value;
+                            if (loggedUser.Id == sessionId)
+                            {
+                                bool ok = await _userHttpService.ResetUserPassword(request, token);
+
+                                if (ok)
+                                    return RedirectToAction(ControllerExtensions.IndexActionName(), ControllerExtensions.ControllerName<HomeController>());
+
+                                ViewBag.Message = "Invalid Email.";
+                                return View();
+                            }
+                        }
+                        return View();
+                    }
+                }
+                throw new UnauthorizedAccessException();
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Message = ErrorMessage;
+                _logger.LogError(ex, LogMessages.LogErrorMessage(), [ControllerExtensions.ControllerName<HomeController>(), ex.Message, DateTime.Now.ToString()]);
+                return View();
+            }
+        }
+
+        [HttpGet]
+        public IActionResult DeleteAccount() => View();
         [HttpPost]
         public async Task<IActionResult> DeleteAccount(LoginUserRequest userLogin)
         {
-            userLogin.Email = HttpContext.Session.GetString("_Email");
+
             try
             {
-                if (userLogin.Email != null && userLogin.Password != null)
+                string? token = Request.Cookies[Constants.TokenName];
+
+                if (token is not null)
                 {
-                    var loggedUser = await _userHttpService.Login(userLogin);
-                    if (loggedUser != null)
+                    userLogin.Email = HttpContext.Session.GetString(SessionKeys.GetSessionKeyEmail());
+                    if (userLogin.Email is not null && userLogin.Password is not null)
                     {
-                        int sessionId = HttpContext.Session.GetInt32("_Id").Value;
-                        if (loggedUser.Id == sessionId)
+                        var loggedUser = await _userHttpService.Login(userLogin);
+                        if (loggedUser != null)
                         {
-                            await _userHttpService.Delete(sessionId);
-                            return RedirectToAction(nameof(Logout));
+                            int sessionId = HttpContext.Session.GetInt32(SessionKeys.GetSessionKeyId()).Value;
+                            if (loggedUser.Id == sessionId)
+                            {
+                                await _userHttpService.Delete(sessionId, token);
+                                return RedirectToAction(nameof(Logout));
+                            }
+                        }
+                        else
+                        {
+                            return View();
                         }
                     }
-                    else
-                    {
-                        return View();
-                    }
                 }
+                throw new UnauthorizedAccessException();
             }
             catch (Exception ex)
             {
 
-                ViewBag.Message = "An error has occurred.";
-                //_utilityClass.GetLog().Error(ex, "Exception caught at DeleteAccount action in UserOperationsController.");
+                ViewBag.Message = ErrorMessage;
+                _logger.LogError(ex, LogMessages.LogErrorMessage(), [ControllerExtensions.ControllerName<HomeController>(), ex.Message, DateTime.Now.ToString()]);
                 return View();
             }
-
-            return View();
         }
         [HttpGet]
         public IActionResult NoAccount()
         {
             ViewBag.Message = "Please create an account to add to cart.";
-            return View("Login");
+            return View(nameof(Login));
         }
         [HttpGet]
         public async Task<IActionResult> Admin()
         {
-            IEnumerable<UserResponse> users = await _userHttpService.GetAll();
-            return View(users);
+            string? token = Request.Cookies[Constants.TokenName];
+
+            if (token is not null)
+            {
+                IEnumerable<UserResponse> users = await _userHttpService.GetAll(token);
+                return View(users);
+            }
+            return RedirectToAction(ControllerExtensions.IndexActionName(), ControllerExtensions.ControllerName<HomeController>());
+
         }
-        
+
         [HttpGet]
-        public async Task<IActionResult> AdminProducts(CancellationToken token)
+        public async Task<IActionResult> AdminProducts()
         {
-            IEnumerable<ProductResponse> users = await _productHttpService.GetAll(token);
-            return View(users);
+            string? token = Request.Cookies[Constants.TokenName];
+
+            if (token is not null)
+            {
+                IEnumerable<ProductResponse> users = await _productHttpService.GetAll();
+                return View(users);
+            }
+            return RedirectToAction(ControllerExtensions.IndexActionName(), ControllerExtensions.ControllerName<HomeController>());
+            
         }
-
-        //[HttpGet]
-        //public async Task<IActionResult> ForgotPassword()
-        //{
-        //    return View();
-        //}
-        //[HttpPost]
-        //public async Task<IActionResult> ForgotPassword(string Email)
-        //{
-        //    if (_utilityClass.IsEmailValid(Email))
-        //    {
-        //        bool res = await _user.CheckEmail(Email);
-        //        if (res)
-        //        {
-        //            try
-        //            {
-        //                var randomUser = _userFactory.CreateUser(Email);
-        //                bool ok = await _user.ResetUserPassword(randomUser);
-        //                if (!ok)
-        //                {
-        //                    ViewBag.Message = "Invalid Email.";
-        //                    return View();
-
-        //                }
-        //                await _emailSender.SendEmailAsync(Email, 1, randomUser);
-        //                return RedirectToAction("Index", "ShredStore");
-        //            }
-        //            catch (Exception ex)
-        //            {
-        //                ViewBag.Message = "An error has occurred.";
-        //                _utilityClass.GetLog().Error(ex, "Exception caught at PasswordReset action in UserOperationsController.");
-        //                return View();
-        //                throw;
-        //            }
-
-        //        }
-        //        else
-        //        {
-        //            ViewBag.Message = "Invalid Email.";
-        //            return View();
-        //        }
-        //    }
-        //    return View();
-        //}
         private List<string> GetRoles()
         {
             List<string> Role = ["Shop", "Customer"];
             return Role;
         }
-        private void SetSessionInfo(UserResponse user)
+        private void SetSessionInfo()
         {
-            HttpContext.Session.SetInt32(SessionKeyId, user.Id);
-            HttpContext.Session.SetString(SessionKeyName, user.Name);
-            HttpContext.Session.SetString(SessionKeyEmail, user.Email);
-            HttpContext.Session.SetString(SessionKeyRole, user.Role);
+            _logger.LogInformation(LogMessages.LogLogoutMessage(), [HttpContext.Session.GetString(SessionKeys.GetSessionKeyName()),
+                HttpContext.Session.GetInt32(SessionKeys.GetSessionKeyId()) ,DateTime.Now.ToString()]);
+
+
+            HttpContext.Session.SetString(SessionKeys.GetSessionKeyName(), "");
+            HttpContext.Session.SetInt32(SessionKeys.GetSessionKeyId(), 0);
+            HttpContext.Session.SetString(SessionKeys.GetSessionKeyEmail(), "");
+            HttpContext.Session.SetString(SessionKeys.GetSessionKeyRole(), "");
         }
-        
+        private void SetSessionInfo(UserResponse user, JwtGenerateResponse response)
+        {
+            HttpContext.Response.Cookies.Append("token", response.Token, new CookieOptions { Expires = DateTime.Now.AddMinutes(cookieExpireTime) });
+            HttpContext.Session.SetInt32(SessionKeys.GetSessionKeyId(), user.Id);
+            HttpContext.Session.SetString(SessionKeys.GetSessionKeyName(), user.Name);
+            HttpContext.Session.SetString(SessionKeys.GetSessionKeyEmail(), user.Email);
+            HttpContext.Session.SetString(SessionKeys.GetSessionKeyRole(), user.Role);
+        }
+
+       
     }
 }
