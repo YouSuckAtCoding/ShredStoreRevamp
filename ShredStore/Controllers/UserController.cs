@@ -17,13 +17,11 @@ namespace ShredStore.Controllers
 
     public class UserController : ControllerBase
     {
-        private const string CreatedUri = "shredstore.com";
         private readonly IUserService _userService;
-        private readonly IJwtService _jwtService;
-        public UserController(IUserService userService, IJwtService jwtService)
+        
+        public UserController(IUserService userService)
         {
             _userService = userService;
-            _jwtService = jwtService;
         }
 
         [HttpPost(ApiEndpoints.UserEndpoints.Loginv2)]
@@ -81,7 +79,7 @@ namespace ShredStore.Controllers
 
             bool result = await _userService.InsertUser(user, token);
             if (result)
-                return Created(CreatedUri, user);
+                return Created(Constants.CreatedReponseUri, user);
 
             return BadRequest();
 
@@ -114,7 +112,7 @@ namespace ShredStore.Controllers
 
             User updated = await _userService.UpdateUser(user, token);
 
-            return Ok(updated.MapToUserResponse());
+            return updated.Id > 0 ? Ok(updated.MapToUserResponse()) : NotFound();
         }
 
         [Authorize(AuthConstants.CustomerPolicyName)]
@@ -125,8 +123,10 @@ namespace ShredStore.Controllers
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordUserRequest request, CancellationToken token)
         {
             LoginUserRequest login = request.MapToLoginUserRequest();
+
             var result = await _userService.Login(login, token);
-            if (result is not null)
+
+            if (result.Id > 0)
             {
                 await _userService.ResetPassword(request, token);
                 return Ok();

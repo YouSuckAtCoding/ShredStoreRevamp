@@ -23,7 +23,7 @@ namespace DatabaseAccess
         /// <param name="connectionId">Id da connection string</param>
         /// <returns>Dados</returns>
         public async Task<IEnumerable<T>> LoadData<T, U>(string StoredProcedure,
-            U parameters, string connectionId = "Default", CancellationToken token = default)
+            U parameters, string connectionId = ConfigConstants.ConnectionId, CancellationToken token = default)
         {
             using IDbConnection connection = new SqlConnection(config.GetConnectionString(connectionId));
 
@@ -39,7 +39,7 @@ namespace DatabaseAccess
         /// <param name="connectionId">Id da connection string</param>
         /// <returns>Nada.</returns>
         public async Task SaveData<T>(string StoredProcedure,
-            T parameters, string connectionId = "Default", CancellationToken token = default)
+            T parameters, string connectionId = ConfigConstants.ConnectionId, CancellationToken token = default)
         {
             using IDbConnection connection = new SqlConnection(config.GetConnectionString(connectionId));
 

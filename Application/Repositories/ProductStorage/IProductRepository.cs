@@ -7,7 +7,7 @@ namespace Application.Repositories.ProductStorage
     {
         Task DeleteProduct(int id, CancellationToken token);
         Task<IEnumerable<ProductCartItemResponse>> GetCartProducts(int cartId, CancellationToken token);
-        Task<Product?> GetProduct(int id, CancellationToken token);
+        Task<Product> GetProduct(int id, CancellationToken token);
         Task<IEnumerable<Product>> GetProducts(CancellationToken token);
         Task<IEnumerable<Product>> GetProductsByCategory(string Category, CancellationToken token);
         Task<IEnumerable<Product>> GetProductsByUserId(int Id, CancellationToken token);

@@ -33,10 +33,10 @@ namespace Application.Services.UserServices
                 return await Task.FromResult(false);
         }
 
-        public async Task<User?> GetUser(int id, CancellationToken token)
+        public async Task<User> GetUser(int id, CancellationToken token)
         {
             var result = await _userRepository.GetUser(id, token);
-            return result is null ? null : result;
+            return result is null ? new User() : result;
         }
 
         public async Task<IEnumerable<User>> GetUsers(CancellationToken token)
@@ -52,24 +52,32 @@ namespace Application.Services.UserServices
             return await Task.FromResult(true);
         }
 
-        public async Task<User?> Login(LoginUserRequest user, CancellationToken token)
+        public async Task<User> Login(LoginUserRequest user, CancellationToken token)
         {
             await _loginValidator.ValidateAndThrowAsync(user, token);
+            
             var result = await _userRepository.Login(user, token);
-            return result is null ? null : result;
+
+            return result is null ? new User() : result;
         }
 
         public async Task<bool> ResetPassword(ResetPasswordUserRequest request, CancellationToken token)
         {
             await _resetValidator.ValidateAndThrowAsync(request);
+
             await _userRepository.ResetPassword(request, token);
+
             return true;
         }
 
-        public async Task<User?> UpdateUser(User request, CancellationToken token)
+        public async Task<User> UpdateUser(User request, CancellationToken token)
         {
             await _userRepository.UpdateUser(request, token);
-            return await _userRepository.GetUser(request.Id, token);
+
+            var updatedUser = await _userRepository.GetUser(request.Id, token);
+
+            return updatedUser ?? new User();
+
 
         }
     }

@@ -15,6 +15,7 @@ namespace ShredStore.Controllers
     [Authorize(AuthConstants.CustomerPolicyName)]
     public class OrderItemController : ControllerBase
     {
+        private const string ResponseUri = "shredstore.com";
         private readonly IOrderItemService _orderItemService;
 
         public OrderItemController(IOrderItemService OrderItemService)
@@ -29,7 +30,7 @@ namespace ShredStore.Controllers
         {
             OrderItem orderItem = request.MapToOrderItem();
             bool result = await _orderItemService.CreateOrderItem(orderItem, token);
-            return result ? Created("shredstore.com", orderItem) : BadRequest();
+            return result ? Created(OrderItemController.ResponseUri, orderItem) : BadRequest();
 
         }
 
@@ -48,18 +49,20 @@ namespace ShredStore.Controllers
         public async Task<IActionResult> Get([FromRoute] int itemId, [FromRoute] int orderId, CancellationToken token)
         {
             OrderItem item = await _orderItemService.GetOrderItem(itemId, orderId, token);
+
             return item is not null ? Ok(item.MapToOrderItemResponse()) : NotFound();
         }
 
         [HttpPut(ApiEndpoints.OrderItemEndpoints.Update)]
         [ProducesResponseType(typeof(OrderItemResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(OrderItemResponse), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Update([FromBody] UpdateOrderItemRequest request, CancellationToken token)
         {
             OrderItem item = request.MapToOrderItem();
 
-            OrderItem? result = await _orderItemService.UpdateOrderItem(item.ProductId, item.OrderId, item.Quantity, token);
+            OrderItem result = await _orderItemService.UpdateOrderItem(item.ProductId, item.OrderId, item.Quantity, token);
 
-            return Ok(result.MapToOrderItemResponse());
+            return result.Id > 0 ? Ok(result!.MapToOrderItemResponse()) : NotFound();
         }
 
         [HttpDelete(ApiEndpoints.OrderItemEndpoints.Delete)]
@@ -68,6 +71,7 @@ namespace ShredStore.Controllers
         public async Task<IActionResult> Delete([FromRoute] int itemId, [FromRoute] int orderId, CancellationToken token)
         {
             var result = await _orderItemService.DeleteItem(itemId, orderId, token);
+
             return result ? Ok() : NotFound();
         }
 
@@ -77,6 +81,7 @@ namespace ShredStore.Controllers
         public async Task<IActionResult> Delete([FromRoute] int orderId, CancellationToken token)
         {
             var result = await _orderItemService.DeleteAlltems(orderId, token);
+
             return result ? Ok() : NotFound();
         }
     }

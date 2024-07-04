@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using Application.Models;
 using Bogus;
 using Bogus.Extensions.Brazil;
@@ -12,7 +7,6 @@ using Contracts.Request.CartRequests;
 using Contracts.Request.OrderRequests;
 using Contracts.Request.ProductRequests;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Internal;
 
 namespace ShredStoreTests.Fake
 {

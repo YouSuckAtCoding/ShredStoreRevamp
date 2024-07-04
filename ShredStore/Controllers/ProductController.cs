@@ -67,8 +67,8 @@ namespace ShredStore.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> Get([FromRoute] int id, CancellationToken token)
         {
-            Product? product = await _productService.GetProduct(id, token);
-            if (product is not null)
+            Product product = await _productService.GetProduct(id, token);
+            if (product.Id > 0)
             {
                 var result = product.MapToProductResponse();
                 return Ok(result);
@@ -85,7 +85,7 @@ namespace ShredStore.Controllers
         {
             var product = request.MapToProduct();
             bool res = await _productService.Create(product, token);
-            return res ? Created("shredstore.com", product) : BadRequest();
+            return res ? Created(Constants.CreatedReponseUri, product) : BadRequest();
         }
 
         [Authorize(AuthConstants.ShopPolicyName)]

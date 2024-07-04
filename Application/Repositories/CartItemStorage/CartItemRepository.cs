@@ -30,10 +30,10 @@ namespace Application.Repositories.CartItemStorage
         public Task DeleteCartItem(int productId, int cartId, CancellationToken token) => sqlDataAccess.SaveData("dbo.spCartItem_Delete", new { ProductId = productId, CartId = cartId }, token: token);
         public Task DeleteAllCartItem(int cartId, CancellationToken token) => sqlDataAccess.SaveData("dbo.spCartItem_DeleteAll", new { CartId = cartId }, token: token);
 
-        public async Task<CartItem?> GetCartItem(int itemId, int cartId, CancellationToken token)
+        public async Task<CartItem> GetCartItem(int itemId, int cartId, CancellationToken token)
         {
             var result = await sqlDataAccess.LoadData<CartItem, dynamic>("dbo.spCartItem_GetById", new { ProductId = itemId, CartId = cartId }, token: token);
-            return result.FirstOrDefault();
+            return result is null ? new CartItem() : result.First();
         }
     }
 }

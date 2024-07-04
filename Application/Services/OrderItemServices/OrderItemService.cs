@@ -1,11 +1,6 @@
 ﻿using Application.Models;
 using Application.Repositories;
 using Application.Repositories.OrderItemStorage;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.Services.OrderItemServices
 {
@@ -52,7 +47,7 @@ namespace Application.Services.OrderItemServices
         public async Task<OrderItem> GetOrderItem(int itemId, int orderId, CancellationToken token)
         {
             var result = await _orderItemRepository.GetOrderItem(itemId, orderId, token);
-            return result;
+            return result ?? new OrderItem();
         }
 
         public async Task<IEnumerable<OrderItem>> GetOrderItems(int orderId, CancellationToken token)
@@ -61,10 +56,13 @@ namespace Application.Services.OrderItemServices
             return result;
         }
 
-        public async Task<OrderItem?> UpdateOrderItem(int itemId, int orderId, int quantity, CancellationToken token)
+        public async Task<OrderItem> UpdateOrderItem(int itemId, int orderId, int quantity, CancellationToken token)
         {
             await _orderItemRepository.UpdateOrderItem(itemId, quantity, orderId, token);
-            return await _orderItemRepository.GetOrderItem(itemId, orderId, token);
+
+            var orderItem = await _orderItemRepository.GetOrderItem(itemId, orderId, token);
+            
+            return orderItem ?? new OrderItem();
 
         }
     }
