@@ -15,8 +15,5 @@ Dapper como ORM para a interação da aplicação com o banco.
 Para testes é utilizado o XUnit, com o pacote Fluent Validations. Como estou usando esse projeto para aprender e praticar testes, o projeto possui diversos testes unitários e de integração
 para marioria das funcionalidades. 
 
-# Documentação (Em desenvolvimento)
-O projeto possui documentação e diversos diagramas UML para representar suas respectivas etapas e objetivos. 
-Clique aqui para visualizar a documentação -> "Link indisponível no momento"
 
 
