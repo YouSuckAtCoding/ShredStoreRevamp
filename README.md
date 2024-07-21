@@ -1,4 +1,4 @@
-# PROJETO EM CONSTRUÇÃO (Sujeito a mudanças na documentação e no read me)
+# ShredStoreRevamp
 
 # Sobre o projeto: 
 O projeto representa uma loja de instrumentos, a qual o usuário pode visualizar os produtos, se cadastrar, 
